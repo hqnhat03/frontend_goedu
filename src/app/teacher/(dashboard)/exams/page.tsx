@@ -1,0 +1,295 @@
+"use client"
+
+import * as React from "react"
+import { ClipboardList, ChevronRight, Plus, RefreshCw, Clock, Calendar, CheckCircle2, FileEdit, Trash2, Eye, Pencil, HelpCircle, Archive } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { CreateExamModal } from "./create-exam-modal"
+import { ExamDetailModal } from "./exam-detail-modal"
+import api from "@/lib/axios"
+import { Badge } from "@/components/ui/badge"
+import { format } from "date-fns"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+  } from "@/components/ui/alert-dialog"
+import { toast } from "sonner"
+import { StatusBadge } from "@/components/ui/status-badge"
+
+interface Exam {
+  id: number
+  class_id: number
+  name: string
+  duration_minutes: number
+  status: 'draft' | 'published' | 'archived'
+  open_at: string
+  close_at: string
+  questions_count: number
+  class?: {
+    class_code: string
+    course_name: string
+  }
+}
+
+export default function ExamsPage() {
+  const router = useRouter()
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false)
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
+  const [selectedExam, setSelectedExam] = React.useState<Exam | null>(null)
+  const [editingExam, setEditingExam] = React.useState<Exam | null>(null)
+  const [examToDelete, setExamToDelete] = React.useState<Exam | null>(null)
+  const [exams, setExams] = React.useState<Exam[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [isDeleting, setIsDeleting] = React.useState(false)
+
+  const handleViewDetail = (exam: Exam) => {
+    setSelectedExam(exam)
+    setIsDetailOpen(true)
+  }
+
+  const handleEdit = (exam: Exam) => {
+    setEditingExam(exam)
+    setIsCreateOpen(true)
+  }
+
+  const handleDeleteClick = (exam: Exam) => {
+    setExamToDelete(exam)
+    setIsDeleteOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!examToDelete) return
+
+    setIsDeleting(true)
+    try {
+      await api.delete(`/teacher/exams/${examToDelete.id}`)
+      toast.success("Xóa bài kiểm tra thành công")
+      fetchExams()
+    } catch (error) {
+      console.error("Failed to delete exam:", error)
+      toast.error("Có lỗi xảy ra khi xóa bài kiểm tra")
+    } finally {
+      setIsDeleting(false)
+      setIsDeleteOpen(false)
+      setExamToDelete(null)
+    }
+  }
+
+  const fetchExams = React.useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const response = await api.get(`/teacher/exams`)
+      setExams(response.data.data)
+    } catch (error) {
+      console.error("Failed to fetch exams:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    fetchExams()
+  }, [fetchExams])
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground font-bold uppercase tracking-wider">
+            <span>Dashboard</span>
+            <ChevronRight className="size-4" />
+            <span className="text-primary">Quản lý bài kiểm tra</span>
+          </div>
+          <h2 className="text-3xl font-black tracking-tight">Quản lý bài kiểm tra</h2>
+        </div>
+        
+        <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={fetchExams} disabled={isLoading} className="rounded-lg">
+                <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button className="rounded-lg shadow-lg shadow-primary/20" onClick={() => {
+                setEditingExam(null)
+                setIsCreateOpen(true)
+            }}>
+                <Plus className="size-4 mr-2" />
+                Thêm bài kiểm tra
+            </Button>
+        </div>
+      </div>
+
+      <div className="bg-background/60 backdrop-blur-sm border border-border/40 rounded-xl overflow-hidden shadow-sm">
+        {exams.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-border/40">
+                <TableHead className="w-[50px] text-center font-bold">STT</TableHead>
+                <TableHead className="font-bold">Lớp học</TableHead>
+                <TableHead className="font-bold">Tên bài kiểm tra</TableHead>
+                <TableHead className="font-bold">Số câu hỏi</TableHead>
+                <TableHead className="font-bold">Thời gian</TableHead>
+                <TableHead className="font-bold">Trạng thái</TableHead>
+                <TableHead className="font-bold">Thời gian mở/đóng</TableHead>
+                <TableHead className="text-right font-bold pr-6">Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {exams.map((exam, index) => (
+                <TableRow key={exam.id} className="group border-border/40 hover:bg-muted/30 transition-colors">
+                  <TableCell className="text-center font-medium text-muted-foreground">{index + 1}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-sm">{exam.class?.class_code}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold truncate max-w-[150px]">{exam.class?.course_name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-bold group-hover:text-primary transition-colors">{exam.name}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium text-muted-foreground">{exam.questions_count} câu</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="size-3.5" />
+                        {exam.duration_minutes} phút
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={exam.status} className="rounded-md" />
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-xs">
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                            <Calendar className="size-3 text-primary/60" />
+                            {format(new Date(exam.open_at), 'dd/MM/yyyy HH:mm')}
+                        </div>
+                        <div className="flex items-center gap-2 text-destructive/70">
+                            <Calendar className="size-3" />
+                            {format(new Date(exam.close_at), 'dd/MM/yyyy HH:mm')}
+                        </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right pr-6">
+                    <div className="flex items-center justify-end gap-2">
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="rounded-lg font-bold text-primary hover:text-primary hover:bg-primary/10"
+                            onClick={() => handleViewDetail(exam)}
+                        >
+                            <Eye className="size-4" />
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="rounded-lg font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            title="Quản lý câu hỏi"
+                            onClick={() => router.push(`/teacher/exams/${exam.id}/questions`)}
+                        >
+                            <HelpCircle className="size-4" />
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="rounded-lg font-bold text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                            onClick={() => handleEdit(exam)}
+                        >
+                            <Pencil className="size-4" />
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="rounded-lg font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteClick(exam)}
+                        >
+                            <Trash2 className="size-4" />
+                        </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : isLoading ? (
+            <div className="p-20 flex flex-col items-center justify-center space-y-4">
+                <RefreshCw className="size-8 text-primary animate-spin" />
+                <p className="text-muted-foreground animate-pulse">Đang tải danh sách bài kiểm tra...</p>
+            </div>
+        ) : (
+          <div className="p-12 flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
+            <div className="p-4 rounded-2xl bg-primary/10 text-primary">
+              <ClipboardList className="size-12" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold">Chưa có bài kiểm tra nào</h3>
+              <p className="text-muted-foreground max-w-xs mx-auto">
+                Bạn chưa tạo bài kiểm tra nào. Hãy nhấn nút "Thêm bài kiểm tra" để bắt đầu.
+              </p>
+              <Button variant="outline" className="mt-4 rounded-lg font-bold" onClick={() => setIsCreateOpen(true)}>
+                <Plus className="size-4 mr-2" />
+                Tạo bài kiểm tra đầu tiên
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <CreateExamModal 
+        open={isCreateOpen} 
+        onOpenChange={setIsCreateOpen}
+        onSuccess={fetchExams}
+        initialData={editingExam}
+      />
+
+      <ExamDetailModal 
+        exam={selectedExam}
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+      />
+
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-black text-destructive flex items-center gap-2">
+                <Trash2 className="size-6" />
+                Xác nhận xóa
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base font-medium">
+              Bạn có chắc chắn muốn xóa bài kiểm tra <span className="font-bold text-foreground">"{examToDelete?.name}"</span>? 
+              <br />
+              <span className="text-sm text-muted-foreground italic">Lưu ý: Hành động này không thể hoàn tác và tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="rounded-lg font-bold border-border/40 hover:bg-muted">Hủy</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={(e) => {
+                e.preventDefault()
+                handleDelete()
+              }}
+              disabled={isDeleting}
+              className="rounded-lg font-bold bg-destructive hover:bg-destructive/90 shadow-lg shadow-destructive/20"
+            >
+              {isDeleting ? "Đang xóa..." : "Xác nhận xóa"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  )
+}

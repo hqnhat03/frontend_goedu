@@ -1,0 +1,493 @@
+"use client"
+
+import * as React from "react"
+import {
+  Plus,
+  Search,
+  Eye,
+  Edit,
+  Trash2,
+  Users,
+  ShieldCheck,
+  ShieldAlert,
+  RefreshCw,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import api from "@/lib/axios"
+import { StudentDrawer } from "./_components/StudentDrawer"
+import { Can } from "@/components/auth/can"
+import { usePermission } from "@/hooks/use-permission"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { useDebounce } from "@/hooks/use-debounce"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+
+interface Student {
+  id: string | number
+  student_type: "student" | "employee"
+  name: string
+  email: string
+  phone: string
+  status: "active" | "inactive"
+  avatar: string
+}
+
+interface PaginationMeta {
+  total: number
+  per_page: number
+  current_page: number
+  last_page: number
+}
+
+export default function StudentsPage() {
+  const router = useRouter()
+  const { hasPermission } = usePermission()
+
+  // Kiểm tra quyền truy cập trang danh sách
+  React.useEffect(() => {
+    if (!hasPermission("student_list")) {
+      toast.error("Bạn không có quyền truy cập trang này")
+      router.push("/admin")
+    }
+  }, [hasPermission, router])
+
+  if (!hasPermission("student_list")) return null
+
+
+  // State for filtering
+  const [search, setSearch] = React.useState("")
+  const [status, setStatus] = React.useState<string>("all")
+  const [studentType, setStudentType] = React.useState<string>("all")
+
+  // State for data
+  const [students, setStudents] = React.useState<Student[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+  const [page, setPage] = React.useState(1)
+  const [meta, setMeta] = React.useState<PaginationMeta | null>(null)
+
+  // Debounced search term
+  const debouncedSearch = useDebounce(search, 300)
+
+  // Delete state
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [studentToDelete, setStudentToDelete] = React.useState<Student | null>(null)
+  const [isDeleting, setIsDeleting] = React.useState(false)
+
+  // Drawer state
+  const [drawerMode, setDrawerMode] = React.useState<"create" | "edit" | "view" | undefined>(undefined)
+  const [selectedStudentId, setSelectedStudentId] = React.useState<string | number | null>(null)
+
+  const studentTypeLabels: Record<string, string> = {
+    all: "Tất cả",
+    student: "Học sinh",
+    employee: "Nhân viên",
+  }
+  const statusLabels: Record<string, string> = {
+    active: "Đang hoạt động",
+    inactive: "Bị khóa",
+  }
+
+  const fetchStudents = React.useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const params = new URLSearchParams()
+
+      params.append("page", page.toString())
+      if (debouncedSearch) params.append("q", debouncedSearch)
+      if (status !== "all") params.append("status", status)
+      if (studentType !== "all") params.append("student_type", studentType)
+
+      const response = await api.get(`/admin/students?${params.toString()}`)
+      const result = response.data
+
+      if (result.success && Array.isArray(result.data)) {
+        setStudents(result.data)
+        if (result.meta) {
+          setMeta(result.meta)
+        }
+      } else {
+        throw new Error(result.message || "Lỗi khi lấy dữ liệu")
+      }
+    } catch (err) {
+      console.error(err)
+      setError(err instanceof Error ? err.message : "Đã có lỗi xảy ra")
+      toast.error(err instanceof Error ? err.message : "Đã có lỗi khi tải dữ liệu")
+    } finally {
+      setIsLoading(false)
+    }
+  }, [debouncedSearch, status, studentType, page])
+
+  React.useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch, status, studentType])
+
+  React.useEffect(() => {
+    fetchStudents()
+  }, [fetchStudents])
+
+  const handleDeleteClick = (student: Student) => {
+    setStudentToDelete(student)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!studentToDelete) return
+
+    setIsDeleting(true)
+    try {
+      const response = await api.delete(`/admin/students/${studentToDelete.id}`)
+      const result = response.data
+
+      if (result.success) {
+        toast.success(result.message || "Xóa học sinh thành công")
+        fetchStudents() // Refresh list
+      } else {
+        throw new Error(result.message || "Không thể xóa học sinh")
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error(err instanceof Error ? err.message : "Đã có lỗi xảy ra khi xóa")
+    } finally {
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
+      setStudentToDelete(null)
+    }
+  }
+
+  const resetFilters = () => {
+    setSearch("")
+    setStatus("all")
+    setStudentType("all")
+  }
+
+  return (
+    <div className="flex flex-col gap-6 p-1">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+            Quản lý học sinh
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Theo dõi, quản lý thông tin học sinh và loại hình tham gia học tập.
+          </p>
+        </div>
+        <Can permission="student_create">
+          <Button 
+            className="bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95 whitespace-nowrap"
+            onClick={() => {
+              setSelectedStudentId(null)
+              setDrawerMode("create")
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Thêm học sinh
+          </Button>
+        </Can>
+      </div>
+
+      {/* Filter Section */}
+      <Card className="border-none shadow-sm bg-muted/40 backdrop-blur-sm">
+        <CardContent className="p-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 items-center">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Tìm tên, email, số điện thoại..."
+                className="pl-9 bg-background border-muted-foreground/20 focus-visible:ring-primary/20 transition-all"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <Select value={statusLabels[status]} onValueChange={(value) => setStatus(value as "all" | "active" | "inactive")}>
+              <SelectTrigger className="bg-background border-muted-foreground/20">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder="Trạng thái" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="active">Đang hoạt động</SelectItem>
+                <SelectItem value="inactive">Không hoạt động</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={studentTypeLabels[studentType]} onValueChange={(value) => setStudentType(value as "all" | "student" | "employee")}>
+              <SelectTrigger className="bg-background border-muted-foreground/20">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder="Loại học sinh" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả loại</SelectItem>
+                <SelectItem value="student">Học sinh</SelectItem>
+                <SelectItem value="employee">Nhân viên</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 bg-background hover:bg-muted transition-colors"
+                onClick={resetFilters}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Table Section */}
+      <div className="rounded-xl border bg-background shadow-xl overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/50">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[120px] font-semibold">Ảnh đại diện</TableHead>
+              <TableHead className="font-semibold">Họ và tên</TableHead>
+              <TableHead className="font-semibold">Loại</TableHead>
+              <TableHead className="font-semibold">Email</TableHead>
+              <TableHead className="font-semibold">Số điện thoại</TableHead>
+              <TableHead className="font-semibold">Trạng thái</TableHead>
+              <TableHead className="text-right font-semibold">Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-sm" />
+                    <p className="text-muted-foreground font-medium animate-pulse">Đang tải dữ liệu...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={8} className="h-32 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2 text-destructive">
+                    <ShieldAlert className="h-8 w-8" />
+                    <p className="font-semibold">{error}</p>
+                    <Button variant="outline" size="sm" onClick={fetchStudents}>Thử lại</Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : students.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
+                  Không tìm thấy học sinh nào phù hợp.
+                </TableCell>
+              </TableRow>
+            ) : (
+              students.map((student) => (
+                <TableRow key={student.id} className="group hover:bg-muted/40 transition-colors">
+                  <TableCell>
+                    <Avatar className="h-10 w-10 border-2 border-background shadow-sm ring-1 ring-muted">
+                      <AvatarImage src={student.avatar} alt={student.name} />
+                      <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                        {student.name?.split(" ").pop()?.substring(0, 2).toUpperCase() || "HS"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+                  <TableCell className="font-semibold text-foreground/90">{student.name}</TableCell>
+                  <TableCell>
+                    <Badge variant={student.student_type === "employee" ? "secondary" : "outline"} className="capitalize">
+                      {student.student_type === "student" ? "Học sinh" : "Nhân viên"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{student.email}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{student.phone}</TableCell>
+                  <TableCell >
+                    {student.status === "active" ? (
+                      <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-200/50 shadow-none">
+                        Đang hoạt động
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-rose-200/50 shadow-none">
+                        Bị khóa
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Can permission="student_detail">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
+                          title="Chi tiết"
+                          onClick={() => {
+                            setSelectedStudentId(student.id)
+                            setDrawerMode("view")
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </Can>
+                      <Can permission="student_edit">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-amber-600 transition-colors"
+                          title="Chỉnh sửa"
+                          onClick={() => {
+                            setSelectedStudentId(student.id)
+                            setDrawerMode("edit")
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Can>
+                      <Can permission="student_delete">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors"
+                          title="Xóa"
+                          onClick={() => handleDeleteClick(student)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </Can>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination Section */}
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4">
+        <p className="text-sm text-muted-foreground">
+          Hiển thị <strong>{students.length}</strong> trên <strong>{meta?.total || 0}</strong> học sinh
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="shadow-sm"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1 || isLoading}
+          >
+            Trước
+          </Button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: meta?.last_page || 1 }, (_, i) => i + 1)
+              .filter((p) => {
+                // Show pages around current page
+                return p === 1 || p === meta?.last_page || Math.abs(p - page) <= 1
+              })
+              .map((p, index, array) => (
+                <React.Fragment key={p}>
+                  {index > 0 && array[index - 1] !== p - 1 && (
+                    <span className="text-muted-foreground px-1">...</span>
+                  )}
+                  <Button
+                    variant={page === p ? "default" : "outline"}
+                    size="sm"
+                    className={`h-8 w-8 p-0 ${page === p ? "shadow-md" : "shadow-sm"}`}
+                    onClick={() => setPage(p)}
+                    disabled={isLoading}
+                  >
+                    {p}
+                  </Button>
+                </React.Fragment>
+              ))}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="shadow-sm"
+            onClick={() => setPage((p) => Math.min(meta?.last_page || 1, p + 1))}
+            disabled={page === meta?.last_page || isLoading}
+          >
+            Sau
+          </Button>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="glass-morphism border-rose-100 ring-4 ring-rose-50/50">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-rose-600">
+              <ShieldAlert className="h-5 w-5" />
+              Xác nhận xóa học sinh
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base pt-2">
+              Bạn có chắc chắn muốn xóa học sinh <strong>{studentToDelete?.name}</strong>?
+              <br />
+              Hành động này sẽ xóa vĩnh viễn dữ liệu và không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel disabled={isDeleting} className="bg-muted/50 border-none hover:bg-muted">Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleConfirmDelete()
+              }}
+              disabled={isDeleting}
+              className="bg-destructive text-white hover:bg-destructive/90 shadow-lg shadow-rose-200 transition-all active:scale-95"
+            >
+              {isDeleting ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Đang xóa...
+                </div>
+              ) : "Xác nhận xóa"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Student Drawer */}
+      <StudentDrawer
+        mode={drawerMode}
+        studentId={selectedStudentId}
+        onClose={() => {
+          setDrawerMode(undefined)
+          setSelectedStudentId(null)
+        }}
+        onSuccess={() => {
+          fetchStudents()
+        }}
+      />
+    </div>
+  )
+}
