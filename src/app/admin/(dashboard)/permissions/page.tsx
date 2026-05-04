@@ -104,48 +104,46 @@ export default function PermissionsPage() {
   const [rolePermissions, setRolePermissions] = useState<Record<number, string[]>>({});
 
 
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/admin/permissions');
+      // Handle both old and new response structures
+      let rawData: PermissionData;
+      if (response.data.data.roles && response.data.data.all_permissions) {
+        rawData = response.data.data;
+      } else {
+        // Fallback to deriving all_permissions from roles if needed
+        const roles = response.data.data;
+        const allPermissionsSet = new Set<string>();
+        roles.forEach((r: Role) => r.permissions.forEach((p: string) => allPermissionsSet.add(p)));
+        rawData = {
+          roles,
+          all_permissions: Array.from(allPermissionsSet)
+        };
+      }
+
+      setData(rawData);
+
+      // Initialize local state
+      const initialPermissions: Record<number, string[]> = {};
+      rawData.roles.forEach(role => {
+        initialPermissions[role.id] = [...role.permissions];
+      });
+      setRolePermissions(initialPermissions);
+
+      if (rawData.roles.length > 0 && !selectedRole) {
+        setSelectedRole(rawData.roles[0].id);
+      }
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+      toast.error('Không thể tải danh sách quyền');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get('/admin/permissions');
-        // Handle both old and new response structures
-        let rawData: PermissionData;
-        if (response.data.data.roles && response.data.data.all_permissions) {
-          rawData = response.data.data;
-        } else {
-          // Fallback to deriving all_permissions from roles if needed
-          const roles = response.data.data;
-          const allPermissionsSet = new Set<string>();
-          roles.forEach((r: Role) => r.permissions.forEach((p: string) => allPermissionsSet.add(p)));
-          rawData = {
-            roles,
-            all_permissions: Array.from(allPermissionsSet)
-          };
-        }
-
-        setData(rawData);
-
-        // Initialize local state
-        const initialPermissions: Record<number, string[]> = {};
-        rawData.roles.forEach(role => {
-          initialPermissions[role.id] = [...role.permissions];
-        });
-        setRolePermissions(initialPermissions);
-
-        if (rawData.roles.length > 0 && !selectedRole) {
-          setSelectedRole(rawData.roles[0].id);
-        }
-      } catch (error) {
-        console.error('Error fetching permissions:', error);
-        toast.error('Không thể tải danh sách quyền');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -303,7 +301,7 @@ export default function PermissionsPage() {
         <div className="flex gap-2 w-full md:w-auto">
           <Button
             variant="outline"
-            onClick={fetchData}
+            onClick={() => fetchData()}
             className="rounded-xl border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md hover:bg-slate-50 transition-all duration-300"
           >
             <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
@@ -429,7 +427,7 @@ export default function PermissionsPage() {
                         <TableCell className="pl-8 py-6">
                           <div className="flex items-center gap-4">
                             <div className="p-3 bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-sm ring-1 ring-slate-200/50 dark:ring-slate-700/50">
-                              <group.config.icon className="w-5 h-5 text-primary" />
+                              {/* <group className="w-5 h-5 text-primary" /> */}
                             </div>
                             <div>
                               <div className="font-bold text-slate-800 dark:text-slate-200">{group.config.label}</div>

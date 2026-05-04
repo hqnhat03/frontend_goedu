@@ -202,7 +202,7 @@ export default function LevelsPage() {
               />
             </div>
 
-            <Select value={status} onValueChange={(val: string) => setStatus(val ?? "all")}>
+            <Select value={status} onValueChange={(val) => setStatus(val ?? "all")}>
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <Settings2 className="h-4 w-4 text-muted-foreground" />
@@ -217,7 +217,7 @@ export default function LevelsPage() {
               </SelectContent>
             </Select>
 
-            <Select value={educationLevel} onValueChange={(val: string) => setEducationLevel(val ?? "all")}>
+            <Select value={educationLevel} onValueChange={(val) => setEducationLevel(val ?? "all")}>
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4 text-muted-foreground" />

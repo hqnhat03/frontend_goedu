@@ -24,7 +24,7 @@ import { useAuthStore } from "@/store/auth-store";
 const loginSchema = z.object({
   email: z.string().email({ message: "Email không hợp lệ" }).min(1, { message: "Vui lòng nhập email" }),
   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
-  remember: z.boolean().default(false),
+  remember: z.boolean(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;

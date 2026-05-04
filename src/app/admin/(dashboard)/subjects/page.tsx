@@ -192,7 +192,7 @@ export default function SubjectsPage() {
               />
             </div>
 
-            <Select value={status} onValueChange={(val: string) => setStatus(val ?? "all")}>
+            <Select value={status} onValueChange={(val) => setStatus(val ?? "all")}>
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <Settings2 className="h-4 w-4 text-muted-foreground" />
@@ -207,7 +207,7 @@ export default function SubjectsPage() {
               </SelectContent>
             </Select>
 
-            <Select value={category} onValueChange={(val: string) => setCategory(val ?? "all")}>
+            <Select value={category} onValueChange={(val) => setCategory(val ?? "all")}>
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4 text-muted-foreground" />

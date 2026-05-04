@@ -187,7 +187,7 @@ export function LoginForm({ role }: LoginFormProps) {
 
           <Tabs value={role} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8 h-12 p-1">
-              <TabsTrigger value="student" asChild>
+              <TabsTrigger value="student">
                 <Link
                   href={`http://student-goedu.demo.vn:3000/login?email=${encodeURIComponent(currentEmail)}`}
                   className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
@@ -196,7 +196,7 @@ export function LoginForm({ role }: LoginFormProps) {
                   Học viên
                 </Link>
               </TabsTrigger>
-              <TabsTrigger value="teacher" asChild>
+              <TabsTrigger value="teacher">
                 <Link
                   href={`http://teacher-goedu.demo.vn:3000/login?email=${encodeURIComponent(currentEmail)}`}
                   className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"

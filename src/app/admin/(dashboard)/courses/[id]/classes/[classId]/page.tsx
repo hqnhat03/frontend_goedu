@@ -85,6 +85,26 @@ const getStatusConfig = (status: string) => {
   }
 }
 
+interface ScheduleItem {
+  id?: string | number;
+  day_of_week: number | string;
+  start_time?: string;
+  end_time?: string;
+}
+
+interface StudentItem {
+  id: string | number;
+  name: string;
+  avatar?: string;
+}
+
+interface TeacherItem {
+  id: string | number;
+  name: string;
+  avatar?: string;
+  email?: string;
+}
+
 export default function ClassDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -146,7 +166,7 @@ export default function ClassDetailPage() {
     }
   }
 
-  const formatTime = (timeString: string) => {
+  const formatTime = (timeString?: string) => {
     if (!timeString) return "N/A"
     // Handle HH:mm:ss format
     return timeString.split(":").slice(0, 2).join(":")
@@ -320,12 +340,12 @@ export default function ClassDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {data.class_schedules
                     .slice()
-                    .sort((a, b) => {
+                    .sort((a: ScheduleItem, b: ScheduleItem) => {
                       const dayA = a.day_of_week === 0 ? 7 : Number(a.day_of_week);
                       const dayB = b.day_of_week === 0 ? 7 : Number(b.day_of_week);
                       return dayA - dayB;
                     })
-                    .map((schedule, idx) => {
+                    .map((schedule: ScheduleItem, idx: number) => {
                       const dayLabel = dayMap[schedule.day_of_week as number] || String(schedule.day_of_week)
                       return (
                         <div
@@ -376,7 +396,7 @@ export default function ClassDetailPage() {
             <CardContent>
               {data.students?.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {data.students.map((student) => (
+                  {data.students.map((student: StudentItem) => (
                     <div
                       key={student.id}
                       className="inline-flex items-center gap-2 p-1.5 pr-3 rounded-lg border bg-background/50 hover:border-blue-200 transition-all hover:shadow-sm group/student"
@@ -416,7 +436,7 @@ export default function ClassDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {data.teachers?.length > 0 ? (
-                data.teachers.map((teacher) => (
+                data.teachers.map((teacher: TeacherItem) => (
                   <div
                     key={teacher.id}
                     className="flex items-center gap-4 p-3 rounded-xl border bg-background/50 hover:border-emerald-200 transition-all hover:shadow-md"

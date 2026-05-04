@@ -46,10 +46,10 @@ const adminSchema = z.object({
   email: z.string().email("Email không hợp lệ"),
   phone: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
-  gender: z.enum(["male", "female", "other"]).default("male"),
+  gender: z.enum(["male", "female", "other"]),
   date_of_birth: z.string().nullable().optional(),
   avatar: z.string().nullable().optional(),
-  status: z.enum(["active", "inactive"]).default("active"),
+  status: z.enum(["active", "inactive"]),
   roles: z.array(z.string()).min(1, "Vui lòng chọn ít nhất một vai trò"),
 })
 
@@ -210,7 +210,7 @@ export default function CreateAdminPage() {
                   <FieldLabel className="text-sm font-semibold">Trạng thái <span className="text-destructive">*</span></FieldLabel>
                   <Select
                     value={form.watch("status")}
-                    onValueChange={(val) => form.setValue("status", val)}
+                    onValueChange={(val) => form.setValue("status", val as "active" | "inactive")}
                   >
                     <SelectTrigger className="h-11 bg-muted/30 border-muted-foreground/10">
                       <div className="flex items-center gap-2">
@@ -229,7 +229,7 @@ export default function CreateAdminPage() {
                   <FieldLabel className="text-sm font-semibold">Giới tính</FieldLabel>
                   <Select
                     value={form.watch("gender")}
-                    onValueChange={(val) => form.setValue("gender", val)}
+                    onValueChange={(val) => form.setValue("gender", val as "male" | "female" | "other")}
                   >
                     <SelectTrigger className="h-11 bg-muted/30 border-muted-foreground/10">
                       <SelectValue placeholder="Chọn giới tính" />

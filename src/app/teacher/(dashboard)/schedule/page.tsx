@@ -278,7 +278,7 @@ export default function SchedulePage() {
                     </Badge>
 
                     <AlertDialog>
-                      <AlertDialogTrigger asChild>
+                      <AlertDialogTrigger>
                         <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive">
                           <Trash2 className="size-4" />
                         </Button>

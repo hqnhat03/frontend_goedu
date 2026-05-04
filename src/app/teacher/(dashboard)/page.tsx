@@ -219,7 +219,7 @@ export default function TeacherDashboard() {
                 <p className="text-sm font-medium text-muted-foreground">Không có lịch dạy cho ngày hôm nay</p>
               </div>
             )}
-            {/* <Button asChild variant="ghost" className="w-full text-primary hover:text-primary hover:bg-primary/5 gap-2 text-xs font-bold uppercase tracking-widest h-10 border border-primary/5 mt-2">
+            {/* <Button variant="ghost" className="w-full text-primary hover:text-primary hover:bg-primary/5 gap-2 text-xs font-bold uppercase tracking-widest h-10 border border-primary/5 mt-2">
               <Link href="/teacher/schedule">
                 Xem toàn bộ lịch dạy <ArrowRight className="size-4" />
               </Link>

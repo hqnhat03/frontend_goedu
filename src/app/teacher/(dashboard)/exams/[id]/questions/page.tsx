@@ -463,11 +463,13 @@ export default function ExamQuestionsPage() {
                       <CardTitle className="text-base font-black hidden lg:block">Câu {q.order_number || index + 1}</CardTitle>
                       <Select
                         value={q.type}
-                        onValueChange={(val: "multiple_choice" | "essay") => {
+                        onValueChange={(val) => {
+                          if (!val) return;
+                          const typeVal = val as "multiple_choice" | "essay";
                           updateQuestion(q.id, {
-                            type: val,
-                            options: val === "essay" ? null : q.options || ["", "", "", ""],
-                            correct_answer: val === "essay" ? null : q.correct_answer || "0",
+                            type: typeVal,
+                            options: typeVal === "essay" ? null : q.options || ["", "", "", ""],
+                            correct_answer: typeVal === "essay" ? null : q.correct_answer || "0",
                           })
                         }}
                       >

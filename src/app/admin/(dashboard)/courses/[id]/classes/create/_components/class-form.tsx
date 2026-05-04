@@ -93,7 +93,8 @@ export function ClassForm() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(classSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(classSchema as any),
     defaultValues: {
       class_code: "",
       max_student: 25,

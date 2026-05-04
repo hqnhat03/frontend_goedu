@@ -66,18 +66,14 @@ type CourseMaterialType = {
 const courseSchema = z.object({
     name: z.string().min(1, "Tên khóa học không được để trống"),
     description: z.string().min(1, "Mô tả khóa học không được để trống"),
-    status: z.enum(["draft", "published", "archived"], {
-        errorMap: () => ({ message: "Vui lòng chọn trạng thái" }),
-    }),
-    target_student: z.enum(["student", "teacher", "all"], {
-        errorMap: () => ({ message: "Vui lòng chọn đối tượng" }),
-    }),
+    status: z.enum(["draft", "published", "archived"]),
+    target_student: z.enum(["student", "teacher", "all"]),
     price: z.number().min(0, "Giá bán phải lớn hơn hoặc bằng 0"),
-    lesson_count: z.number().optional().default(0),
-    completion_time: z.number().optional().default(0),
+    lesson_count: z.number().optional(),
+    completion_time: z.number().optional(),
     image_url: z.string().optional(),
-    level_id: z.number({ invalid_type_error: "Vui lòng chọn trình độ" }).min(1, "Vui lòng chọn trình độ"),
-    subject_id: z.number({ invalid_type_error: "Vui lòng chọn môn học" }).min(1, "Vui lòng chọn môn học"),
+    level_id: z.number().min(1, "Vui lòng chọn trình độ"),
+    subject_id: z.number().min(1, "Vui lòng chọn môn học"),
     course_materials: z.array(
         z.object({
             id: z.string().optional(),

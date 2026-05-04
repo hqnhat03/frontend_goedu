@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import axios, { AxiosError } from "axios"
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import { Course, CourseCard } from "./_components/CourseCard"
 import { FilterSidebar, FilterState } from "./_components/FilterSidebar"
 
@@ -25,6 +25,14 @@ const initialFilters: FilterState = {
 }
 
 export default function CoursesPage() {
+   return (
+      <Suspense fallback={<CoursesSkeleton />}>
+         <CoursesContent />
+      </Suspense>
+   )
+}
+
+function CoursesContent() {
    const [courses, setCourses] = useState<Course[]>([])
    const [meta, setMeta] = useState<MetaData | null>(null)
    const [isLoading, setIsLoading] = useState(true)
@@ -173,7 +181,7 @@ export default function CoursesPage() {
 
                   <div className="flex items-center gap-3 w-full sm:w-auto">
                      <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Sort by</span>
-                     <Select value={sortBy} onValueChange={(v) => { setSortBy(v); setCurrentPage(1) }}>
+                     <Select value={sortBy} onValueChange={(v) => { setSortBy(v ?? "newest"); setCurrentPage(1) }}>
                         <SelectTrigger className="w-full sm:w-[160px] bg-background">
                            <SelectValue placeholder="Sort..." />
                         </SelectTrigger>
@@ -279,6 +287,33 @@ export default function CoursesPage() {
                      )}
                   </div>
                )}
+            </main>
+         </div>
+      </div>
+   )
+}
+
+function CoursesSkeleton() {
+   return (
+      <div className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
+         <div className="mb-8 md:mb-12">
+            <Skeleton className="h-10 w-64 mb-4" />
+            <Skeleton className="h-6 w-full max-w-2xl" />
+         </div>
+         <div className="flex flex-col md:flex-row gap-8">
+            <aside className="hidden md:block w-72 shrink-0">
+               <Skeleton className="h-[400px] w-full rounded-xl" />
+            </aside>
+            <main className="flex-1">
+               <div className="flex justify-between items-center mb-6 pb-4 border-b">
+                  <Skeleton className="h-10 w-32" />
+                  <Skeleton className="h-10 w-40" />
+               </div>
+               <div className="flex flex-col gap-6">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                     <Skeleton key={i} className="h-[180px] w-full rounded-xl" />
+                  ))}
+               </div>
             </main>
          </div>
       </div>

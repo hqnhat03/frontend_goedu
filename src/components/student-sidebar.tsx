@@ -88,7 +88,7 @@ export function StudentSidebar() {
                 <SidebarMenuButton
                   isActive={pathname === item.url}
                   tooltip={item.title}
-                  className={`h-11 rounded-lg transition-all duration-200 hover:bg-slate-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold ${item.className || ""}`}
+                  className={`h-11 rounded-lg transition-all duration-200 hover:bg-slate-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold`}
                 >
                   <Link href={item.url} className="flex items-center gap-3 w-full">
                     <item.icon className="size-5 shrink-0" />

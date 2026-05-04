@@ -43,6 +43,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
 
 // ─────────────────────────── Types ───────────────────────────
 
@@ -73,10 +74,10 @@ const adminSchema = z.object({
     email: z.string().email("Email không hợp lệ"),
     phone: z.string().nullable().optional(),
     address: z.string().nullable().optional(),
-    gender: z.enum(["male", "female", "other"]).default("male"),
+    gender: z.enum(["male", "female", "other"]),
     date_of_birth: z.string().nullable().optional(),
     avatar: z.string().nullable().optional(),
-    status: z.enum(["active", "inactive"]).default("active"),
+    status: z.enum(["active", "inactive"]),
     roles: z.array(z.string()).min(1, "Vui lòng chọn một vai trò").max(1, "Chỉ được chọn một vai trò"),
 })
 
@@ -243,8 +244,10 @@ export function AdminDrawer({
 
             handleOpenChange(false)
             onSuccess?.()
-        } catch (err) {
-            toast.error(err.response?.data?.message || err.message || "Đã có lỗi xảy ra.")
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Đã có lỗi xảy ra.")
+            }
         } finally {
             setIsSubmitting(false)
         }

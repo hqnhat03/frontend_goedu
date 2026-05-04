@@ -110,7 +110,8 @@ export default function ClassLecturesPage() {
   const [isDeleting, setIsDeleting] = React.useState(false)
 
   const form = useForm<LectureFormValues>({
-    resolver: zodResolver(lectureSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(lectureSchema as any),
     defaultValues: {
       name: "",
       duration_time: 0,

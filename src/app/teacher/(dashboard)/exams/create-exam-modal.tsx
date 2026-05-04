@@ -25,8 +25,8 @@ import {
 } from "@/components/ui/select"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
-import { AxiosError } from "axios"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AxiosError } from "axios"
 import { Calendar, Loader2 } from "lucide-react"
 import * as React from "react"
 import { useForm } from "react-hook-form"
@@ -62,7 +62,8 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
   const [isLoadingClasses, setIsLoadingClasses] = React.useState(false)
 
   const form = useForm<ExamFormValues>({
-    resolver: zodResolver(examSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(examSchema as any),
     defaultValues: {
       class_id: 0,
       name: "",
@@ -94,7 +95,7 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
     }
   }, [open])
 
-  const formatToLocalDatetime = (dateString: string) => {
+  const formatToLocalDatetime = (dateString?: string) => {
     if (!dateString) return ""
     const d = new Date(dateString)
     if (isNaN(d.getTime())) return ""
@@ -179,7 +180,7 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
               <FieldLabel>Lớp học</FieldLabel>
               <FieldContent>
                 <Select
-                  onValueChange={(value) => form.setValue("class_id", parseInt(value))}
+                  onValueChange={(value) => value && form.setValue("class_id", parseInt(value))}
                   value={form.watch("class_id")?.toString()}
                   disabled={isSubmitting || isLoadingClasses || !!initialData}
                 >

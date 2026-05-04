@@ -189,7 +189,7 @@ export default function AdminsPage() {
             </div>
 
             <div className="w-full md:w-64">
-              <Select value={status} onValueChange={setStatus}>
+              <Select value={status} onValueChange={(val) => setStatus(val || "all")}>
                 <SelectTrigger className="bg-background border-muted-foreground/20">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="h-4 w-4" />
@@ -322,11 +322,15 @@ export default function AdminsPage() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {admin.roles && admin.roles.length > 0 ? (
-                          admin.roles.map((role) => (
-                            <Badge key={role} variant="secondary" className="bg-primary/5 text-primary border-primary/10 font-normal text-[10px] flex items-center gap-1">
-                              {role}
-                            </Badge>
-                          ))
+                          admin.roles.map((role, idx) => {
+                            const roleName = typeof role === "string" ? role : role.name;
+                            const roleKey = typeof role === "string" ? role : role.id?.toString() || String(idx);
+                            return (
+                              <Badge key={roleKey} variant="secondary" className="bg-primary/5 text-primary border-primary/10 font-normal text-[10px] flex items-center gap-1">
+                                {roleName}
+                              </Badge>
+                            );
+                          })
                         ) : (
                           <span className="text-xs text-muted-foreground">Chưa phân vai trò</span>
                         )}

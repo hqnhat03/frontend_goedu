@@ -711,7 +711,7 @@ export function StudentDrawer({
             <AddCourseModal
                 open={isAddCourseOpen}
                 onOpenChange={setIsAddCourseOpen}
-                studentId={studentId}
+                studentId={studentId ?? null}
                 studentName={watch("name")}
                 onSuccess={() => {
                     // Cùng có thể reload data ở đây nếu cần hiển thị danh sách khóa học của student

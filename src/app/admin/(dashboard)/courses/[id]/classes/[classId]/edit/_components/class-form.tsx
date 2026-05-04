@@ -138,7 +138,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
       end_day: initialData.end_day ? parseISO(initialData.end_day) : undefined,
       max_student: initialData.max_student || 25,
       meeting_url: initialData.meeting_url || "",
-      status: initialData.status || "published",
+      status: (initialData.status as "draft" | "published" | "archived") || "published",
       course_id: initialData.course_id || Number(params.id),
       class_teachers: (initialData.class_teaches || initialData.class_teachers || []).map((t) => ({
         id: t.id || uuidv4(),
@@ -146,7 +146,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
       })),
       class_schedules: (initialData.class_schedules || []).map((s) => ({
         id: s.id || uuidv4(),
-        day_of_week: s.day_of_week,
+        day_of_week: Number(s.day_of_week),
         start_time: s.start_time?.substring(0, 5),
         end_time: s.end_time?.substring(0, 5)
       })),

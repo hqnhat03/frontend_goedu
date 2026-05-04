@@ -12,6 +12,8 @@ import * as React from "react"
 import { toast } from "sonner"
 
 interface StudentProfile {
+  name: string;
+  email: string;
   avatar: string;
   date_of_birth: string;
   phone: string;
@@ -72,10 +74,12 @@ export default function ProfilePage() {
 
         setProfile(prev => prev ? { ...prev, avatar: url } : null)
         // Also update authUser store locally to reflect immediately across the app
-        useAuthStore.getState().setAuth(
-          { ...authUser, avatar: url },
-          useAuthStore.getState().token!
-        );
+        if (authUser) {
+          useAuthStore.getState().setAuth(
+            { ...authUser, avatar: url },
+            useAuthStore.getState().token!
+          );
+        }
         toast.success("Thay đổi ảnh đại diện thành công!")
       } else {
         toast.error("Không nhận được URL ảnh từ server")
