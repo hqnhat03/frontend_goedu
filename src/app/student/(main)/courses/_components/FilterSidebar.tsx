@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import axios from "axios"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RefreshCcw } from "lucide-react"
+import axios from "axios"
+import { RefreshCcw, Search } from "lucide-react"
+import React, { useEffect, useState } from "react"
 
 export interface FilterState {
   keyword: string
@@ -30,9 +29,9 @@ export function FilterSidebar({
   onReset,
   className = ""
 }: FilterSidebarProps) {
-  const [levels, setLevels] = useState<{id: number, level: string}[]>([])
-  const [subjects, setSubjects] = useState<{id: number, name: string, category: string}[]>([])
-  
+  const [levels, setLevels] = useState<{ id: number, level: string }[]>([])
+  const [subjects, setSubjects] = useState<{ id: number, name: string, category: string }[]>([])
+
   const [isLoadingLevels, setIsLoadingLevels] = useState(false)
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false)
 
@@ -41,7 +40,7 @@ export function FilterSidebar({
       try {
         setIsLoadingLevels(true)
         setIsLoadingSubjects(true)
-        
+
         const [lvRes, subRes] = await Promise.all([
           axios.get("http://127.0.0.1:8000/api/common/levels"),
           axios.get("http://127.0.0.1:8000/api/common/subjects")
@@ -49,7 +48,7 @@ export function FilterSidebar({
 
         if (lvRes.data.success) setLevels(lvRes.data.data)
         if (subRes.data.success) setSubjects(subRes.data.data)
-        
+
       } catch (error) {
         console.error("Failed to fetch filter data:", error)
       } finally {
@@ -77,97 +76,97 @@ export function FilterSidebar({
 
   return (
     <div className={`space-y-8 ${className}`}>
-       <div>
-         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-foreground">
-           <Search className="w-4 h-4" /> Search
-         </h3>
-         <Input 
-           placeholder="Search courses..." 
-           value={filters.keyword}
-           onChange={(e) => setFilters(prev => ({...prev, keyword: e.target.value}))}
-           className="w-full bg-background"
-           onKeyDown={(e) => {
-             if (e.key === 'Enter') onApply()
-           }}
-         />
-       </div>
+      <div>
+        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-foreground">
+          <Search className="w-4 h-4" /> Search
+        </h3>
+        <Input
+          placeholder="Search courses..."
+          value={filters.keyword}
+          onChange={(e) => setFilters(prev => ({ ...prev, keyword: e.target.value }))}
+          className="w-full bg-background"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onApply()
+          }}
+        />
+      </div>
 
-       <div>
-         <h3 className="text-sm font-semibold mb-3 text-foreground">Subject</h3>
-         <div className="space-y-3">
-            {isLoadingSubjects ? (
-               <div className="space-y-2">
-                  {[1, 2, 3].map(i => (
-                     <div key={i} className="flex items-center space-x-3">
-                        <div className="w-4 h-4 rounded bg-muted animate-pulse" />
-                        <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                     </div>
-                  ))}
-               </div>
-            ) : (
-               subjects.map(subject => (
-                  <div key={subject.id} className="flex items-center space-x-3">
-                     <Checkbox 
-                        id={`subject-${subject.id}`} 
-                        checked={filters.subject_id.includes(subject.id.toString())}
-                        onCheckedChange={(checked) => handleToggleFilter('subject_id', subject.id.toString(), checked)}
-                     />
-                     <Label 
-                       htmlFor={`subject-${subject.id}`} 
-                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                     >
-                        {subject.name}
-                     </Label>
-                  </div>
-               ))
-            )}
-         </div>
-       </div>
-
-
-
-       <div>
-         <h3 className="text-sm font-semibold mb-3 text-foreground">Level</h3>
-         <div className="space-y-3">
-            {isLoadingLevels ? (
-               <div className="space-y-2">
-                  {[1, 2, 3].map(i => (
-                     <div key={i} className="flex items-center space-x-3">
-                        <div className="w-4 h-4 rounded bg-muted animate-pulse" />
-                        <div className="h-4 w-20 bg-muted animate-pulse rounded" />
-                     </div>
-                  ))}
-               </div>
-            ) : (
-               levels.map(level => (
-                  <div key={level.id} className="flex items-center space-x-3">
-                     <Checkbox 
-                        id={`level-${level.id}`} 
-                        checked={filters.level_id.includes(level.id.toString())}
-                        onCheckedChange={(checked) => handleToggleFilter('level_id', level.id.toString(), checked)}
-                     />
-                     <Label 
-                       htmlFor={`level-${level.id}`} 
-                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                     >
-                        {level.level}
-                     </Label>
-                  </div>
-               ))
-            )}
-         </div>
-       </div>
+      <div>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Subject</h3>
+        <div className="space-y-3">
+          {isLoadingSubjects ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className="w-4 h-4 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            subjects.map(subject => (
+              <div key={subject.id} className="flex items-center space-x-3">
+                <Checkbox
+                  id={`subject-${subject.id}`}
+                  checked={filters.subject_id.includes(subject.id.toString())}
+                  onCheckedChange={(checked) => handleToggleFilter('subject_id', subject.id.toString(), checked)}
+                />
+                <Label
+                  htmlFor={`subject-${subject.id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {subject.name}
+                </Label>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
 
-       <div className="pt-6 flex flex-col gap-3 border-t">
-          <Button onClick={onApply} className="w-full font-medium shadow-sm">
-            Apply Filters
-          </Button>
-          <Button onClick={onReset} variant="outline" className="w-full font-medium">
-            <RefreshCcw className="w-4 h-4 mr-2" />
-            Reset
-          </Button>
-       </div>
+
+      <div>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Level</h3>
+        <div className="space-y-3">
+          {isLoadingLevels ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className="w-4 h-4 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-20 bg-muted animate-pulse rounded" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            levels.map(level => (
+              <div key={level.id} className="flex items-center space-x-3">
+                <Checkbox
+                  id={`level-${level.id}`}
+                  checked={filters.level_id.includes(level.id.toString())}
+                  onCheckedChange={(checked) => handleToggleFilter('level_id', level.id.toString(), checked)}
+                />
+                <Label
+                  htmlFor={`level-${level.id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {level.level}
+                </Label>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+
+      <div className="pt-6 flex flex-col gap-3 border-t">
+        <Button onClick={onApply} className="w-full font-medium shadow-sm">
+          Apply Filters
+        </Button>
+        <Button onClick={onReset} variant="outline" className="w-full font-medium">
+          <RefreshCcw className="w-4 h-4 mr-2" />
+          Reset
+        </Button>
+      </div>
     </div>
   )
 }

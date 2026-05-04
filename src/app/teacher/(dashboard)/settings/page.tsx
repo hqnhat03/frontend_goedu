@@ -1,9 +1,8 @@
 "use client"
 
-import * as React from "react"
-import { Settings as SettingsIcon, Bell, Shield, User, Smartphone, Globe } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Bell, Globe, Settings as SettingsIcon, Shield, Smartphone, User } from "lucide-react"
 
 const settingsSections = [
   {

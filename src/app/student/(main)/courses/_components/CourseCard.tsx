@@ -1,8 +1,9 @@
-import Link from "next/link"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Clock, BookOpen } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { BookOpen, Clock } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
 export interface Course {
   id: string | number
@@ -31,7 +32,7 @@ export function CourseCard({ course }: { course: Course }) {
     <Card className="p-0 flex flex-col sm:flex-row overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group bg-card border-border">
       {/* image header */}
       <div className="relative w-full sm:w-[320px] shrink-0 aspect-video sm:aspect-auto overflow-hidden bg-muted">
-        <img
+        <Image
           src={course.image_url || 'https://placehold.co/600x400?text=No+Image'}
           alt={course.name}
           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"

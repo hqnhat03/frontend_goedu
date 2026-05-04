@@ -1,15 +1,5 @@
 "use client"
 
-import * as React from "react"
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Table as TableIcon, LayoutList, Loader2, Clock, BookOpen, MapPin, Video, ExternalLink, Trash2, X } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import api from "@/lib/axios"
-import { format, startOfWeek, addDays, isSameDay, parseISO } from "date-fns"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +11,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
+import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns"
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, ExternalLink, LayoutList, Plus, Table as TableIcon, Trash2, Video, X } from "lucide-react"
+import * as React from "react"
 import { toast } from "sonner"
 
 const TIMES = Array.from({ length: 26 }, (_, i) => {

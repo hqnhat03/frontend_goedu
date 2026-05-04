@@ -1,57 +1,37 @@
 "use client"
 
-import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
-import * as z from "zod"
+import { format } from "date-fns"
 import {
-    Save,
-    Loader2,
-    Plus,
-    ShieldCheck,
+    Calendar,
     CalendarIcon,
+    Camera,
     Check,
     ChevronsUpDown,
-    X,
-    Eye,
     Edit,
-    User,
-    Phone,
+    Loader2,
     Mail,
     MapPin,
+    Phone,
+    Plus,
+    Save,
+    ShieldCheck,
+    User,
     Users,
-    Calendar,
-    Camera,
+    X
 } from "lucide-react"
-import { toast } from "sonner"
-import { format } from "date-fns"
 import Image from "next/image"
+import * as React from "react"
 import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-    Field,
-    FieldLabel,
-    FieldError,
-    FieldContent,
-} from "@/components/ui/field"
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Can } from "@/components/auth/can"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import {
     Command,
     CommandEmpty,
@@ -60,10 +40,30 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
+import {
+    Field,
+    FieldContent,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet"
+import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
-import { Can } from "@/components/auth/can"
+import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
 
 // ─────────────────────────── Types ───────────────────────────
 
@@ -151,6 +151,13 @@ interface GuardianDrawerProps {
     /** Custom trigger element — wrapping will open the drawer.
      *  If omitted, you must control open state externally via `mode`. */
     trigger?: React.ReactNode
+}
+
+interface StudentType {
+    id: number;
+    name: string;
+    email: string;
+    avatar: string;
 }
 
 // ─────────────────────────── Component ───────────────────────────
@@ -244,24 +251,18 @@ export function GuardianDrawer({
                             : new Date(),
                         avatar: data.avatar || "",
                         student_ids: data.students
-                            ? data.students.map((s: any) => s.id)
+                            ? data.students.map((s: StudentType) => s.id)
                             : [],
                     })
                     if (data.students && Array.isArray(data.students)) {
-                        data.students.forEach((s: any) => {
-                            const n =
-                                s.name ||
-                                s.full_name ||
-                                `Học sinh ID: ${s.id}`
+                        data.students.forEach((s: StudentType) => {
+                            const n = s.name
                             studentDict.current.set(s.id, n)
                         })
                         setStudents(
-                            data.students.map((s: any) => ({
+                            data.students.map((s: StudentType) => ({
                                 id: s.id,
-                                name:
-                                    s.name ||
-                                    s.full_name ||
-                                    `Học sinh ID: ${s.id}`,
+                                name: s.name,
                                 email: s.email,
                             }))
                         )
@@ -311,14 +312,10 @@ export function GuardianDrawer({
                             ? res.data.data.data
                             : []
 
-                const mapped = raw.map((s: any) => {
-                    const n =
-                        s.name ||
-                        s.full_name ||
-                        s.user?.name ||
-                        `Học sinh ID: ${s.id}`
+                const mapped = raw.map((s: StudentType) => {
+                    const n = s.name
                     studentDict.current.set(s.id, n)
-                    return { id: s.id, name: n, email: s.email || s.user?.email }
+                    return { id: s.id, name: n, email: s.email }
                 })
                 setStudents(mapped)
             })
@@ -353,21 +350,19 @@ export function GuardianDrawer({
 
             handleOpenChange(false)
             onSuccess?.()
-        } catch (err: any) {
-            const msg =
-                err.response?.data?.message ||
-                err.message ||
-                "Đã có lỗi xảy ra."
-            toast.error(msg)
-            if (err.response?.data?.errors) {
-                Object.entries(err.response.data.errors).forEach(
-                    ([key, val]) => {
-                        // @ts-ignore
-                        form.setError(key, {
-                            message: (val as string[])[0],
-                        })
-                    }
-                )
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                const msg = err.response?.data?.message || "Đã có lỗi xảy ra."
+                toast.error(msg)
+                if (err.response?.data?.errors) {
+                    Object.entries(err.response.data.errors).forEach(
+                        ([key, val]) => {
+                            form.setError(key as keyof GuardianFormValues, {
+                                message: (val as string[])[0],
+                            })
+                        }
+                    )
+                }
             }
         } finally {
             setIsSubmitting(false)
@@ -400,8 +395,10 @@ export function GuardianDrawer({
             } else {
                 throw new Error("Không nhận được URL từ máy chủ")
             }
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || "Lỗi khi tải ảnh lên")
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Lỗi khi tải ảnh lên")
+            }
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ""
@@ -624,7 +621,7 @@ export function GuardianDrawer({
                         >
                             {/* Avatar selector at the top */}
                             <div className="flex flex-col items-center gap-2 py-2">
-                                <div 
+                                <div
                                     className={cn(
                                         "relative group cursor-pointer",
                                         (isDisabled || isUploading) && "cursor-not-allowed opacity-70"
@@ -644,7 +641,7 @@ export function GuardianDrawer({
                                                 <User className="h-12 w-12 text-primary/30" />
                                             </div>
                                         )}
-                                        
+
                                         {/* Hover Overlay */}
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             {isUploading ? (
@@ -654,7 +651,7 @@ export function GuardianDrawer({
                                             )}
                                         </div>
                                     </div>
-                                    
+
                                     {/* Upload Progress Indicator */}
                                     {isUploading && (
                                         <div className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-background border-2 border-primary/20 flex items-center justify-center shadow-md">
@@ -665,7 +662,7 @@ export function GuardianDrawer({
                                 <p className="text-xs text-muted-foreground font-medium">
                                     Click để {currentAvatar ? "đổi" : "tải"} ảnh đại diện
                                 </p>
-                                <input 
+                                <input
                                     type="file"
                                     ref={fileInputRef}
                                     className="hidden"

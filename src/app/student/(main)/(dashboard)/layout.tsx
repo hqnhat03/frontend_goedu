@@ -1,13 +1,9 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { useAuthStore } from "@/store/auth-store"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { StudentSidebar } from "@/components/student-sidebar"
-import { Separator } from "@/components/ui/separator"
-import { Bell, Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
+import * as React from "react"
 
 export default function StudentDashboardLayout({
     children,
@@ -16,7 +12,6 @@ export default function StudentDashboardLayout({
 }) {
     const router = useRouter()
     const [mounted, setMounted] = React.useState(false)
-    const { user } = useAuthStore()
 
     React.useEffect(() => {
         setMounted(true)

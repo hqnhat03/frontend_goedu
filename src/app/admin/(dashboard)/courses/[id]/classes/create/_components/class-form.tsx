@@ -1,35 +1,35 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
+import api from "@/lib/axios"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
-import * as z from "zod"
-import { format, isAfter, isBefore, startOfDay } from "date-fns"
-import { vi } from "date-fns/locale"
+import { format, isBefore, startOfDay } from "date-fns"
 import {
-  Save,
-  Loader2,
   BookOpen,
   Clock,
+  Loader2,
+  Save,
 } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import api from "@/lib/axios"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Field,
-  FieldLabel,
-  FieldError,
   FieldContent,
+  FieldError,
+  FieldLabel,
 } from "@/components/ui/field"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
+import { AxiosError } from "axios"
 import { CourseSelect } from "../../_components/course-select"
-import { TeacherSelect } from "../../_components/teacher-select"
 import { SchedulePicker } from "../../_components/schedule-picker"
+import { TeacherSelect } from "../../_components/teacher-select"
 
 const classSchema = z.object({
   class_code: z.string().min(1, "Vui lòng nhập mã lớp"),
@@ -93,7 +93,7 @@ export function ClassForm() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(classSchema as any) as any,
+    resolver: zodResolver(classSchema),
     defaultValues: {
       class_code: "",
       max_student: 25,
@@ -125,9 +125,11 @@ export function ClassForm() {
 
       router.push(targetUrl)
       router.refresh()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      toast.error(err.response?.data?.message || err.message || "Có lỗi xảy ra khi tạo lớp học")
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message || "Có lỗi xảy ra khi tạo lớp học")
+      }
       setIsSubmitting(false)
     }
   }

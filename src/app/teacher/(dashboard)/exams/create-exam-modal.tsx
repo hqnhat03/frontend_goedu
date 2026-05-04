@@ -1,20 +1,20 @@
 "use client"
 
-import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import api from "@/lib/axios"
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -23,14 +23,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldContent,
-} from "@/components/ui/field"
-import { Loader2, Calendar } from "lucide-react"
+import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Calendar, Loader2 } from "lucide-react"
+import * as React from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 
 const examSchema = z.object({
   class_id: z.coerce.number().min(1, "Vui lòng chọn lớp học"),
@@ -52,12 +53,12 @@ interface CreateExamModalProps {
   onSuccess?: () => void
   open: boolean
   onOpenChange: (open: boolean) => void
-  initialData?: any // For edit mode if needed
+  initialData?: (Partial<ExamFormValues> & { id: number }) | null // For edit mode if needed
 }
 
 export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: CreateExamModalProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [classes, setClasses] = React.useState<any[]>([])
+  const [classes, setClasses] = React.useState<{ id: number; class_code: string }[]>([])
   const [isLoadingClasses, setIsLoadingClasses] = React.useState(false)
 
   const form = useForm<ExamFormValues>({
@@ -152,9 +153,11 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
       form.reset()
       onSuccess?.()
       onOpenChange(false)
-    } catch (error: any) {
-      console.error(error)
-      toast.error(error.response?.data?.message || "Đã có lỗi xảy ra")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error(error)
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -239,7 +242,7 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
                         <button
                           key={opt.value}
                           type="button"
-                          onClick={() => form.setValue("status", opt.value as any)}
+                          onClick={() => form.setValue("status", opt.value as ExamFormValues["status"])}
                           disabled={isSubmitting}
                           className={cn(
                             "flex-1 rounded-lg border px-2 py-1.5 text-sm font-medium transition-all",

@@ -15,7 +15,7 @@ api.interceptors.request.use(
         .split('; ')
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
-        
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -29,11 +29,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
+
     // Check if the error is 401 and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         console.warn('Handling 401: Token might be expired.');
         if (typeof window !== 'undefined') {
@@ -49,26 +49,26 @@ api.interceptors.response.use(
     // Handle 403 Forbidden: Permissions might have changed
     if (error.response?.status === 403) {
       console.warn('Handling 403: Permissions might have changed. Re-fetching profile...');
-      
+
       if (typeof window !== 'undefined') {
         const { useAuthStore } = await import('@/store/auth-store');
         const token = useAuthStore.getState().token;
-        
+
         if (token) {
           try {
             // Use axios directly to avoid interceptor loop if /auth/me itself is 403 (unlikely but safe)
-            const res = await axios.get('http://127.0.0.1:8000/api/auth/me', {
+            const res = await axios.get(`${process.env.API_URL}/auth/me`, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json',
               }
             });
-            
+
             if (res.data.success) {
               const newUser = res.data.data;
               useAuthStore.getState().setUser(newUser);
               console.log('Permissions updated successfully.');
-              
+
               // Optional: notify user but don't block
               // if (window.confirm('Quyền hạn của bạn đã được cập nhật. Bạn có muốn tải lại trang?')) {
               //   window.location.reload();
@@ -80,7 +80,7 @@ api.interceptors.response.use(
         }
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

@@ -1,42 +1,23 @@
 "use client"
 
-import * as React from "react"
+import { Course, useCourseStore } from "@/store/course-store"
 import {
-  Plus,
-  Search,
   BookOpen,
   Edit,
-  Trash2,
-  RefreshCw,
-  Settings2,
+  Eye,
   GraduationCap,
   Layers,
+  Plus,
+  RefreshCw,
+  Search,
+  Settings2,
+  Trash2,
   Users,
-  Eye,
 } from "lucide-react"
 import Link from "next/link"
-import { useCourseStore, Course } from "@/store/course-store"
+import * as React from "react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { Card, CardContent } from "@/components/ui/card"
+import { Can } from "@/components/auth/can"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,12 +28,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { toast } from "sonner"
-import api from "@/lib/axios"
-import { Can } from "@/components/auth/can"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { StatusBadge } from "@/components/ui/status-badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import { Level } from "@/store/level-store"
+import { Subject } from "@/store/subject-store"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
-
+import { toast } from "sonner"
 
 const targetStudentConfig: Record<string, { label: string, color: string }> = {
   all: { label: "Tất cả", color: "bg-indigo-500/10 text-indigo-600 border-indigo-200" },
@@ -94,6 +96,8 @@ export default function CoursesPage() {
     "employee": "Nhân viên",
   }
 
+
+
   const subjectMapper = React.useMemo(() => {
     return Object.fromEntries(
       subjectsFilter.map(item => [item.id, item.name])
@@ -119,16 +123,20 @@ export default function CoursesPage() {
         api.get("/common/subjects"),
         api.get("/common/levels")
       ])
-      
+
       if (subjectsRes.status === 200) {
-        setSubjectsFilter(subjectsRes.data.data || [])
+        const subjectsData = subjectsRes.data?.data || []
+        setSubjectsFilter(subjectsData.map((s: Subject) => ({
+          id: s.id,
+          name: s.name
+        })))
       }
-      
+
       if (levelsRes.status === 200) {
         const levelsData = levelsRes.data?.data || []
-        setLevelsFilter(levelsData.map((l: any) => ({
+        setLevelsFilter(levelsData.map((l: Level) => ({
           id: l.id,
-          name: l.level || l.name
+          name: l.level
         })))
       }
     } catch (error) {
@@ -353,7 +361,7 @@ export default function CoursesPage() {
                       <div className="flex items-center gap-3">
                         <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                           {item.thumbnail ? (
-                            <img src={item.thumbnail} alt="" className="size-full object-cover rounded-lg" />
+                            <Image src={item.thumbnail} alt="" className="size-full object-cover rounded-lg" />
                           ) : (
                             <BookOpen className="size-5" />
                           )}
@@ -379,7 +387,7 @@ export default function CoursesPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="py-4">
-                      <StatusBadge status={item.status as any} className="shadow-none rounded-md" />
+                      <StatusBadge status={item.status} className="shadow-none rounded-md" />
                     </TableCell>
                     <TableCell className="text-right py-4">
                       <div className="flex justify-end gap-1">

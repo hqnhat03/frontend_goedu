@@ -1,11 +1,7 @@
 "use client"
 
-import * as React from "react"
-import { Check, ChevronsUpDown, Loader2, X } from "lucide-react"
-import { v4 as uuidv4 } from "uuid"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -20,6 +16,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
+import { Check, ChevronsUpDown, Loader2, X } from "lucide-react"
+import * as React from "react"
+import { v4 as uuidv4 } from "uuid"
 
 interface Teacher {
   id: number
@@ -51,21 +51,28 @@ export function TeacherSelect({ value = [], onChange, disabled }: TeacherSelectP
       try {
         const res = await api.get("/admin/teachers")
         // Handle variations in API response format
-        const data = Array.isArray(res.data) 
-            ? res.data 
-            : Array.isArray(res.data?.data) 
-              ? res.data.data 
-              : Array.isArray(res.data?.teachers)
-                ? res.data.teachers
-                : []
-                
-        const formattedTeachers = data.map((t: any) => {
-          const name = t.name || t.user?.name || `Giáo viên ID: ${t.id}`
+        const data = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+            ? res.data.data
+            : Array.isArray(res.data?.teachers)
+              ? res.data.teachers
+              : []
+
+        type TeacherType = {
+          id: number
+          name: string,
+          email?: string,
+          expertise?: string,
+        }
+
+        const formattedTeachers = data.map((t: TeacherType) => {
+          const name = t.name
           teacherDict.current.set(t.id, name)
-          return { 
-            id: t.id, 
-            name, 
-            email: t.email || t.user?.email,
+          return {
+            id: t.id,
+            name,
+            email: t.email,
             expertise: t.expertise
           }
         })
@@ -76,7 +83,7 @@ export function TeacherSelect({ value = [], onChange, disabled }: TeacherSelectP
         setIsLoading(false)
       }
     }
-    
+
     // Only fetch when dropdown opens the first time, or just fetch right away
     fetchTeachers()
   }, [])

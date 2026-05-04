@@ -1,17 +1,16 @@
 "use client"
 
-import * as React from "react"
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Video, ExternalLink, Clock, BookOpen, MapPin, Table as TableIcon, LayoutList, Loader2 } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import api from "@/lib/axios"
-import { format, startOfWeek, addDays, isSameDay, parseISO } from "date-fns"
-import { vi } from "date-fns/locale"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
-import { toast } from "sonner"
+import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns"
+import { vi } from "date-fns/locale"
+import { BookOpen, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, ExternalLink, LayoutList, MapPin, Table as TableIcon, Video } from "lucide-react"
+import * as React from "react"
 
 const TIMES = Array.from({ length: 26 }, (_, i) => {
     const hour = Math.floor(i / 2) + 7

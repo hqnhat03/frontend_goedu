@@ -1,31 +1,31 @@
 "use client";
 
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GraduationCap, Lock, LogIn, Mail, MoveLeft, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock, LogIn, User, GraduationCap, ArrowLeft, MoveLeft } from "lucide-react";
+import React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
-  FieldError,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Tabs,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
 import api from "@/lib/axios";
-import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
+import { AxiosError } from "axios";
 
 
 const loginSchema = z.object({
@@ -96,16 +96,17 @@ export function LoginForm({ role }: LoginFormProps) {
       } else {
         toast.error(result.message || "Đăng nhập thất bại");
       }
-    } catch (error: any) {
-      console.error(error);
-      const message = error.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
-      toast.error(message);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const message = error.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
+        toast.error(message);
 
-      if (error.response?.data?.errors) {
-        const fieldErrors = error.response.data.errors;
-        Object.keys(fieldErrors).forEach((key) => {
-          form.setError(key as any, { message: fieldErrors[key][0] });
-        });
+        if (error.response?.data?.errors) {
+          const fieldErrors = error.response.data.errors;
+          Object.keys(fieldErrors).forEach((key) => {
+            form.setError(key as keyof LoginFormValues, { message: fieldErrors[key][0] });
+          });
+        }
       }
     } finally {
       setIsLoading(false);

@@ -1,19 +1,17 @@
 "use client"
 
-import * as React from "react"
-import { usePathname } from "next/navigation"
 import {
-  User,
-  LogOut,
   Award,
   Bell,
-  Search,
-  Menu,
-  ChevronDown
+  ChevronDown,
+  LogOut,
+  User
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +21,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
 import { useAuthStore } from "@/store/auth-store"

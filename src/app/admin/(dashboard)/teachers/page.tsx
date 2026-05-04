@@ -1,40 +1,16 @@
 "use client"
 
-import * as React from "react"
 import {
+  Edit,
+  Eye,
+  Filter,
   Plus,
   Search,
-  Eye,
-  Edit,
-  Trash2,
-  Filter
+  Trash2
 } from "lucide-react"
+import * as React from "react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { useDebounce } from "@/hooks/use-debounce"
-import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import api from "@/lib/axios"
+import { Can } from "@/components/auth/can"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,9 +21,32 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { TeacherDrawer, Teacher } from "./_components/TeacherDrawer"
-import { Can } from "@/components/auth/can"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { useDebounce } from "@/hooks/use-debounce"
 import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { Teacher, TeacherDrawer } from "./_components/TeacherDrawer"
 
 export default function TeachersPage() {
   const router = useRouter()
@@ -164,7 +163,7 @@ export default function TeachersPage() {
           </p>
         </div>
         <Can permission="teacher_create">
-          <Button 
+          <Button
             className="bg-primary hover:bg-primary/90 shadow-md shadow-primary/20"
             onClick={() => openDrawer("create")}
           >
@@ -366,7 +365,7 @@ export default function TeachersPage() {
       </div>
 
       {/* Drawer */}
-      <TeacherDrawer 
+      <TeacherDrawer
         mode={drawerMode}
         teacher={selectedTeacher}
         onClose={() => {

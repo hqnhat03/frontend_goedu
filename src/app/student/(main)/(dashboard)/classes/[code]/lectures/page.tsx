@@ -1,22 +1,23 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import api from '@/lib/axios';
+import { AxiosError } from 'axios';
 import {
     BookOpen,
-    Clock,
-    PlayCircle,
     ChevronRight,
+    Clock,
     FileText,
-    Video,
-    ShieldAlert
+    PlayCircle,
+    ShieldAlert,
+    Video
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Lecture {
     id: number;
@@ -45,9 +46,10 @@ export default function LecturesPage() {
                 } else {
                     setError(response.data.message || 'Không thể tải danh sách bài giảng');
                 }
-            } catch (err: any) {
-                console.error('Error fetching lectures:', err);
-                setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+            } catch (err: unknown) {
+                if (err instanceof AxiosError) {
+                    setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+                }
             } finally {
                 setLoading(false);
             }
@@ -162,7 +164,7 @@ export default function LecturesPage() {
 
                                         {/* Action Button - Smaller */}
                                         <div className="hidden sm:block">
-                                            <Button 
+                                            <Button
                                                 size="sm"
                                                 variant="ghost"
                                                 className="border border-slate-100 group-hover:border-primary group-hover:bg-primary group-hover:text-white text-slate-600 rounded-lg h-9 px-4 text-xs font-bold transition-all shadow-sm"
@@ -172,7 +174,7 @@ export default function LecturesPage() {
                                                 <ChevronRight className="w-3 h-3 ml-0.5 transition-transform group-hover:translate-x-1" />
                                             </Button>
                                         </div>
-                                        
+
                                         <div className="sm:hidden">
                                             <div className="p-1.5 rounded-full bg-slate-50 group-hover:bg-primary group-hover:text-white transition-all text-slate-400">
                                                 <ChevronRight className="w-4 h-4" />

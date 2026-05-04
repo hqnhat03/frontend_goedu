@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import api from '@/lib/axios';
-import { toast } from 'sonner';
-import { useRouter } from "next/navigation"
-import { usePermission } from "@/hooks/use-permission"
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -13,38 +14,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Shield,
-  Save,
-  RefreshCw,
-  Lock,
-  Search,
-  LayoutDashboard,
-  UserCog,
-  Users,
-  GraduationCap,
-  BookOpen,
-  School,
-  Newspaper,
-  Layers,
-  Book,
-  TrendingUp,
-  ShieldAlert,
-  UserCircle,
-  Key,
-  UserCheck,
-  CheckCircle2,
-  AlertCircle,
-  Settings2,
-  Filter
-} from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { usePermission } from "@/hooks/use-permission";
+import api from '@/lib/axios';
 import { cn } from '@/lib/utils';
+import {
+  AlertCircle,
+  Book,
+  BookOpen,
+  CheckCircle2,
+  GraduationCap,
+  Key,
+  Layers,
+  LayoutDashboard,
+  Lock,
+  Newspaper,
+  RefreshCw,
+  Save,
+  School,
+  Search,
+  Settings2,
+  Shield,
+  ShieldAlert,
+  TrendingUp,
+  UserCheck,
+  UserCircle,
+  UserCog,
+  Users
+} from 'lucide-react';
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Role {
   id: number;
@@ -57,7 +56,7 @@ interface PermissionData {
   all_permissions: string[];
 }
 
-const GROUP_CONFIG: Record<string, { label: string; icon: any }> = {
+const GROUP_CONFIG: Record<string, { label: string; icon: React.ComponentType }> = {
   dashboard: { label: 'Bảng điều khiển', icon: LayoutDashboard },
   admin: { label: 'Quản trị viên', icon: UserCog },
   teacher: { label: 'Giáo viên', icon: Users },
@@ -104,47 +103,51 @@ export default function PermissionsPage() {
   // Local state for modified permissions
   const [rolePermissions, setRolePermissions] = useState<Record<number, string[]>>({});
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get('/admin/permissions');
-      // Handle both old and new response structures
-      let rawData: PermissionData;
-      if (response.data.data.roles && response.data.data.all_permissions) {
-        rawData = response.data.data;
-      } else {
-        // Fallback to deriving all_permissions from roles if needed
-        const roles = response.data.data;
-        const allPermissionsSet = new Set<string>();
-        roles.forEach((r: Role) => r.permissions.forEach((p: string) => allPermissionsSet.add(p)));
-        rawData = {
-          roles,
-          all_permissions: Array.from(allPermissionsSet)
-        };
-      }
 
-      setData(rawData);
-
-      // Initialize local state
-      const initialPermissions: Record<number, string[]> = {};
-      rawData.roles.forEach(role => {
-        initialPermissions[role.id] = [...role.permissions];
-      });
-      setRolePermissions(initialPermissions);
-
-      if (rawData.roles.length > 0 && !selectedRole) {
-        setSelectedRole(rawData.roles[0].id);
-      }
-    } catch (error) {
-      console.error('Error fetching permissions:', error);
-      toast.error('Không thể tải danh sách quyền');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get('/admin/permissions');
+        // Handle both old and new response structures
+        let rawData: PermissionData;
+        if (response.data.data.roles && response.data.data.all_permissions) {
+          rawData = response.data.data;
+        } else {
+          // Fallback to deriving all_permissions from roles if needed
+          const roles = response.data.data;
+          const allPermissionsSet = new Set<string>();
+          roles.forEach((r: Role) => r.permissions.forEach((p: string) => allPermissionsSet.add(p)));
+          rawData = {
+            roles,
+            all_permissions: Array.from(allPermissionsSet)
+          };
+        }
+
+        setData(rawData);
+
+        // Initialize local state
+        const initialPermissions: Record<number, string[]> = {};
+        rawData.roles.forEach(role => {
+          initialPermissions[role.id] = [...role.permissions];
+        });
+        setRolePermissions(initialPermissions);
+
+        if (rawData.roles.length > 0 && !selectedRole) {
+          setSelectedRole(rawData.roles[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+        toast.error('Không thể tải danh sách quyền');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTogglePermission = (roleId: number, permission: string) => {

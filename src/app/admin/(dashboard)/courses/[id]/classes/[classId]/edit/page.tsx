@@ -1,14 +1,15 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
-import { ChevronLeft, Loader2 } from "lucide-react"
-import { toast } from "sonner"
 import api from "@/lib/axios"
+import { ChevronLeft } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
-import { ClassForm } from "./_components/class-form"
 import { usePermission } from "@/hooks/use-permission"
+import { AxiosError } from "axios"
+import { ClassForm } from "./_components/class-form"
 
 /**
  * EditClassPage
@@ -20,7 +21,6 @@ export default function EditClassPage() {
   const params = useParams()
   const router = useRouter()
   const classId = params.classId as string
-  const courseId = params.id as string
   const { hasPermission } = usePermission()
 
   // Kiểm tra quyền
@@ -32,7 +32,7 @@ export default function EditClassPage() {
   }, [hasPermission, router])
 
 
-  const [classData, setClassData] = React.useState<any>(null)
+  const [classData, setClassData] = React.useState<React.ComponentProps<typeof ClassForm>["initialData"] | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -46,9 +46,10 @@ export default function EditClassPage() {
         } else {
           toast.error(response.data.message || "Không thể tải thông tin lớp học")
         }
-      } catch (error: any) {
-        console.error("Fetch class error:", error)
-        toast.error(error.response?.data?.message || "Có lỗi xảy ra khi tải thông tin lớp học")
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data?.message || "Có lỗi xảy ra khi tải thông tin lớp học")
+        }
       } finally {
         setIsLoading(false)
       }

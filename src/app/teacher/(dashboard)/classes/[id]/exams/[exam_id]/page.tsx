@@ -1,26 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import api from "@/lib/axios";
-import {
-    Users,
-    CheckCircle2,
-    Clock,
-    Search,
-    ArrowLeft,
-    ChevronRight,
-    TrendingUp,
-    Mail,
-    GraduationCap
-} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
     CardHeader,
-    CardTitle,
-    CardDescription
+    CardTitle
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+    Skeleton
+} from "@/components/ui/skeleton";
 import {
     Table,
     TableBody,
@@ -29,17 +21,23 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-    Skeleton
-} from "@/components/ui/skeleton";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
+import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useExamStore } from "@/store/exam-store";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import {
+    ArrowLeft,
+    CheckCircle2,
+    ChevronRight,
+    Clock,
+    Mail,
+    Search,
+    TrendingUp,
+    Users
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Student {
     id: number;

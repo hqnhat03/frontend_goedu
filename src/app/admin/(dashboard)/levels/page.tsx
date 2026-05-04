@@ -1,39 +1,20 @@
 "use client"
 
-import * as React from "react"
-import {
-  Search,
-  Layers,
-  Trash2,
-  RefreshCw,
-  LayoutGrid,
-  Settings2,
-} from "lucide-react"
-import { Level } from "@/store/level-store"
-import { LevelFormDrawer } from "./_components/LevelFormDrawer"
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
+import { Level } from "@/store/level-store"
+import {
+  Layers,
+  LayoutGrid,
+  RefreshCw,
+  Search,
+  Settings2,
+  Trash2,
+} from "lucide-react"
 import { useRouter } from "next/navigation"
+import * as React from "react"
+import { LevelFormDrawer } from "./_components/LevelFormDrawer"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,8 +25,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import api from "@/lib/axios"
+import { toast } from "sonner"
 
 const statusConfig = {
   draft: { label: "Bản nháp", color: "bg-slate-500/10 text-slate-600 border-slate-200" },
@@ -75,8 +75,6 @@ export default function LevelsPage() {
   const [levelToDelete, setLevelToDelete] = React.useState<Level | null>(null)
   const [isDeleting, setIsDeleting] = React.useState(false)
 
-  if (!hasPermission("level_list")) return null
-
 
   // Giả sử có API để lấy danh sách cấp học tương tự như category của subject
   const fetchEducationLevels = React.useCallback(async () => {
@@ -85,10 +83,13 @@ export default function LevelsPage() {
       const result = response.data
       if (response.status === 200) {
         const data = result.data || []
-        // Ensure we have an array of strings to avoid [object Object] keys
-        const levels = data.map((item: any) => {
-            if (typeof item === 'string') return item
-            return item.education_level || item.name || (typeof item === 'object' ? Object.values(item)[0] : String(item))
+        const levels = data.map((item: unknown) => {
+          if (typeof item === 'string') return item
+          if (item && typeof item === 'object') {
+            const obj = item as Record<string, unknown>
+            return (obj.education_level as string) || (obj.name as string) || String(Object.values(obj)[0])
+          }
+          return String(item)
         })
         setEducationLevels(levels)
       }
@@ -115,7 +116,7 @@ export default function LevelsPage() {
       const result = response.data
       if (response.status === 200) {
         setItems(result.data || [])
-        
+
         // Nếu không có API lấy education-levels riêng, ta trích xuất từ data
         if (educationLevels.length === 0 && result.data) {
           const uniqueEduLevels: string[] = Array.from(
@@ -167,6 +168,8 @@ export default function LevelsPage() {
     setStatus("all")
     setEducationLevel("all")
   }
+
+  if (!hasPermission("level_list")) return null
 
   return (
     <div className="flex flex-col gap-6 p-1">

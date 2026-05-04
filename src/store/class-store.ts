@@ -19,7 +19,12 @@ export interface ClassData {
     id: string | number
     teacher_id: number
   }>
-  students: any[]
+  students: Array<{
+    id: string | number
+    name: string
+    email: string
+    avatar: string
+  }>
   class_schedules: Array<{
     id: string | number
     day_of_week: number

@@ -1,30 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
-import api from "@/lib/axios"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Clock,
-  BookOpen,
-  Users,
-  CalendarDays,
-  ChevronLeft,
-  ChevronDown,
-  GraduationCap,
-  Star,
-  PlayCircle,
-  CheckCircle2,
-  Calendar,
-  Tag,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
 import {
   Dialog,
   DialogContent,
@@ -32,10 +10,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { toast } from "sonner"
-import { useAuthStore } from "@/store/auth-store"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
+import { useAuthStore } from "@/store/auth-store"
+import { AxiosError } from "axios"
+import {
+  BookOpen,
+  Calendar,
+  CalendarDays,
+  CheckCircle2,
+  ChevronDown,
+  ChevronLeft,
+  Clock,
+  GraduationCap,
+  PlayCircle,
+  Star,
+  Tag,
+  Users,
+} from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
@@ -327,9 +329,10 @@ export default function CourseDetailPage() {
       } else {
         toast.error(res.data.message || "Đăng ký thất bại. Vui lòng thử lại.")
       }
-    } catch (err: any) {
-      console.error("Registration error:", err)
-      toast.error(err.response?.data?.message || "Không thể thực hiện đăng ký lúc này.")
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message || "Không thể thực hiện đăng ký lúc này.")
+      }
     } finally {
       setIsRegistering(false)
     }
@@ -347,8 +350,10 @@ export default function CourseDetailPage() {
         } else {
           setError(res.data.message ?? "Không thể tải dữ liệu khóa học.")
         }
-      } catch (err: any) {
-        setError("Không thể kết nối đến máy chủ. Vui lòng thử lại.")
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          setError(err.response?.data?.message || "Không thể kết nối đến máy chủ. Vui lòng thử lại.")
+        }
       } finally {
         setIsLoading(false)
       }
@@ -397,7 +402,7 @@ export default function CourseDetailPage() {
         <div className="lg:col-span-2 flex flex-col gap-7">
           {/* Hero image */}
           <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-muted shadow-md group">
-            <img
+            <Image
               src={course.image_url || "https://placehold.co/1280x720?text=No+Image"}
               alt={course.name}
               className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"

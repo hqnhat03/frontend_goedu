@@ -1,18 +1,29 @@
 "use client"
 
-import * as React from "react"
-import { User, Mail, Shield, Globe, Phone, MapPin, Calendar, CheckCircle2, Camera, Loader2, School, Trophy, Briefcase } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { useAuthStore } from "@/store/auth-store"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import api from "@/lib/axios"
-import { toast } from "sonner"
+import { useAuthStore } from "@/store/auth-store"
+import { AxiosError } from "axios"
+import { Calendar, Camera, Globe, Loader2, Mail, MapPin, Phone, Shield, User } from "lucide-react"
 import Link from "next/link"
+import * as React from "react"
+import { toast } from "sonner"
+
+interface AdminProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  address: string;
+  date_of_birth: string;
+}
 
 export default function ProfilePage() {
   const { user: authUser } = useAuthStore()
-  const [profile, setProfile] = React.useState<any>(null)
+  const [profile, setProfile] = React.useState<AdminProfile | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [isUploading, setIsUploading] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -56,19 +67,19 @@ export default function ProfilePage() {
         // Cập nhật lên backend
         await api.put("/admin/profile", { avatar: url })
 
-        setProfile((prev: any) => ({ ...prev, avatar: url }))
+        setProfile((prev) => prev ? { ...prev, avatar: url } : prev)
         // Also update authUser store locally to reflect immediately across the app
-        useAuthStore.getState().setAuth(
-          { ...authUser, avatar: url },
-          useAuthStore.getState().token!
-        );
+        if (authUser) {
+          useAuthStore.getState().setUser({ ...authUser, avatar: url })
+        }
         toast.success("Thay đổi ảnh đại diện thành công!")
       } else {
         toast.error("Không nhận được URL ảnh từ server")
       }
-    } catch (err: any) {
-      console.error("Upload error:", err)
-      toast.error("Tải ảnh lên thất bại")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Tải ảnh lên thất bại.")
+      }
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""

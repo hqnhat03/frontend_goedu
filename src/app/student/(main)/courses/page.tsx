@@ -1,15 +1,15 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
-import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import axios from "axios"
-import { FilterSidebar, FilterState } from "./_components/FilterSidebar"
-import { CourseCard, Course } from "./_components/CourseCard"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SlidersHorizontal, ChevronRight, ChevronLeft } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Skeleton } from "@/components/ui/skeleton"
+import axios, { AxiosError } from "axios"
+import { ChevronLeft, ChevronRight, Search, SlidersHorizontal } from "lucide-react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
+import { Course, CourseCard } from "./_components/CourseCard"
+import { FilterSidebar, FilterState } from "./_components/FilterSidebar"
 
 interface MetaData {
    total: number
@@ -68,11 +68,10 @@ export default function CoursesPage() {
          } else {
             setError("Failed to fetch courses data.")
          }
-      } catch (err: any) {
-         // Mock data fallback if backend is not available for demo purposes
-         console.warn("Backend fetch failed, using fallback empty state. Error:", err);
-         setCourses([]);
-         setMeta({ total: 0, per_page: 12, current_page: 1, last_page: 1 });
+      } catch (err: unknown) {
+         if (err instanceof AxiosError) {
+            setError(err.response?.data?.message || "Không thể kết nối đến máy chủ. Vui lòng thử lại.")
+         }
       } finally {
          setIsLoading(false)
       }
@@ -83,6 +82,7 @@ export default function CoursesPage() {
       if (page !== currentPage) {
          setCurrentPage(page)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [searchParams])
 
    useEffect(() => {
@@ -145,7 +145,7 @@ export default function CoursesPage() {
                   <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                      {/* Mobile Filter Trigger */}
                      <Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
-                        <SheetTrigger render={(props) => (
+                        <SheetTrigger render={() => (
                            <Button variant="outline" className="md:hidden flex items-center gap-2">
                               <SlidersHorizontal className="w-4 h-4" /> Filters
                            </Button>
@@ -217,7 +217,7 @@ export default function CoursesPage() {
                      </div>
                      <h3 className="text-xl font-semibold mb-2">No courses found</h3>
                      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                        We couldn't find any courses matching your current filters. Try adjusting them or resetting.
+                        We couldn&apos;t find any courses matching your current filters. Try adjusting them or resetting.
                      </p>
                      <Button onClick={handleResetFilters}>Clear all filters</Button>
                   </div>

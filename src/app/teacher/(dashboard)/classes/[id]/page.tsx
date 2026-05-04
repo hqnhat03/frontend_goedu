@@ -1,27 +1,11 @@
 "use client"
 
-import * as React from "react"
-import { useParams } from "next/navigation"
-import {
-  Users,
-  Calendar,
-  Clock,
-  ChevronRight,
-  User,
-  GraduationCap,
-  CalendarDays,
-  Search,
-  MoreVertical,
-  Mail,
-  Phone
-} from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -31,9 +15,22 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import api from "@/lib/axios"
-import { toast } from "sonner"
 import { format } from "date-fns"
-import { vi } from "date-fns/locale"
+import {
+  CalendarDays,
+  ChevronRight,
+  Clock,
+  GraduationCap,
+  Mail,
+  MoreVertical,
+  Phone,
+  Search,
+  User,
+  Users
+} from "lucide-react"
+import { useParams } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
 
 interface Schedule {
   id: string
@@ -271,8 +268,8 @@ export default function ClassDetailPage() {
                 </div>
                 <div className="relative w-full sm:w-64">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Tìm kiếm học sinh..." 
+                  <Input
+                    placeholder="Tìm kiếm học sinh..."
                     className="pl-9 bg-background/50 border-border/40 rounded-xl focus-visible:ring-primary/20"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}

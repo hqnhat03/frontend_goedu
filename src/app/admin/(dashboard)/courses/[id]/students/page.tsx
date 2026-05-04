@@ -1,39 +1,26 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
-import {
-    ArrowLeft,
-    Search,
-    RefreshCw,
-    Eye,
-    Trash2,
-    Users,
-    UserCheck,
-    UserPlus,
-    ShieldAlert,
-    LayoutGrid,
-} from "lucide-react"
-import { toast } from "sonner"
-import api from "@/lib/axios"
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import api from "@/lib/axios"
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+    ArrowLeft,
+    Eye,
+    LayoutGrid,
+    RefreshCw,
+    Search,
+    ShieldAlert,
+    Trash2,
+    UserCheck,
+    UserPlus,
+    Users,
+} from "lucide-react"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
+
+import { StudentDrawer } from "@/app/admin/(dashboard)/students/_components/StudentDrawer"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -44,9 +31,21 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { StudentDrawer } from "@/app/admin/(dashboard)/students/_components/StudentDrawer"
-import { AssignClassModal } from "./_components/AssignClassModal"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { AssignClassModal } from "./_components/AssignClassModal"
 
 interface Student {
     id: string | number
@@ -111,7 +110,7 @@ export default function CourseStudentsPage() {
     const fetchStudents = React.useCallback(async () => {
         setIsLoading(true)
         try {
-            const params_obj: any = {}
+            const params_obj: Record<string, string> = {}
             if (filterType === "registered") params_obj.is_assigned = "false"
             if (filterType === "arranged") params_obj.is_assigned = "true"
 

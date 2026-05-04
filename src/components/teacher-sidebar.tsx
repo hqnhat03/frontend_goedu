@@ -1,27 +1,20 @@
 "use client"
 
-import * as React from "react"
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  ClipboardList,
+  GraduationCap,
+  Layers,
+  LayoutDashboard
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  Calendar,
-  Layers,
-  LayoutDashboard,
-  LogOut,
-  User,
-  Settings,
-  ChevronRight,
-  GraduationCap,
-  Users,
-  ClipboardList,
-  BookOpen,
-  ArrowLeft
-} from "lucide-react"
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -29,7 +22,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  useSidebar,
+  useSidebar
 } from "@/components/ui/sidebar"
 
 const navItems = [

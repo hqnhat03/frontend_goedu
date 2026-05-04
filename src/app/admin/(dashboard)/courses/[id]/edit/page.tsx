@@ -1,47 +1,31 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, useFieldArray, Controller } from "react-hook-form"
-import * as z from "zod"
-import { v4 as uuidv4 } from "uuid"
-import {
-    Save,
-    Loader2,
-    ChevronLeft,
-    Plus,
-    Trash2,
-    LinkIcon,
-    CheckIcon,
-    ImageIcon,
-    BookOpen,
-    ChevronsUpDown,
-    Layers,
-    LayoutGrid
-} from "lucide-react"
-import { toast } from "sonner"
-import api from "@/lib/axios"
 import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+    BookOpen,
+    CheckIcon,
+    ChevronLeft,
+    ChevronsUpDown,
+    ImageIcon,
+    Layers,
+    LayoutGrid,
+    LinkIcon,
+    Loader2,
+    Plus,
+    Save,
+    Trash2
+} from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
+import { Controller, useFieldArray, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { v4 as uuidv4 } from "uuid"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
-    Field,
-    FieldLabel,
-    FieldError,
-    FieldContent,
-} from "@/components/ui/field"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
     Command,
     CommandEmpty,
@@ -50,7 +34,34 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
+import {
+    Field,
+    FieldContent,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
+import Image from "next/image"
+
+type LevelType = {
+    id: number;
+    level: string;
+};
+
+type SubjectType = {
+    id: number;
+    name: string;
+};
+
+type CourseMaterialType = {
+    id: string;
+    name: string;
+    link_url: string;
+};
 
 const courseSchema = z.object({
     name: z.string().min(1, "Tên khóa học không được để trống"),
@@ -92,7 +103,7 @@ export default function EditCoursePage() {
         }
     }, [hasPermission, router])
 
-    
+
     const [isLoadingInit, setIsLoadingInit] = React.useState(true)
     const [isSubmitting, setIsSubmitting] = React.useState(false)
     const [levels, setLevels] = React.useState<{ label: string; value: number }[]>([])
@@ -135,13 +146,13 @@ export default function EditCoursePage() {
                 const levelsData = levelRes.data.data || levelRes.data || [];
                 const subjectsData = subjectRes.data.data || subjectRes.data || [];
 
-                setLevels(levelsData.map((item: any) => ({
-                    label: item.level || item.name || String(item.id),
+                setLevels(levelsData.map((item: LevelType) => ({
+                    label: item.level,
                     value: Number(item.id)
                 })));
 
-                setSubjects(subjectsData.map((item: any) => ({
-                    label: item.name || String(item.id),
+                setSubjects(subjectsData.map((item: SubjectType) => ({
+                    label: item.name,
                     value: Number(item.id)
                 })));
 
@@ -150,13 +161,13 @@ export default function EditCoursePage() {
                 if (cData) {
                     let defaultLevelId = Number(cData.level_id || cData.level?.id || 0);
                     if (!defaultLevelId && typeof cData.level === 'string') {
-                        const matched = levelsData.find((l: any) => (l.level || l.name) === cData.level);
+                        const matched = levelsData.find((l: LevelType) => l.level === cData.level);
                         if (matched) defaultLevelId = Number(matched.id);
                     }
-                    
+
                     let defaultSubjectId = Number(cData.subject_id || cData.subject?.id || 0);
                     if (!defaultSubjectId && typeof cData.subject === 'string') {
-                        const matched = subjectsData.find((s: any) => s.name === cData.subject);
+                        const matched = subjectsData.find((s: SubjectType) => s.name === cData.subject);
                         if (matched) defaultSubjectId = Number(matched.id);
                     }
 
@@ -171,7 +182,7 @@ export default function EditCoursePage() {
                         image_url: cData.image_url || "",
                         level_id: defaultLevelId,
                         subject_id: defaultSubjectId,
-                        course_materials: Array.isArray(cData.course_materials) ? cData.course_materials.map((m: any) => ({
+                        course_materials: Array.isArray(cData.course_materials) ? cData.course_materials.map((m: CourseMaterialType) => ({
                             id: m.id ? String(m.id) : uuidv4(),
                             name: m.name || "",
                             link_url: m.link_url || ""
@@ -205,9 +216,11 @@ export default function EditCoursePage() {
             toast.success("Cập nhật khóa học thành công!")
             router.push("/admin/courses")
             router.refresh()
-        } catch (err: any) {
-            console.error(err)
-            toast.error(err.response?.data?.message || "Có lỗi xảy ra khi cập nhật khóa học")
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                console.error(err.response?.data?.message)
+                toast.error(err.response?.data?.message || "Có lỗi xảy ra khi cập nhật khóa học")
+            }
         } finally {
             setIsSubmitting(false)
         }
@@ -442,7 +455,7 @@ export default function EditCoursePage() {
                             <CardContent className="space-y-4">
                                 {fields.length === 0 ? (
                                     <div className="text-center py-6 text-muted-foreground text-sm border border-dashed rounded-lg bg-muted/20">
-                                        Chưa có tài liệu nào. Bấm "Thêm tài liệu" để bắt đầu.
+                                        Chưa có tài liệu nào. Bấm Thêm tài liệu đểbắt đầu.
                                     </div>
                                 ) : (
                                     fields.map((field, index) => (
@@ -509,8 +522,8 @@ export default function EditCoursePage() {
                                                         variant="outline"
                                                         className={cn(
                                                             "h-9 px-2 text-xs md:text-sm font-medium transition-all bg-transparent",
-                                                            field.value === "draft" 
-                                                                ? "border-slate-500 text-slate-700 dark:text-slate-300 ring-1 ring-slate-500 bg-slate-50 dark:bg-slate-900/50" 
+                                                            field.value === "draft"
+                                                                ? "border-slate-500 text-slate-700 dark:text-slate-300 ring-1 ring-slate-500 bg-slate-50 dark:bg-slate-900/50"
                                                                 : "border-input text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
                                                         )}
                                                         onClick={() => field.onChange("draft")}
@@ -522,8 +535,8 @@ export default function EditCoursePage() {
                                                         variant="outline"
                                                         className={cn(
                                                             "h-9 px-2 text-xs md:text-sm font-medium transition-all bg-transparent",
-                                                            field.value === "published" 
-                                                                ? "border-emerald-500 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500 bg-emerald-50 dark:bg-emerald-950/30" 
+                                                            field.value === "published"
+                                                                ? "border-emerald-500 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
                                                                 : "border-input text-muted-foreground hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30"
                                                         )}
                                                         onClick={() => field.onChange("published")}
@@ -535,8 +548,8 @@ export default function EditCoursePage() {
                                                         variant="outline"
                                                         className={cn(
                                                             "h-9 px-2 text-xs md:text-sm font-medium transition-all bg-transparent",
-                                                            field.value === "archived" 
-                                                                ? "border-rose-500 text-rose-700 dark:text-rose-400 ring-1 ring-rose-500 bg-rose-50 dark:bg-rose-950/30" 
+                                                            field.value === "archived"
+                                                                ? "border-rose-500 text-rose-700 dark:text-rose-400 ring-1 ring-rose-500 bg-rose-50 dark:bg-rose-950/30"
                                                                 : "border-input text-muted-foreground hover:bg-rose-50/50 dark:hover:bg-rose-950/30"
                                                         )}
                                                         onClick={() => field.onChange("archived")}
@@ -668,10 +681,12 @@ export default function EditCoursePage() {
 
                                 {imageUrl ? (
                                     <div className="rounded-lg overflow-hidden border bg-muted flex items-center justify-center min-h-[160px]">
-                                        <img
+                                        <Image
                                             src={imageUrl}
                                             alt="Preview"
-                                            className="w-full h-auto object-cover max-h-[250px]"
+                                            width={250}
+                                            height={250}
+                                            className="w-full h-auto max-h-[250px]"
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';
                                                 e.currentTarget.parentElement?.classList.add('p-8');

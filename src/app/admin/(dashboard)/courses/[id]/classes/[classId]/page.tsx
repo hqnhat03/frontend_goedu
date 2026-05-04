@@ -1,36 +1,34 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
+import { Can } from "@/components/auth/can"
+import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
 import {
+  Archive,
   ArrowLeft,
+  Building2,
   Calendar,
+  CheckCircle2,
   Clock,
+  Clock3,
   Copy,
   ExternalLink,
   GraduationCap,
-  Link as LinkIcon,
   Mail,
-  MoreVertical,
   Pencil,
-  Users,
-  Video,
-  CheckCircle2,
-  Clock3,
-  Archive,
   UserCheck,
-  Building2,
+  Users,
+  Video
 } from "lucide-react"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
 import { toast } from "sonner"
-import api from "@/lib/axios"
-import { Can } from "@/components/auth/can"
-import { usePermission } from "@/hooks/use-permission"
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import {
   Tooltip,
@@ -40,42 +38,9 @@ import {
 } from "@/components/ui/tooltip"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { useClassStore } from "@/store/class-store"
+
 
 // Types based on API response
-interface Teacher {
-  id: number | string
-  name: string
-  avatar?: string
-  email?: string
-}
-
-interface Student {
-  id: number | string
-  name: string
-  avatar?: string
-  email?: string
-}
-
-interface ClassSchedule {
-  id: number | string
-  day_of_week: number | string
-  start_time: string
-  end_time: string
-}
-
-interface ClassDetail {
-  id: number
-  class_code: string
-  start_day: string
-  end_day: string
-  max_student: number
-  meeting_url: string
-  status: "draft" | "published" | "archived" | string
-  teachers: Teacher[]
-  students: Student[]
-  class_schedules: ClassSchedule[]
-}
 
 const dayMap: Record<number, string> = {
   1: "Thứ 2",
@@ -86,8 +51,6 @@ const dayMap: Record<number, string> = {
   6: "Thứ 7",
   0: "Chủ nhật"
 }
-
-const cn = (...inputs: any[]) => inputs.filter(Boolean).join(" ")
 
 const getStatusConfig = (status: string) => {
   switch (status?.toLowerCase()) {
@@ -135,8 +98,9 @@ export default function ClassDetailPage() {
     }
   }, [hasPermission, router])
 
-  const { classDetail: data, setClassDetail: setData } = useClassStore()
-  const [isLoading, setIsLoading] = React.useState(!data || String(data.id) !== String(params.classId))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [data, setData] = React.useState<any>(null)
+  const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
 
 
@@ -160,18 +124,13 @@ export default function ClassDetailPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [params.classId, setData])
+  }, [params.classId])
 
   React.useEffect(() => {
     if (params.classId) {
-      // If no data or data is for a different class, fetch fresh data
-      if (!data || String(data.id) !== String(params.classId)) {
-        fetchClassDetail()
-      } else {
-        setIsLoading(false)
-      }
+      fetchClassDetail()
     }
-  }, [fetchClassDetail, params.classId, data])
+  }, [fetchClassDetail, params.classId])
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A"
@@ -367,29 +326,29 @@ export default function ClassDetailPage() {
                       return dayA - dayB;
                     })
                     .map((schedule, idx) => {
-                    const dayLabel = dayMap[schedule.day_of_week as number] || String(schedule.day_of_week)
-                    return (
-                      <div
-                        key={schedule.id || idx}
-                        className="flex items-center justify-between p-4 rounded-xl border bg-background/50 hover:bg-background transition-colors group/item"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="size-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 font-bold text-sm">
-                            {dayLabel.replace("Thứ ", "T").replace("Chủ nhật", "CN")}
+                      const dayLabel = dayMap[schedule.day_of_week as number] || String(schedule.day_of_week)
+                      return (
+                        <div
+                          key={schedule.id || idx}
+                          className="flex items-center justify-between p-4 rounded-xl border bg-background/50 hover:bg-background transition-colors group/item"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 font-bold text-sm">
+                              {dayLabel.replace("Thứ ", "T").replace("Chủ nhật", "CN")}
+                            </div>
+                            <div>
+                              <p className="font-semibold">{dayLabel}</p>
+                              <p className="text-xs text-muted-foreground">Cố định hàng tuần</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-semibold">{dayLabel}</p>
-                            <p className="text-xs text-muted-foreground">Cố định hàng tuần</p>
+                          <div className="text-right">
+                            <Badge variant="secondary" className="font-mono text-xs">
+                              {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
+                            </Badge>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <Badge variant="secondary" className="font-mono text-xs">
-                            {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
-                          </Badge>
-                        </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
                 </div>
               ) : (
                 <div className="py-8 text-center text-muted-foreground italic border-2 border-dashed rounded-xl flex flex-col items-center gap-2">

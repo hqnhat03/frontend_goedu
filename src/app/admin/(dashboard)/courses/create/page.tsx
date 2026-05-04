@@ -1,47 +1,31 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, useFieldArray, Controller } from "react-hook-form"
-import * as z from "zod"
-import { v4 as uuidv4 } from "uuid"
-import {
-    Save,
-    Loader2,
-    ChevronLeft,
-    Plus,
-    Trash2,
-    LinkIcon,
-    CheckIcon,
-    ImageIcon,
-    BookOpen,
-    ChevronsUpDown,
-    Layers,
-    LayoutGrid
-} from "lucide-react"
-import { toast } from "sonner"
-import api from "@/lib/axios"
 import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+    BookOpen,
+    CheckIcon,
+    ChevronLeft,
+    ChevronsUpDown,
+    ImageIcon,
+    Layers,
+    LayoutGrid,
+    LinkIcon,
+    Loader2,
+    Plus,
+    Save,
+    Trash2
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import * as React from "react"
+import { Controller, useFieldArray, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { v4 as uuidv4 } from "uuid"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
-    Field,
-    FieldLabel,
-    FieldError,
-    FieldContent,
-} from "@/components/ui/field"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Command,
     CommandEmpty,
@@ -50,7 +34,28 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
+import {
+    Field,
+    FieldContent,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
+import Image from "next/image"
+
+type LevelType = {
+    level: string;
+    id: number;
+}
+
+type SubjectType = {
+    name: string;
+    id: number;
+}
 
 // 1. Tách schema zod riêng
 const courseSchema = z.object({
@@ -128,13 +133,13 @@ export default function CreateCoursePage() {
                 const levelsData = levelRes.data.data || levelRes.data || [];
                 const subjectsData = subjectRes.data.data || subjectRes.data || [];
 
-                setLevels(levelsData.map((item: any) => ({
-                    label: item.level || item.name || String(item.id), // Handle fallback if API differs
+                setLevels(levelsData.map((item: LevelType) => ({
+                    label: item.level,
                     value: Number(item.id)
                 })));
 
-                setSubjects(subjectsData.map((item: any) => ({
-                    label: item.name || String(item.id),
+                setSubjects(subjectsData.map((item: SubjectType) => ({
+                    label: item.name,
                     value: Number(item.id)
                 })));
             } catch (error) {
@@ -155,16 +160,19 @@ export default function CreateCoursePage() {
                 course_materials: data.course_materials?.filter(m => m.link_url.trim() !== "") || []
             }
 
-            const res = await api.post("/admin/courses", payload)
-
+            await api.post("/admin/courses", payload)
             toast.success("Tạo khóa học thành công!")
             form.reset()
             // Redirect sau khi tạo thành công
             router.push("/admin/courses")
             router.refresh()
-        } catch (err: any) {
-            console.error(err)
-            toast.error(err.response?.data?.message || "Có lỗi xảy ra khi tạo khóa học")
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                console.error(err)
+                toast.error(err.response?.data?.message || "Có lỗi xảy ra khi tạo khóa học")
+            } else {
+                toast.error("Có lỗi xảy ra khi tạo khóa học")
+            }
         } finally {
             setIsSubmitting(false)
         }
@@ -380,7 +388,7 @@ export default function CreateCoursePage() {
                             <CardContent className="space-y-4">
                                 {fields.length === 0 ? (
                                     <div className="text-center py-6 text-muted-foreground text-sm border border-dashed rounded-lg bg-muted/20">
-                                        Chưa có tài liệu nào. Bấm "Thêm tài liệu" để bắt đầu.
+                                        Chưa có tài liệu nào. Bấm Thêm tài liệu để bắt đầu.
                                     </div>
                                 ) : (
                                     fields.map((field, index) => (
@@ -447,8 +455,8 @@ export default function CreateCoursePage() {
                                                         variant="outline"
                                                         className={cn(
                                                             "h-9 px-2 text-xs md:text-sm font-medium transition-all bg-transparent",
-                                                            field.value === "draft" 
-                                                                ? "border-slate-500 text-slate-700 dark:text-slate-300 ring-1 ring-slate-500 bg-slate-50 dark:bg-slate-900/50" 
+                                                            field.value === "draft"
+                                                                ? "border-slate-500 text-slate-700 dark:text-slate-300 ring-1 ring-slate-500 bg-slate-50 dark:bg-slate-900/50"
                                                                 : "border-input text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-900"
                                                         )}
                                                         onClick={() => field.onChange("draft")}
@@ -460,8 +468,8 @@ export default function CreateCoursePage() {
                                                         variant="outline"
                                                         className={cn(
                                                             "h-9 px-2 text-xs md:text-sm font-medium transition-all bg-transparent",
-                                                            field.value === "published" 
-                                                                ? "border-emerald-500 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500 bg-emerald-50 dark:bg-emerald-950/30" 
+                                                            field.value === "published"
+                                                                ? "border-emerald-500 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
                                                                 : "border-input text-muted-foreground hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30"
                                                         )}
                                                         onClick={() => field.onChange("published")}
@@ -473,8 +481,8 @@ export default function CreateCoursePage() {
                                                         variant="outline"
                                                         className={cn(
                                                             "h-9 px-2 text-xs md:text-sm font-medium transition-all bg-transparent",
-                                                            field.value === "archived" 
-                                                                ? "border-rose-500 text-rose-700 dark:text-rose-400 ring-1 ring-rose-500 bg-rose-50 dark:bg-rose-950/30" 
+                                                            field.value === "archived"
+                                                                ? "border-rose-500 text-rose-700 dark:text-rose-400 ring-1 ring-rose-500 bg-rose-50 dark:bg-rose-950/30"
                                                                 : "border-input text-muted-foreground hover:bg-rose-50/50 dark:hover:bg-rose-950/30"
                                                         )}
                                                         onClick={() => field.onChange("archived")}
@@ -606,7 +614,7 @@ export default function CreateCoursePage() {
 
                                 {imageUrl ? (
                                     <div className="rounded-lg overflow-hidden border bg-muted flex items-center justify-center min-h-[160px]">
-                                        <img
+                                        <Image
                                             src={imageUrl}
                                             alt="Preview"
                                             className="w-full h-auto object-cover max-h-[250px]"

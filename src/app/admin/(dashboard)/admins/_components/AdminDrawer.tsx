@@ -1,43 +1,38 @@
 "use client"
 
-import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
-import * as z from "zod"
 import {
-    Save,
-    Loader2,
-    Plus,
-    ShieldCheck,
-    CalendarIcon,
-    Check,
-    ChevronsUpDown,
-    X,
-    Eye,
-    Edit,
-    User,
-    Phone,
-    Mail,
-    MapPin,
     Calendar,
     Camera,
+    Check,
+    Edit,
+    Loader2,
+    Mail,
+    MapPin,
+    Phone,
+    Save,
     Shield,
-    Activity,
-    UserCircle
+    ShieldCheck,
+    User
 } from "lucide-react"
-import { toast } from "sonner"
-import { format } from "date-fns"
-import Image from "next/image"
+import * as React from "react"
 import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 
+import { Can } from "@/components/auth/can"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
     Field,
-    FieldLabel,
-    FieldError,
     FieldContent,
+    FieldError,
+    FieldLabel,
 } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import {
     Sheet,
     SheetContent,
@@ -45,14 +40,9 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
-import { cn } from "@/lib/utils"
 import api from "@/lib/axios"
-import { Can } from "@/components/auth/can"
+import { cn } from "@/lib/utils"
 
 // ─────────────────────────── Types ───────────────────────────
 
@@ -94,7 +84,12 @@ type AdminFormValues = z.infer<typeof adminSchema>
 
 // ─────────────────────────── Helpers ───────────────────────────
 
-const genderOptions = [
+interface GenderOptions {
+    value: "male" | "female" | "other"
+    label: string
+}
+
+const genderOptions: GenderOptions[] = [
     { value: "male", label: "Nam" },
     { value: "female", label: "Nữ" },
     { value: "other", label: "Khác" },
@@ -162,12 +157,10 @@ export function AdminDrawer({
     const {
         register,
         handleSubmit,
-        control,
         formState: { errors },
         reset,
         watch,
         setValue,
-        getValues,
     } = form
 
     const currentAvatar = watch("avatar")
@@ -179,6 +172,7 @@ export function AdminDrawer({
     const fileInputRef = React.useRef<HTMLInputElement>(null)
 
     // Reset + load data when drawer opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (!open) return
 
@@ -208,8 +202,8 @@ export function AdminDrawer({
                         status: data.status || "active",
                         date_of_birth: data.date_of_birth || null,
                         avatar: data.avatar || null,
-                        roles: data.roles 
-                            ? data.roles.map((r: any) => typeof r === 'string' ? r : r.name)
+                        roles: data.roles
+                            ? data.roles.map((r: Role) => typeof r === 'string' ? r : r.name)
                             : [],
                     })
                 })
@@ -233,6 +227,7 @@ export function AdminDrawer({
                 roles: ["admin"],
             })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, internalMode, admin?.id])
 
     const onSubmit = async (data: AdminFormValues) => {
@@ -248,7 +243,7 @@ export function AdminDrawer({
 
             handleOpenChange(false)
             onSuccess?.()
-        } catch (err: any) {
+        } catch (err) {
             toast.error(err.response?.data?.message || err.message || "Đã có lỗi xảy ra.")
         } finally {
             setIsSubmitting(false)
@@ -282,7 +277,7 @@ export function AdminDrawer({
                 setValue("avatar", url, { shouldValidate: true })
                 toast.success("Tải ảnh lên thành công")
             }
-        } catch (err: any) {
+        } catch {
             toast.error("Lỗi khi tải ảnh lên")
         } finally {
             setIsUploading(false)
@@ -292,7 +287,7 @@ export function AdminDrawer({
     const isView = internalMode === "view"
     const isDisabled = isSubmitting || isFetching
 
-    const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string, value?: string | null }) => (
+    const DetailRow = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value?: string | null }) => (
         <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                 <Icon className="h-4 w-4" />
@@ -430,7 +425,7 @@ export function AdminDrawer({
                                             <button
                                                 key={opt.value}
                                                 type="button"
-                                                onClick={() => setValue("gender", opt.value as any)}
+                                                onClick={() => setValue("gender", opt.value)}
                                                 className={cn(
                                                     "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
                                                     watch("gender") === opt.value ? "bg-primary/10 border-primary text-primary" : "border-input bg-transparent text-muted-foreground"
@@ -491,8 +486,8 @@ export function AdminDrawer({
                                                 key={role.id}
                                                 className={cn(
                                                     "flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer select-none",
-                                                    currentRoles.includes(role.name) 
-                                                        ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20 shadow-sm shadow-primary/5" 
+                                                    currentRoles.includes(role.name)
+                                                        ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20 shadow-sm shadow-primary/5"
                                                         : "bg-muted/5 border-slate-200 dark:border-slate-800 hover:border-primary/30"
                                                 )}
                                                 onClick={() => handleRoleSelect(role.name)}
@@ -500,8 +495,8 @@ export function AdminDrawer({
                                                 <div className="flex items-center gap-3">
                                                     <div className={cn(
                                                         "w-5 h-5 rounded-full border flex items-center justify-center transition-all",
-                                                        currentRoles.includes(role.name) 
-                                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20" 
+                                                        currentRoles.includes(role.name)
+                                                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                                                             : "border-slate-300 dark:border-slate-600"
                                                     )}>
                                                         {currentRoles.includes(role.name) && <Check className="h-3 w-3 stroke-[3]" />}

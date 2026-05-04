@@ -1,19 +1,18 @@
 "use client"
 
-import * as React from "react"
+import { usePermission } from "@/hooks/use-permission"
+import {
+  BookOpen,
+  ChevronRight,
+  GraduationCap,
+  LayoutDashboard,
+  Settings,
+  ShieldCheck,
+  UserCheck,
+  Users,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard,
-  BookOpen,
-  Users,
-  GraduationCap,
-  ShieldCheck,
-  ChevronRight,
-  Settings,
-  UserCheck,
-} from "lucide-react"
-import { usePermission } from "@/hooks/use-permission"
 
 import {
   Sidebar,
@@ -27,8 +26,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarProvider,
-  SidebarRail,
+  SidebarRail
 } from "@/components/ui/sidebar"
 
 const navItems = [

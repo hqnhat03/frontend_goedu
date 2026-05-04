@@ -1,32 +1,31 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
 import {
   ArrowLeft,
   BookOpen,
-  Calendar,
   Clock,
+  Edit,
   FileText,
   GraduationCap,
   Layers,
   LayoutGrid,
   Settings2,
-  Users,
-  Edit,
+  Users
 } from "lucide-react"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
 
+import { Can } from "@/components/auth/can"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "sonner"
-import api from "@/lib/axios"
-import { Can } from "@/components/auth/can"
+import { StatusBadge } from "@/components/ui/status-badge"
 import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import Image from "next/image"
+import { toast } from "sonner"
 
 interface CourseDetail {
   id: number
@@ -41,8 +40,16 @@ interface CourseDetail {
   target_student: "all" | "student" | "employee"
   lesson_count: number
   completion_time: number
-  course_materials: any[]
+  course_materials: CourseMaterialType[]
 }
+
+interface CourseMaterialType {
+  id: number
+  name: string
+  link_url: string
+}
+
+type StatusType = "draft" | "published" | "archived"
 
 
 const targetStudentConfig: Record<string, { label: string; color: string }> = {
@@ -169,7 +176,7 @@ export default function CourseDetailPage() {
           <Card className="border-none shadow-md overflow-hidden bg-gradient-to-b from-card to-muted/20">
             <div className="h-48 w-full bg-muted relative border-b">
               {course.image_url ? (
-                <img
+                <Image
                   src={course.image_url}
                   alt={course.name}
                   className="w-full h-full object-cover"
@@ -195,7 +202,7 @@ export default function CourseDetailPage() {
                     <Users className="w-3.5 h-3.5 mr-1.5" />
                     {targetStudentConfig[course.target_student]?.label || course.target_student}
                   </Badge>
-                  <StatusBadge status={course.status as any} className="px-3 py-1 text-sm shadow-none font-medium rounded-md" />
+                  <StatusBadge status={course.status as StatusType} className="px-3 py-1 text-sm shadow-none font-medium rounded-md" />
                 </div>
               </div>
 
@@ -290,7 +297,7 @@ export default function CourseDetailPage() {
               <div className="divide-y">
                 <div className="flex justify-between items-center p-4 hover:bg-muted/30 transition-colors">
                   <span className="text-sm text-muted-foreground font-medium">Trạng thái</span>
-                  <StatusBadge status={course.status as any} className="shadow-none rounded-md" />
+                  <StatusBadge status={course.status as StatusType} className="shadow-none rounded-md" />
                 </div>
                 <div className="flex justify-between items-center p-4 hover:bg-muted/30 transition-colors">
                   <span className="text-sm text-muted-foreground font-medium">Môn học</span>

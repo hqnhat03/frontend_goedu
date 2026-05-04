@@ -1,21 +1,18 @@
 "use client"
 
-import * as React from "react"
 import {
-  Users,
-  Calendar,
   BookOpen,
-  TrendingUp,
+  Calendar,
   Clock,
-  ArrowRight,
-  Loader2
+  TrendingUp,
+  Users
 } from "lucide-react"
+import * as React from "react"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import api from "@/lib/axios"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import Link from "next/link"
+import api from "@/lib/axios"
 import { useAuthStore } from "@/store/auth-store"
 
 interface DashboardStats {
@@ -249,7 +246,7 @@ export default function TeacherDashboard() {
             <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/20 group hover:border-emerald-400/30 transition-colors cursor-pointer">
               <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Tin nhắn</p>
               <p className="text-sm font-bold mb-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">Phụ huynh em Nguyễn Văn B</p>
-              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">"Chào thầy, gia đình muốn xin phép cho em B nghỉ học ngày mai vì lý do sức khỏe..."</p>
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">&quot;Chào thầy, gia đình muốn xin phép cho em B nghỉ học ngày mai vì lý do sức khỏe...&quot;</p>
             </div>
             <Button variant="outline" className="w-full text-xs font-bold uppercase tracking-widest h-10 border-muted-foreground/10 hover:bg-muted/10">
               Xem tất cả thông báo

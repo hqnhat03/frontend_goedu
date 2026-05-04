@@ -1,30 +1,31 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import api from '@/lib/axios';
-import {
-    ChevronLeft,
-    AlertCircle,
-    FileText,
-    MessageCircle,
-    Info,
-    ArrowLeft
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
+import api from '@/lib/axios';
 import { cn } from '@/lib/utils';
+import { AxiosError } from 'axios';
+import {
+    AlertCircle,
+    ArrowLeft,
+    ChevronLeft,
+    FileText,
+    Info,
+    MessageCircle
+} from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Question {
     id: string;
     question: string;
     type: 'multiple_choice' | 'essay' | 'multiple_select';
     options: string[] | null;
-    correct_answer: any;
+    correct_answer: string;
     score: number;
     order_number?: number;
 }
@@ -32,7 +33,7 @@ interface Question {
 interface ExamDetail {
     id: number;
     question: Question;
-    answer_content: any;
+    answer_content: string | string[];
     score: number;
     is_correct: boolean;
     teacher_comment: string | null;
@@ -76,9 +77,10 @@ export default function ExamResultPage() {
                 } else {
                     setError(response.data.message || 'Không thể tải kết quả bài kiểm tra');
                 }
-            } catch (err: any) {
-                console.error('Error fetching exam result:', err);
-                setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+            } catch (err: unknown) {
+                if (err instanceof AxiosError) {
+                    setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+                }
             } finally {
                 setLoading(false);
             }
@@ -86,17 +88,6 @@ export default function ExamResultPage() {
 
         fetchResult();
     }, [exam_id]);
-
-    const formatDate = (dateString: string) => {
-        if (!dateString) return '---';
-        return new Date(dateString).toLocaleString('vi-VN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    };
 
     if (loading) {
         return (

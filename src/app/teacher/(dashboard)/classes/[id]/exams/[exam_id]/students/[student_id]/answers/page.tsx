@@ -1,43 +1,37 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import api from "@/lib/axios";
-import { 
-  ArrowLeft, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  MessageSquare, 
-  Trophy,
-  User,
-  Calendar,
-  AlertCircle,
-  ChevronRight,
-  FileText,
-  Save,
-  Loader2,
-  ChevronLeft
-} from "lucide-react";
-import { toast } from "sonner"; // Assuming sonner is available or I'll use simple alert/state if not. Let's check imports.
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardFooter,
-  CardTitle,
-  CardDescription 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
+import { Textarea } from "@/components/ui/textarea";
+import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useExamStore } from "@/store/exam-store";
+import { AxiosError } from "axios";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  MessageSquare,
+  Save,
+  Trophy,
+  User
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner"; // Assuming sonner is available or I'll use simple alert/state if not. Let's check imports.
 
 interface Question {
   id: string;
@@ -85,14 +79,14 @@ interface APIResponse {
 export default function StudentAnswersPage() {
   const params = useParams();
   const router = useRouter();
-  const { id: classId, exam_id: examId, student_id: studentId } = params;
+  const { exam_id: examId, student_id: studentId } = params;
   const { currentStudentName: studentName } = useExamStore();
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ExamResultData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  
+
   // Grading state
   const [grades, setGrades] = useState<Record<string, { score: number; comment: string }>>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -105,7 +99,7 @@ export default function StudentAnswersPage() {
         if (response.data.success) {
           const resultData = response.data.data;
           setData(resultData);
-          
+
           // Initialize grades state from current data
           const initialGrades: Record<string, { score: number; comment: string }> = {};
           resultData.details.forEach(detail => {
@@ -118,9 +112,11 @@ export default function StudentAnswersPage() {
         } else {
           setError(response.data.message || "Không thể tải dữ liệu.");
         }
-      } catch (err: any) {
-        console.error("Error fetching student answers:", err);
-        setError(err.response?.data?.message || "Đã có lỗi xảy ra khi kết nối máy chủ.");
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          console.error("Error fetching student answers:", err);
+          setError(err.response?.data?.message || "Đã có lỗi xảy ra khi kết nối máy chủ.");
+        }
       } finally {
         setLoading(false);
       }
@@ -164,26 +160,25 @@ export default function StudentAnswersPage() {
 
   const totalPossibleScore = data.details.reduce((acc, detail) => acc + detail.question.score, 0);
 
-  // Calculate current total score from grades state
   const currentTotalScore = Object.values(grades).reduce((acc, g) => acc + (Number(g.score) || 0), 0);
 
-  const handleUpdateGrade = (questionId: string, field: "score" | "comment", value: any) => {
+  const handleUpdateGrade = (questionId: string, field: "score" | "comment", value: string | number) => {
     setGrades(prev => ({
       ...prev,
       [questionId]: {
         ...prev[questionId],
-        [field]: field === "score" ? parseFloat(value) || 0 : value
+        [field]: field === "score" ? parseFloat(String(value)) || 0 : String(value)
       }
     }));
   };
 
   const saveGrades = async () => {
     if (!data) return;
-    
+
     try {
       setSaving(true);
       const essayDetails = data.details.filter(d => d.question.type === "essay");
-      
+
       const payload = {
         answers: essayDetails.map(d => ({
           question_id: d.question_id,
@@ -194,15 +189,17 @@ export default function StudentAnswersPage() {
       };
 
       const response = await api.put(`/teacher/results/${data.id}/grade`, payload);
-      
+
       if (response.data.success) {
         toast.success("Chấm điểm thành công!");
         setData(prev => prev ? { ...prev, score: currentTotalScore, status: "completed" } : null);
         setIsEditing(false);
       }
-    } catch (err: any) {
-      console.error("Error saving grades:", err);
-      toast.error(err.response?.data?.message || "Đã có lỗi xảy ra khi lưu điểm.");
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        console.error("Error saving grades:", err);
+        toast.error(err.response?.data?.message || "Đã có lỗi xảy ra khi lưu điểm.");
+      }
     } finally {
       setSaving(false);
     }
@@ -240,9 +237,9 @@ export default function StudentAnswersPage() {
     <div className="p-6 space-y-8 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Navigation Header */}
       <div className="space-y-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => router.back()}
           className="group -ml-2 text-muted-foreground hover:text-primary transition-colors"
         >
@@ -262,7 +259,7 @@ export default function StudentAnswersPage() {
               Mã học sinh: <span className="font-medium text-slate-700 dark:text-slate-300">#{data.student_id}</span>
             </p>
           </div>
-          
+
           {(data.status !== "completed" || isEditing) ? (
             <div className="flex gap-2">
               {isEditing && (
@@ -270,7 +267,7 @@ export default function StudentAnswersPage() {
                   Hủy chỉnh sửa
                 </Button>
               )}
-              <Button 
+              <Button
                 className="shadow-lg shadow-blue-200 dark:shadow-none font-bold px-6 h-11"
                 disabled={saving}
                 onClick={saveGrades}
@@ -357,14 +354,14 @@ export default function StudentAnswersPage() {
         </div>
 
         <div className="space-y-8">
-          {data.details.sort((a, b) => a.question.order_number - b.question.order_number).map((detail, index) => {
+          {data.details.sort((a, b) => a.question.order_number - b.question.order_number).map((detail) => {
             const isCorrect = detail.is_correct;
             const isEssay = detail.question.type === "essay";
-            
+
             // Helper to determine if an option is correct or student's choice
             const getOptionStatus = (optionValue: string, optionIndex: number) => {
               const isStudentChoice = detail.answer_content === optionValue;
-              
+
               // Handle correct answer as either index or value
               let isCorrectAnswer = false;
               if (detail.question.correct_answer === optionIndex.toString()) {
@@ -377,13 +374,13 @@ export default function StudentAnswersPage() {
             };
 
             return (
-              <Card 
-                key={detail.id} 
+              <Card
+                key={detail.id}
                 className={cn(
                   "border-none shadow-lg transition-all duration-300 hover:shadow-xl ring-1",
-                  isCorrect === true ? "ring-emerald-100 dark:ring-emerald-950/20" : 
-                  isCorrect === false ? "ring-rose-100 dark:ring-rose-950/20" : 
-                  "ring-slate-100 dark:ring-slate-800"
+                  isCorrect === true ? "ring-emerald-100 dark:ring-emerald-950/20" :
+                    isCorrect === false ? "ring-rose-100 dark:ring-rose-950/20" :
+                      "ring-slate-100 dark:ring-slate-800"
                 )}
               >
                 <CardHeader className="pb-3 border-b border-slate-50 dark:border-slate-800/50">
@@ -404,7 +401,7 @@ export default function StudentAnswersPage() {
                     <div className="text-right flex flex-col items-end gap-2">
                       <p className="text-sm font-medium text-muted-foreground">Điểm</p>
                       <div className="flex items-center gap-2 bg-white dark:bg-slate-950 p-1 px-2 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <Input 
+                        <Input
                           type="number"
                           step="0.1"
                           min="0"
@@ -425,9 +422,9 @@ export default function StudentAnswersPage() {
                 <CardContent className="pt-6 space-y-6">
                   {/* Question Content */}
                   <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <div 
+                    <div
                       className="text-lg font-medium leading-relaxed text-slate-800 dark:text-slate-200"
-                      dangerouslySetInnerHTML={{ __html: detail.question.question }} 
+                      dangerouslySetInnerHTML={{ __html: detail.question.question }}
                     />
                   </div>
 
@@ -436,34 +433,34 @@ export default function StudentAnswersPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                       {detail.question.options.map((option, idx) => {
                         const { isStudentChoice, isCorrectAnswer } = getOptionStatus(option, idx);
-                        
+
                         return (
-                          <div 
+                          <div
                             key={idx}
                             className={cn(
                               "flex items-center justify-between p-3 rounded-xl border-2 transition-all",
-                              isStudentChoice && isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" : 
-                              isStudentChoice && !isCorrectAnswer ? "bg-rose-50 border-rose-500 dark:bg-rose-950/20" :
-                              isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" :
-                              "bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800"
+                              isStudentChoice && isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" :
+                                isStudentChoice && !isCorrectAnswer ? "bg-rose-50 border-rose-500 dark:bg-rose-950/20" :
+                                  isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" :
+                                    "bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800"
                             )}
                           >
                             <div className="flex items-center gap-2">
                               <div className={cn(
                                 "flex items-center justify-center w-6 h-6 rounded-full border-2 text-xs font-bold",
                                 isStudentChoice && isCorrectAnswer ? "border-emerald-600 text-emerald-600 bg-white" :
-                                isStudentChoice && !isCorrectAnswer ? "border-rose-600 text-rose-600 bg-white" :
-                                isCorrectAnswer ? "border-emerald-600 text-emerald-600 bg-white" :
-                                "border-slate-300 text-slate-500"
+                                  isStudentChoice && !isCorrectAnswer ? "border-rose-600 text-rose-600 bg-white" :
+                                    isCorrectAnswer ? "border-emerald-600 text-emerald-600 bg-white" :
+                                      "border-slate-300 text-slate-500"
                               )}>
                                 {String.fromCharCode(65 + idx)}
                               </div>
                               <span className={cn(
                                 "text-sm",
                                 isStudentChoice && isCorrectAnswer ? "font-bold text-emerald-700 dark:text-emerald-400" :
-                                isStudentChoice && !isCorrectAnswer ? "font-bold text-rose-700 dark:text-rose-400" :
-                                isCorrectAnswer ? "font-bold text-emerald-700 dark:text-emerald-400" :
-                                "text-slate-700 dark:text-slate-300"
+                                  isStudentChoice && !isCorrectAnswer ? "font-bold text-rose-700 dark:text-rose-400" :
+                                    isCorrectAnswer ? "font-bold text-emerald-700 dark:text-emerald-400" :
+                                      "text-slate-700 dark:text-slate-300"
                               )}>
                                 {option}
                               </span>
@@ -496,7 +493,7 @@ export default function StudentAnswersPage() {
                         <MessageSquare className="h-4 w-4" />
                         Nhận xét của giáo viên
                       </div>
-                      <Textarea 
+                      <Textarea
                         placeholder="Nhập nhận xét cho câu trả lời này..."
                         className="min-h-[80px] bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 focus:ring-indigo-500 rounded-xl transition-all"
                         value={grades[detail.question_id]?.comment || ""}

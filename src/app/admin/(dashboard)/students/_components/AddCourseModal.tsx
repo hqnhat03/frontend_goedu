@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import {
     Select,
     SelectContent,
@@ -16,11 +16,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { BookOpen, Layers, GraduationCap, Loader2, Save } from "lucide-react"
-import { toast } from "sonner"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
+import { BookOpen, GraduationCap, Layers, Loader2, Save } from "lucide-react"
+import * as React from "react"
+import { toast } from "sonner"
 
 interface AddCourseModalProps {
     open: boolean
@@ -38,6 +39,11 @@ interface FilterOption {
 interface Course {
     id: number
     name: string
+}
+
+interface LevelType {
+    id: number
+    level: string
 }
 
 export function AddCourseModal({
@@ -82,9 +88,9 @@ export function AddCourseModal({
             const levelsData = levelsRes.data?.data || []
 
             setSubjects(subjectsData)
-            setLevels(levelsData.map((l: any) => ({
+            setLevels(levelsData.map((l: LevelType) => ({
                 id: l.id,
-                name: l.level || l.name
+                name: l.level
             })))
         } catch (error) {
             console.error("Failed to fetch filters:", error)
@@ -123,6 +129,7 @@ export function AddCourseModal({
         }
 
         fetchCourses()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSubject, selectedLevel, open])
 
     const handleAdd = async () => {
@@ -144,9 +151,10 @@ export function AddCourseModal({
             } else {
                 toast.error(res.data?.message || "Không thể thêm vào khóa học")
             }
-        } catch (error: any) {
-            console.error("Enrollment error:", error)
-            toast.error(error.response?.data?.message || "Đã có lỗi xảy ra")
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.message || "Đã có lỗi xảy ra")
+            }
         } finally {
             setIsSubmitting(false)
         }

@@ -1,15 +1,16 @@
 "use client"
 
-import * as React from "react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -18,12 +19,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { LayoutGrid, Users, Loader2, Search, Check } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { toast } from "sonner"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
+import { Check, LayoutGrid, Loader2, Search, Users } from "lucide-react"
+import * as React from "react"
+import { toast } from "sonner"
 
 interface ClassItem {
     id: number
@@ -102,9 +103,11 @@ export function AssignClassModal({
             } else {
                 toast.error(res.data?.message || "Không thể thêm vào lớp")
             }
-        } catch (error: any) {
-            console.error("Assign error:", error)
-            toast.error(error.response?.data?.message || "Đã có lỗi xảy ra")
+        } catch (error: unknown) {
+            if (error instanceof AxiosError) {
+                console.error("Assign error:", error)
+                toast.error(error.response?.data?.message || "Đã có lỗi xảy ra")
+            }
         } finally {
             setIsSubmitting(false)
         }

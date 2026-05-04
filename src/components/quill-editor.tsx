@@ -1,8 +1,8 @@
 "use client"
 
-import * as React from "react"
 import Quill from "quill"
 import "quill/dist/quill.snow.css"
+import * as React from "react"
 
 interface QuillEditorProps {
   value: string
@@ -33,12 +33,13 @@ export function QuillEditor({
 
   React.useEffect(() => {
     if (!containerRef.current || quillRef.current) return
+    const container = containerRef.current
 
     // Clear container to prevent duplicate toolbars on re-mount/HMR
-    containerRef.current.innerHTML = ""
+    container.innerHTML = ""
     // Create a dedicated editor element inside the container
     const editorDiv = document.createElement("div")
-    containerRef.current.appendChild(editorDiv)
+    container.appendChild(editorDiv)
 
     const toolbarOptions = [
       ["bold", "italic", "underline", "strike"],
@@ -90,8 +91,8 @@ export function QuillEditor({
 
     return () => {
       quillRef.current = null
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ""
+      if (container) {
+        container.innerHTML = ""
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

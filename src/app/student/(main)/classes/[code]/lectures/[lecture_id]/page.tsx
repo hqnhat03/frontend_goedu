@@ -1,25 +1,21 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import api from '@/lib/axios'
 import {
+    CheckCircle2,
     ChevronLeft,
-    Play,
+    Clock,
+    ExternalLink,
     FileText,
     MessageSquare,
-    ChevronRight,
-    PlayCircle,
-    CheckCircle2,
-    Lock,
-    ExternalLink,
-    Clock
+    Play
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 interface Lecture {
     id: number

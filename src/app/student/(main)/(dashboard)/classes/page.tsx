@@ -1,31 +1,20 @@
 "use client"
 
-import React from "react"
-import api from "@/lib/axios"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import api from "@/lib/axios"
 import {
+  ArrowRight,
   BookOpen,
   Clock,
-  MapPin,
-  User,
-  Calendar,
-  MoreVertical,
-  PlayCircle,
-  Users,
   GraduationCap,
-  ArrowRight
+  Users
 } from "lucide-react"
 import Link from "next/link"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import React from "react"
 
 import {
   Tooltip,

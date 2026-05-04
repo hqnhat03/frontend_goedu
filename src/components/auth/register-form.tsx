@@ -1,25 +1,26 @@
 "use client";
 
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock, Mail, MoveLeft, Phone, UserCircle, UserPlus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User, UserPlus, MoveLeft, Phone, UserCircle } from "lucide-react";
+import React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
-  FieldError,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import api from "@/lib/axios";
 import { useAuthStore } from "@/store/auth-store";
+import { AxiosError } from "axios";
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Họ và tên phải có ít nhất 2 ký tự" }),
@@ -88,16 +89,18 @@ export function RegisterForm() {
       } else {
         toast.error(result.message || "Đăng ký thất bại");
       }
-    } catch (error: any) {
-      console.error(error);
-      const message = error.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
-      toast.error(message);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error(error);
+        const message = error.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
+        toast.error(message);
 
-      if (error.response?.data?.errors) {
-        const fieldErrors = error.response.data.errors;
-        Object.keys(fieldErrors).forEach((key) => {
-          form.setError(key as any, { message: fieldErrors[key][0] });
-        });
+        if (error.response?.data?.errors) {
+          const fieldErrors = error.response.data.errors;
+          Object.keys(fieldErrors).forEach((key) => {
+            form.setError(key as keyof RegisterFormValues, { message: fieldErrors[key][0] });
+          });
+        }
       }
     } finally {
       setIsLoading(false);

@@ -1,49 +1,46 @@
 "use client"
 
-import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
-import * as z from "zod"
+import { format } from "date-fns"
 import {
-    Save,
-    Loader2,
-    Plus,
-    ShieldCheck,
+    Briefcase,
+    Calendar,
     CalendarIcon,
-    Check,
-    ChevronsUpDown,
-    X,
-    Eye,
+    Camera,
     Edit,
-    User,
-    Phone,
+    FileText,
+    Globe,
+    GraduationCap,
+    Info,
+    Loader2,
     Mail,
     MapPin,
-    Users,
-    Calendar,
-    Camera,
-    GraduationCap,
-    Briefcase,
-    Globe,
-    Nationality,
-    Info,
-    FileText,
+    Phone,
+    Save,
     ShieldAlert,
+    ShieldCheck,
+    User,
+    Users
 } from "lucide-react"
-import { toast } from "sonner"
-import { format } from "date-fns"
 import Image from "next/image"
+import * as React from "react"
 import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 
+import { Can } from "@/components/auth/can"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import {
     Field,
-    FieldLabel,
-    FieldError,
     FieldContent,
+    FieldError,
+    FieldLabel,
 } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import {
     Sheet,
     SheetContent,
@@ -51,18 +48,11 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { Textarea } from "@/components/ui/textarea"
 import api from "@/lib/axios"
-import { Can } from "@/components/auth/can"
+import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
 
 // ─────────────────────────── Types ───────────────────────────
 
@@ -296,21 +286,19 @@ export function TeacherDrawer({
 
             handleOpenChange(false)
             onSuccess?.()
-        } catch (err: any) {
-            const msg =
-                err.response?.data?.message ||
-                err.message ||
-                "Đã có lỗi xảy ra."
-            toast.error(msg)
-            if (err.response?.data?.errors) {
-                Object.entries(err.response.data.errors).forEach(
-                    ([key, val]) => {
-                        // @ts-ignore
-                        form.setError(key, {
-                            message: (val as string[])[0],
-                        })
-                    }
-                )
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                const msg = err.response?.data?.message || "Đã có lỗi xảy ra."
+                toast.error(msg)
+                if (err.response?.data?.errors) {
+                    Object.entries(err.response.data.errors).forEach(
+                        ([key, val]) => {
+                            form.setError(key as keyof TeacherFormValues, {
+                                message: (val as string[])[0],
+                            })
+                        }
+                    )
+                }
             }
         } finally {
             setIsSubmitting(false)
@@ -343,8 +331,10 @@ export function TeacherDrawer({
             } else {
                 throw new Error("Không nhận được URL từ máy chủ")
             }
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || "Lỗi khi tải ảnh lên")
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Lỗi khi tải ảnh lên")
+            }
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ""

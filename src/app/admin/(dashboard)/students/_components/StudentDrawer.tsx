@@ -1,41 +1,43 @@
 "use client"
 
-import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { format, isValid } from "date-fns"
 import {
-    Save,
-    Loader2,
-    GraduationCap,
     Briefcase,
-    X,
-    Eye,
-    Edit,
-    User,
-    Phone,
-    Mail,
-    MapPin,
     Calendar,
     Camera,
+    Edit,
+    GraduationCap,
+    Loader2,
+    Mail,
+    MapPin,
+    Phone,
+    Save,
     School,
-    Trophy,
-    ShieldCheck,
     ShieldAlert,
+    ShieldCheck,
+    Trophy,
+    User
 } from "lucide-react"
-import { toast } from "sonner"
-import { format, isValid } from "date-fns"
 import Image from "next/image"
+import * as React from "react"
 import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 
+import { Can } from "@/components/auth/can"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
     Field,
-    FieldLabel,
-    FieldError,
     FieldContent,
+    FieldError,
+    FieldLabel,
 } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import {
     Sheet,
     SheetContent,
@@ -43,14 +45,11 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
+import { AxiosError } from "axios"
 import { AddCourseModal } from "./AddCourseModal"
-import { Can } from "@/components/auth/can"
 
 // ─────────────────────────── Types ───────────────────────────
 
@@ -182,7 +181,6 @@ export function StudentDrawer({
     const {
         register,
         handleSubmit,
-        control,
         formState: { errors },
         reset,
         watch,
@@ -217,7 +215,7 @@ export function StudentDrawer({
                         address: data.address || "",
                         gender: data.gender || "male",
                         status: data.status || "active",
-                        date_of_birth: dobString as any,
+                        date_of_birth: dobString as unknown as Date,
                         avatar: data.avatar || "",
                         student_type: data.student_type || "student",
                         school: data.school || "",
@@ -244,13 +242,14 @@ export function StudentDrawer({
                 status: "active",
                 student_type: "student",
                 avatar: "",
-                date_of_birth: "" as any,
+                date_of_birth: "" as unknown as Date,
                 school: "",
                 grade: "",
                 work: "",
                 position: "",
             })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, internalMode, studentId])
 
     const onSubmit = async (data: StudentFormValues) => {
@@ -279,17 +278,14 @@ export function StudentDrawer({
 
             handleOpenChange(false)
             onSuccess?.()
-        } catch (err: any) {
-            const msg =
-                err.response?.data?.message ||
-                err.message ||
-                "Đã có lỗi xảy ra."
-            toast.error(msg)
-            if (err.response?.data?.errors) {
-                Object.entries(err.response.data.errors).forEach(([key, val]) => {
-                    // @ts-ignore
-                    form.setError(key, { message: (val as string[])[0] })
-                })
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Đã có lỗi xảy ra")
+                if (err.response?.data?.errors) {
+                    Object.entries(err.response.data.errors).forEach(([key, val]) => {
+                        form.setError(key as keyof StudentFormValues, { message: (val as string[])[0] })
+                    })
+                }
             }
         } finally {
             setIsSubmitting(false)
@@ -327,15 +323,16 @@ export function StudentDrawer({
                 }
                 reader.readAsDataURL(file)
             }
-        } catch (err: any) {
-            // Fallback to base64 on error as well for now
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Đã có lỗi xảy ra")
+            }
             const reader = new FileReader()
             reader.onloadend = () => {
                 const base64 = reader.result as string
                 form.setValue("avatar", base64)
             }
             reader.readAsDataURL(file)
-            console.error("Upload error:", err)
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ""

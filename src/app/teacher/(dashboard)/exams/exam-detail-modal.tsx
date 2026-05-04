@@ -1,26 +1,21 @@
 "use client"
 
-import * as React from "react"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { StatusBadge } from "@/components/ui/status-badge"
-import {
-  Clock,
-  Calendar,
-  Info,
-  HelpCircle,
-  ExternalLink,
-} from "lucide-react"
 import { format } from "date-fns"
-import { useRouter } from "next/navigation"
+import {
+  Calendar,
+  Clock,
+  HelpCircle,
+  Info
+} from "lucide-react"
 import { toast } from "sonner"
 
 interface Exam {
@@ -45,7 +40,6 @@ interface ExamDetailModalProps {
 }
 
 export function ExamDetailModal({ exam, open, onOpenChange }: ExamDetailModalProps) {
-  const router = useRouter()
 
   if (!exam) return null
 

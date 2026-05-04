@@ -1,27 +1,28 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import api from '@/lib/axios';
+import { AxiosError } from 'axios';
+import { format, isAfter, isBefore, parseISO } from 'date-fns';
+import { vi } from 'date-fns/locale';
 import {
+    AlertCircle,
+    Calendar,
+    CheckCircle2,
+    ChevronRight,
     ClipboardList,
     Clock,
-    Calendar,
-    ChevronRight,
+    Lock,
     Search,
     ShieldAlert,
-    Timer,
-    AlertCircle,
-    CheckCircle2,
-    Lock
+    Timer
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { format, isBefore, isAfter, parseISO } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Exam {
     id: number;
@@ -51,9 +52,10 @@ export default function ExamsPage() {
                 } else {
                     setError(response.data.message || 'Không thể tải danh sách bài kiểm tra');
                 }
-            } catch (err: any) {
-                console.error('Error fetching exams:', err);
-                setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+            } catch (err: unknown) {
+                if (err instanceof AxiosError) {
+                    setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+                }
             } finally {
                 setLoading(false);
             }

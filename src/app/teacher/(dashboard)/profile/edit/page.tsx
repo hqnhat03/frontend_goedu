@@ -1,17 +1,18 @@
 "use client"
 
-import * as React from "react"
-import { ArrowLeft, Save, Loader2, User, BookOpen, Briefcase, Globe } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useAuthStore } from "@/store/auth-store"
 import api from "@/lib/axios"
-import { toast } from "sonner"
+import { useAuthStore } from "@/store/auth-store"
+import { AxiosError } from "axios"
+import { ArrowLeft, Briefcase, Loader2, Save, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
 
 export default function EditTeacherProfilePage() {
   const router = useRouter()
@@ -85,9 +86,10 @@ export default function EditTeacherProfilePage() {
       } else {
         toast.error("Cập nhật thất bại. Vui lòng thử lại.")
       }
-    } catch (error: any) {
-      console.error("Update error:", error)
-      toast.error(error.response?.data?.message || "Cập nhật thất bại. Vui lòng thử lại.")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Cập nhật thất bại. Vui lòng thử lại.")
+      }
     } finally {
       setUpdateLoading(false)
     }

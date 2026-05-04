@@ -1,18 +1,37 @@
 "use client"
 
-import * as React from "react"
-import { User, Mail, Shield, Globe, Phone, Calendar, Camera, Loader2, MapPin, Flag, Briefcase, GraduationCap, Users, BookOpen } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { useAuthStore } from "@/store/auth-store"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import api from "@/lib/axios"
-import { toast } from "sonner"
+import { useAuthStore } from "@/store/auth-store"
+import { AxiosError } from "axios"
+import { BookOpen, Briefcase, Calendar, Camera, Flag, GraduationCap, Loader2, Mail, MapPin, Phone, Shield, User, Users } from "lucide-react"
 import Link from "next/link"
+import * as React from "react"
+import { toast } from "sonner"
+
+interface TeacherProfile {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  date_of_birth: string;
+  address: string;
+  nationality: string;
+  expertise: string;
+  experience: string;
+  bio: string;
+  avatar: string;
+  created_at: string;
+  updated_at: string;
+  target_student: string;
+}
+
 
 export default function TeacherProfilePage() {
   const { user: authUser } = useAuthStore()
-  const [profile, setProfile] = React.useState<any>(null)
+  const [profile, setProfile] = React.useState<TeacherProfile | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [isUploading, setIsUploading] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -56,19 +75,20 @@ export default function TeacherProfilePage() {
         // Cập nhật lên backend
         await api.put("/teacher/profile", { avatar: url })
 
-        setProfile((prev: any) => ({ ...prev, avatar: url }))
+        setProfile((prev: TeacherProfile | null) => prev ? { ...prev, avatar: url } : null)
         // Also update authUser store locally to reflect immediately across the app
-        useAuthStore.getState().setAuth(
-          { ...authUser, avatar: url },
-          useAuthStore.getState().token!
-        );
+        const currentUser = useAuthStore.getState().user;
+        if (currentUser) {
+          useAuthStore.getState().setUser({ ...currentUser, avatar: url });
+        }
         toast.success("Thay đổi ảnh đại diện thành công!")
       } else {
         toast.error("Không nhận được URL ảnh từ server")
       }
-    } catch (err: any) {
-      console.error("Upload error:", err)
-      toast.error("Tải ảnh lên thất bại")
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message || "Tải ảnh lên thất bại")
+      }
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -86,7 +106,6 @@ export default function TeacherProfilePage() {
   const displayName = profile?.name || authUser.name;
   const displayEmail = profile?.email || authUser.email;
   const displayAvatar = profile?.avatar || authUser.avatar;
-  const displayRole = authUser.role;
   const displayPhone = profile?.phone;
   const displayDob = profile?.date_of_birth;
   const displayAddress = profile?.address;

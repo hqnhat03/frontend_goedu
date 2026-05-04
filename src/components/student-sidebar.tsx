@@ -1,42 +1,26 @@
 "use client"
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname, useParams } from "next/navigation"
 import {
-  LayoutDashboard,
   BookOpen,
   Calendar,
-  Settings,
-  ChevronRight,
-  GraduationCap,
-  Bell,
-  LogOut,
-  User,
   ChevronLeft,
-  Newspaper,
   ClipboardList,
   Info,
+  LayoutDashboard,
+  Newspaper
 } from "lucide-react"
+import Link from "next/link"
+import { useParams, usePathname } from "next/navigation"
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarRail,
-  SidebarSeparator,
+  SidebarRail
 } from "@/components/ui/sidebar"
-import { useAuthStore } from "@/store/auth-store"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 
 const navItems = [
   {
@@ -59,7 +43,6 @@ const navItems = [
 export function StudentSidebar() {
   const pathname = usePathname()
   const params = useParams()
-  const { user, logout } = useAuthStore()
 
   const code = params?.code as string
   const isClassRoute = pathname.startsWith(`/classes/${code}`) && code
@@ -94,11 +77,6 @@ export function StudentSidebar() {
   ]
 
   const itemsToRender = isClassRoute ? classNavItems : navItems
-
-  const handleLogout = () => {
-    logout()
-    window.location.href = "/student/login"
-  }
 
   return (
     <Sidebar collapsible="icon" className="relative border-r border-slate-200">

@@ -1,34 +1,23 @@
 "use client"
 
-import * as React from "react"
-import {
-  Plus,
-  Search,
-  Shield,
-  Edit,
-  Trash2,
-  RefreshCw,
-} from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { toast } from "sonner"
-import api from "@/lib/axios"
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
-import { useRouter } from "next/navigation"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import api from "@/lib/axios"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent } from "@/components/ui/card"
+  Edit,
+  Plus,
+  RefreshCw,
+  Search,
+  Shield,
+  Trash2,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import * as React from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +28,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -49,10 +40,19 @@ import {
 } from "@/components/ui/dialog"
 import {
   Field,
-  FieldLabel,
-  FieldError,
   FieldContent,
+  FieldError,
+  FieldLabel,
 } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 interface Role {
   id: number
@@ -81,13 +81,11 @@ export default function RolesPage() {
   const [items, setItems] = React.useState<Role[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
 
-  if (!hasPermission("role_list")) return null
 
-  
   // Create/Edit Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [editingRole, setEditingRole] = React.useState<Role | null>(null)
-  
+
   // Delete Alert State
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
   const [roleToDelete, setRoleToDelete] = React.useState<Role | null>(null)
@@ -133,10 +131,10 @@ export default function RolesPage() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = editingRole 
+      const response = editingRole
         ? await api.put(`/admin/roles/${editingRole.id}`, data)
         : await api.post(`/admin/roles`, data)
-      
+
       const result = response.data
       if (response.status === 200 || response.status === 201) {
         toast.success(editingRole ? "Cập nhật vai trò thành công" : "Tạo vai trò thành công")
@@ -153,7 +151,7 @@ export default function RolesPage() {
 
   const handleDelete = async () => {
     if (!roleToDelete) return
-    
+
     if (roleToDelete.name === "super_admin") {
       toast.error("Không thể xóa vai trò quản trị viên tối cao")
       setIsDeleteDialogOpen(false)
@@ -180,9 +178,11 @@ export default function RolesPage() {
     }
   }
 
-  const filteredItems = items.filter(item => 
+  const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase())
   )
+
+  if (!hasPermission("role_list")) return null
 
   return (
     <div className="flex flex-col gap-6 p-1">
@@ -197,7 +197,7 @@ export default function RolesPage() {
           </p>
         </div>
         <Can permission="role_create">
-          <Button 
+          <Button
             className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap"
             onClick={() => onOpenModal()}
           >
@@ -315,8 +315,8 @@ export default function RolesPage() {
             <Field>
               <FieldLabel>Tên vai trò <span className="text-destructive">*</span></FieldLabel>
               <FieldContent>
-                <Input 
-                  placeholder="VD: admin, teacher, support..." 
+                <Input
+                  placeholder="VD: admin, teacher, support..."
                   {...form.register("name")}
                 />
               </FieldContent>

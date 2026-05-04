@@ -1,11 +1,10 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { TeacherSidebar } from "@/components/teacher-sidebar"
 import { TeacherHeader } from "@/components/teacher-header"
-import { useAuthStore } from "@/store/auth-store"
+import { TeacherSidebar } from "@/components/teacher-sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
+import * as React from "react"
 
 export default function TeacherLayout({
   children,
@@ -14,7 +13,6 @@ export default function TeacherLayout({
 }) {
   const router = useRouter()
   const [mounted, setMounted] = React.useState(false)
-  const token = useAuthStore((state) => state.token)
 
   React.useEffect(() => {
     setMounted(true)

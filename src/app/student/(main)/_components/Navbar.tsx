@@ -1,14 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from '@/components/ui/button';
-import {
-  GraduationCap, Menu, X, LogOut, User, BookOpen, Settings,
-  Bell, Search, ChevronDown, Award, LayoutDashboard
-} from 'lucide-react';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/auth-store';
-import { useRouter, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +11,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth-store';
+import {
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  User,
+  X
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

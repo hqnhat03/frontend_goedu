@@ -1,45 +1,24 @@
 "use client"
 
-import * as React from "react"
-import {
-  Plus,
-  Search,
-  Eye,
-  Edit,
-  Trash2,
-  Users,
-  ShieldCheck,
-  ShieldAlert,
-  RefreshCw,
-} from "lucide-react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import api from "@/lib/axios"
-import { StudentDrawer } from "./_components/StudentDrawer"
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import {
+  Edit,
+  Eye,
+  Plus,
+  RefreshCw,
+  Search,
+  ShieldAlert,
+  ShieldCheck,
+  Trash2,
+  Users,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
+import { StudentDrawer } from "./_components/StudentDrawer"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { useDebounce } from "@/hooks/use-debounce"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +29,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { useDebounce } from "@/hooks/use-debounce"
 
 interface Student {
   id: string | number
@@ -79,8 +79,6 @@ export default function StudentsPage() {
       router.push("/admin")
     }
   }, [hasPermission, router])
-
-  if (!hasPermission("student_list")) return null
 
 
   // State for filtering
@@ -191,6 +189,8 @@ export default function StudentsPage() {
     setStudentType("all")
   }
 
+  if (!hasPermission("student_list")) return null
+
   return (
     <div className="flex flex-col gap-6 p-1">
       {/* Header Section */}
@@ -204,7 +204,7 @@ export default function StudentsPage() {
           </p>
         </div>
         <Can permission="student_create">
-          <Button 
+          <Button
             className="bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95 whitespace-nowrap"
             onClick={() => {
               setSelectedStudentId(null)

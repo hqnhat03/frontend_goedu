@@ -1,27 +1,25 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import api from '@/lib/axios';
-import {
-    Calendar,
-    Users,
-    Video,
-    Clock,
-    ChevronLeft,
-    GraduationCap,
-    BookOpen,
-    ArrowRight,
-    MapPin,
-    Shield
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
+import api from '@/lib/axios';
+import { AxiosError } from 'axios';
+import {
+    ArrowRight,
+    Calendar,
+    ChevronLeft,
+    Clock,
+    GraduationCap,
+    Shield,
+    Users,
+    Video
+} from 'lucide-react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Teacher {
     id: number;
@@ -86,9 +84,10 @@ export default function ClassDetailPage() {
                 } else {
                     setError(response.data.message || 'Không thể tải thông tin lớp học');
                 }
-            } catch (err: any) {
-                console.error('Error fetching class detail:', err);
-                setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+            } catch (err: unknown) {
+                if (err instanceof AxiosError) {
+                    setError(err.response?.data?.message || 'Có lỗi xảy ra khi kết nối máy chủ');
+                }
             } finally {
                 setLoading(false);
             }
@@ -156,8 +155,8 @@ export default function ClassDetailPage() {
                             Chi tiết lớp học
                             <Badge
                                 className={`rounded-full px-3 py-0.5 text-[11px] font-semibold border-none shadow-sm pointer-events-none ${classData.status === 'published'
-                                        ? 'bg-emerald-500 text-white'
-                                        : 'bg-slate-400 text-white'
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-slate-400 text-white'
                                     }`}
                             >
                                 {classData.status === 'published' ? 'Đang học' : 'Đã kết thúc'}

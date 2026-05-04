@@ -1,26 +1,34 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 import {
-  ChevronLeft,
-  Save,
-  Loader2,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Shield,
   Activity,
+  Calendar,
+  ChevronLeft,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  Save,
+  Shield,
+  User,
   UserCircle
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import * as React from "react"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import * as z from "zod"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Field,
+  FieldError,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -29,16 +37,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldGroup,
-} from "@/components/ui/field"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
 import api from "@/lib/axios"
+import { AxiosError } from "axios"
 import Link from "next/link"
 
 const adminSchema = z.object({
@@ -108,10 +108,13 @@ export default function CreateAdminPage() {
         router.push("/admin/admins")
         router.refresh()
       }
-    } catch (error: any) {
-      console.error(error)
-      const message = error.response?.data?.message || "Đã có lỗi xảy ra khi tạo quản trị viên"
-      toast.error(message)
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error(error)
+        const message = error.response?.data?.message || "Đã có lỗi xảy ra khi tạo quản trị viên"
+        toast.error(message)
+      }
+
     }
   }
 
@@ -207,7 +210,7 @@ export default function CreateAdminPage() {
                   <FieldLabel className="text-sm font-semibold">Trạng thái <span className="text-destructive">*</span></FieldLabel>
                   <Select
                     value={form.watch("status")}
-                    onValueChange={(val: any) => form.setValue("status", val)}
+                    onValueChange={(val) => form.setValue("status", val)}
                   >
                     <SelectTrigger className="h-11 bg-muted/30 border-muted-foreground/10">
                       <div className="flex items-center gap-2">
@@ -226,7 +229,7 @@ export default function CreateAdminPage() {
                   <FieldLabel className="text-sm font-semibold">Giới tính</FieldLabel>
                   <Select
                     value={form.watch("gender")}
-                    onValueChange={(val: any) => form.setValue("gender", val)}
+                    onValueChange={(val) => form.setValue("gender", val)}
                   >
                     <SelectTrigger className="h-11 bg-muted/30 border-muted-foreground/10">
                       <SelectValue placeholder="Chọn giới tính" />

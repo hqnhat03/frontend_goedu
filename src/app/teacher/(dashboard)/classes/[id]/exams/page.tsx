@@ -1,21 +1,8 @@
 "use client"
 
-import * as React from "react"
-import { useParams } from "next/navigation"
-import {
-    ClipboardList,
-    ChevronRight,
-    Eye,
-    MoreVertical,
-    FileText,
-    LayoutGrid,
-    CheckCircle2,
-} from "lucide-react"
-import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
     Table,
     TableBody,
@@ -25,8 +12,17 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import api from "@/lib/axios"
+import {
+    ChevronRight,
+    ClipboardList,
+    Eye,
+    FileText,
+    LayoutGrid
+} from "lucide-react"
+import Link from "next/link"
+import { useParams } from "next/navigation"
+import * as React from "react"
 import { toast } from "sonner"
-import { Skeleton } from "@/components/ui/skeleton"
 
 interface Exam {
     id: number

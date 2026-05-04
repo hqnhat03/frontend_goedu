@@ -1,27 +1,28 @@
 "use client"
 
-import React from "react"
+import { usePermission } from "@/hooks/use-permission"
 import {
-  Users,
   BookOpen,
   GraduationCap,
-  UserPlus,
   TrendingUp,
+  UserPlus,
+  Users,
 } from "lucide-react"
-import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { usePermission } from "@/hooks/use-permission"
+import React from "react"
+import { toast } from "sonner"
 
+import { GrowthChart } from "@/components/dashboard-charts"
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { GrowthChart } from "@/components/dashboard-charts"
 import api from "@/lib/axios"
+import { AxiosError } from "axios"
 
 interface DashboardData {
   total_teacher: number
@@ -51,15 +52,16 @@ export default function DashboardPage() {
       setIsLoading(true)
       try {
         const response = await api.get("/admin/dashboard")
-        
+
         if (response.data.success) {
           setData(response.data.data)
         } else {
           toast.error(response.data.message || "Đã có lỗi xảy ra")
         }
-      } catch (error: any) {
-        console.error("Dashboard fetch error:", error)
-        toast.error(error.response?.data?.message || "Không thể kết nối với máy chủ API")
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          toast.error(error.response?.data?.message || "Không thể kết nối với máy chủ API")
+        }
       } finally {
         setIsLoading(false)
       }

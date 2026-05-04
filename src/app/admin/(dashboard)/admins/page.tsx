@@ -1,51 +1,22 @@
 "use client"
 
-import * as React from "react"
 import {
-  Plus,
-  Search,
-  Eye,
+  Activity,
   Edit,
-  Trash2,
-  ShieldCheck,
-  UserCheck,
-  UserX,
+  Eye,
   Mail,
   Phone,
-  MoreVertical,
-  Activity,
-  Shield,
+  Plus,
   RefreshCcw,
-  SearchX
+  Search,
+  SearchX,
+  Trash2,
+  UserCheck,
+  UserX
 } from "lucide-react"
+import * as React from "react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { useDebounce } from "@/hooks/use-debounce"
-import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import api from "@/lib/axios"
 import { Can } from "@/components/auth/can"
-import { usePermission } from "@/hooks/use-permission"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,14 +27,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { useDebounce } from "@/hooks/use-debounce"
+import { usePermission } from "@/hooks/use-permission"
+import api from "@/lib/axios"
+import { AxiosError } from "axios"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { AdminDrawer, type Admin } from "./_components/AdminDrawer"
 
 export default function AdminsPage() {
@@ -83,8 +73,6 @@ export default function AdminsPage() {
   const [admins, setAdmins] = React.useState<Admin[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-
-  if (!hasPermission("admin_list")) return null
 
 
   const debouncedSearch = useDebounce(search, 400)
@@ -114,10 +102,12 @@ export default function AdminsPage() {
       } else {
         setAdmins([])
       }
-    } catch (err: any) {
-      console.error(err)
-      setError(err.response?.data?.message || "Không thể tải danh sách quản trị viên")
-      toast.error("Lỗi: " + (err.response?.data?.message || "Đã có lỗi xảy ra"))
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        console.error(err)
+        setError(err.response?.data?.message || "Không thể tải danh sách quản trị viên")
+        toast.error("Lỗi: " + (err.response?.data?.message || "Đã có lỗi xảy ra"))
+      }
     } finally {
       setIsLoading(false)
     }
@@ -143,9 +133,11 @@ export default function AdminsPage() {
         toast.success(response.data?.message || "Xóa quản trị viên thành công")
         setAdmins(prev => prev.filter(a => a.id !== adminToDelete.id))
       }
-    } catch (err: any) {
-      console.error(err)
-      toast.error(err.response?.data?.message || "Lỗi khi xóa quản trị viên")
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        console.error(err)
+        toast.error(err.response?.data?.message || "Lỗi khi xóa quản trị viên")
+      }
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)
@@ -153,18 +145,7 @@ export default function AdminsPage() {
     }
   }
 
-  const toggleStatus = async (admin: Admin) => {
-    const newStatus = admin.status === "active" ? "inactive" : "active"
-    try {
-      const response = await api.patch(`/admin/admins/${admin.id}/status`, { status: newStatus })
-      if (response.status === 200) {
-        toast.success(`Đã ${newStatus === "active" ? "kích hoạt" : "vô hiệu hóa"} quản trị viên`)
-        setAdmins(prev => prev.map(a => a.id === admin.id ? { ...a, status: newStatus } : a))
-      }
-    } catch (err: any) {
-      toast.error("Không thể cập nhật trạng thái")
-    }
-  }
+  if (!hasPermission("admin_list")) return null
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-700">

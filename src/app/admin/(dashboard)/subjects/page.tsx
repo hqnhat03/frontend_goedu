@@ -1,39 +1,20 @@
 "use client"
 
-import * as React from "react"
-import {
-  Search,
-  Trash2,
-  BookOpen,
-  RefreshCw,
-  LayoutGrid,
-  Settings2,
-} from "lucide-react"
-import { SubjectFormDrawer } from "./_components/SubjectFormDrawer"
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
+import {
+  BookOpen,
+  LayoutGrid,
+  RefreshCw,
+  Search,
+  Settings2,
+  Trash2,
+} from "lucide-react"
 import { useRouter } from "next/navigation"
+import * as React from "react"
+import { SubjectFormDrawer } from "./_components/SubjectFormDrawer"
 
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,8 +25,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import api from "@/lib/axios"
+import { toast } from "sonner"
 
 interface Subject {
   id: string
@@ -80,8 +80,6 @@ export default function SubjectsPage() {
   const [items, setItems] = React.useState<Subject[]>([])
   const [categories, setCategories] = React.useState<{ name: string; slug: string }[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
-
-  if (!hasPermission("subject_list")) return null
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
   const [subjectToDelete, setSubjectToDelete] = React.useState<Subject | null>(null)
@@ -160,6 +158,8 @@ export default function SubjectsPage() {
     setStatus("all")
     setCategory("all")
   }
+
+  if (!hasPermission("subject_list")) return null
 
   return (
     <div className="flex flex-col gap-6 p-1">
@@ -303,7 +303,7 @@ export default function SubjectsPage() {
                                 className="h-8 w-8 text-muted-foreground hover:text-amber-600 transition-colors"
                                 title="Chỉnh sửa"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                               </Button>
                             }
                           />

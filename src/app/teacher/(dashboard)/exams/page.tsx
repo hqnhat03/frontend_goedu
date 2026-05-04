@@ -1,14 +1,17 @@
 "use client"
 
-import * as React from "react"
-import { ClipboardList, ChevronRight, Plus, RefreshCw, Clock, Calendar, CheckCircle2, FileEdit, Trash2, Eye, Pencil, HelpCircle, Archive } from "lucide-react"
-import { useRouter } from "next/navigation"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { CreateExamModal } from "./create-exam-modal"
-import { ExamDetailModal } from "./exam-detail-modal"
-import api from "@/lib/axios"
-import { Badge } from "@/components/ui/badge"
-import { format } from "date-fns"
+import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
   TableBody,
@@ -17,18 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-  } from "@/components/ui/alert-dialog"
+import api from "@/lib/axios"
+import { format } from "date-fns"
+import { Calendar, ChevronRight, ClipboardList, Clock, Eye, HelpCircle, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import * as React from "react"
 import { toast } from "sonner"
-import { StatusBadge } from "@/components/ui/status-badge"
+import { CreateExamModal } from "./create-exam-modal"
+import { ExamDetailModal } from "./exam-detail-modal"
 
 interface Exam {
   id: number
@@ -117,18 +116,18 @@ export default function ExamsPage() {
           </div>
           <h2 className="text-3xl font-black tracking-tight">Quản lý bài kiểm tra</h2>
         </div>
-        
+
         <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={fetchExams} disabled={isLoading} className="rounded-lg">
-                <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button className="rounded-lg shadow-lg shadow-primary/20" onClick={() => {
-                setEditingExam(null)
-                setIsCreateOpen(true)
-            }}>
-                <Plus className="size-4 mr-2" />
-                Thêm bài kiểm tra
-            </Button>
+          <Button variant="outline" size="icon" onClick={fetchExams} disabled={isLoading} className="rounded-lg">
+            <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+          <Button className="rounded-lg shadow-lg shadow-primary/20" onClick={() => {
+            setEditingExam(null)
+            setIsCreateOpen(true)
+          }}>
+            <Plus className="size-4 mr-2" />
+            Thêm bài kiểm tra
+          </Button>
         </div>
       </div>
 
@@ -153,8 +152,8 @@ export default function ExamsPage() {
                   <TableCell className="text-center font-medium text-muted-foreground">{index + 1}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                        <span className="font-bold text-sm">{exam.class?.class_code}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-bold truncate max-w-[150px]">{exam.class?.course_name}</span>
+                      <span className="font-bold text-sm">{exam.class?.class_code}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold truncate max-w-[150px]">{exam.class?.course_name}</span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -165,8 +164,8 @@ export default function ExamsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="size-3.5" />
-                        {exam.duration_minutes} phút
+                      <Clock className="size-3.5" />
+                      {exam.duration_minutes} phút
                     </div>
                   </TableCell>
                   <TableCell>
@@ -174,51 +173,51 @@ export default function ExamsPage() {
                   </TableCell>
                   <TableCell className="text-muted-foreground text-xs">
                     <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                            <Calendar className="size-3 text-primary/60" />
-                            {format(new Date(exam.open_at), 'dd/MM/yyyy HH:mm')}
-                        </div>
-                        <div className="flex items-center gap-2 text-destructive/70">
-                            <Calendar className="size-3" />
-                            {format(new Date(exam.close_at), 'dd/MM/yyyy HH:mm')}
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="size-3 text-primary/60" />
+                        {format(new Date(exam.open_at), 'dd/MM/yyyy HH:mm')}
+                      </div>
+                      <div className="flex items-center gap-2 text-destructive/70">
+                        <Calendar className="size-3" />
+                        {format(new Date(exam.close_at), 'dd/MM/yyyy HH:mm')}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-right pr-6">
                     <div className="flex items-center justify-end gap-2">
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="rounded-lg font-bold text-primary hover:text-primary hover:bg-primary/10"
-                            onClick={() => handleViewDetail(exam)}
-                        >
-                            <Eye className="size-4" />
-                        </Button>
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="rounded-lg font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            title="Quản lý câu hỏi"
-                            onClick={() => router.push(`/teacher/exams/${exam.id}/questions`)}
-                        >
-                            <HelpCircle className="size-4" />
-                        </Button>
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="rounded-lg font-bold text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                            onClick={() => handleEdit(exam)}
-                        >
-                            <Pencil className="size-4" />
-                        </Button>
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="rounded-lg font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => handleDeleteClick(exam)}
-                        >
-                            <Trash2 className="size-4" />
-                        </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-lg font-bold text-primary hover:text-primary hover:bg-primary/10"
+                        onClick={() => handleViewDetail(exam)}
+                      >
+                        <Eye className="size-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-lg font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        title="Quản lý câu hỏi"
+                        onClick={() => router.push(`/teacher/exams/${exam.id}/questions`)}
+                      >
+                        <HelpCircle className="size-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-lg font-bold text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                        onClick={() => handleEdit(exam)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-lg font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDeleteClick(exam)}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -226,10 +225,10 @@ export default function ExamsPage() {
             </TableBody>
           </Table>
         ) : isLoading ? (
-            <div className="p-20 flex flex-col items-center justify-center space-y-4">
-                <RefreshCw className="size-8 text-primary animate-spin" />
-                <p className="text-muted-foreground animate-pulse">Đang tải danh sách bài kiểm tra...</p>
-            </div>
+          <div className="p-20 flex flex-col items-center justify-center space-y-4">
+            <RefreshCw className="size-8 text-primary animate-spin" />
+            <p className="text-muted-foreground animate-pulse">Đang tải danh sách bài kiểm tra...</p>
+          </div>
         ) : (
           <div className="p-12 flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
             <div className="p-4 rounded-2xl bg-primary/10 text-primary">
@@ -238,7 +237,7 @@ export default function ExamsPage() {
             <div className="space-y-2">
               <h3 className="text-xl font-bold">Chưa có bài kiểm tra nào</h3>
               <p className="text-muted-foreground max-w-xs mx-auto">
-                Bạn chưa tạo bài kiểm tra nào. Hãy nhấn nút "Thêm bài kiểm tra" để bắt đầu.
+                Bạn chưa tạo bài kiểm tra nào. Hãy nhấn nút &quot;Thêm bài kiểm tra&quot; để bắt đầu.
               </p>
               <Button variant="outline" className="mt-4 rounded-lg font-bold" onClick={() => setIsCreateOpen(true)}>
                 <Plus className="size-4 mr-2" />
@@ -249,14 +248,14 @@ export default function ExamsPage() {
         )}
       </div>
 
-      <CreateExamModal 
-        open={isCreateOpen} 
+      <CreateExamModal
+        open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
         onSuccess={fetchExams}
         initialData={editingExam}
       />
 
-      <ExamDetailModal 
+      <ExamDetailModal
         exam={selectedExam}
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
@@ -266,18 +265,18 @@ export default function ExamsPage() {
         <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-black text-destructive flex items-center gap-2">
-                <Trash2 className="size-6" />
-                Xác nhận xóa
+              <Trash2 className="size-6" />
+              Xác nhận xóa
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base font-medium">
-              Bạn có chắc chắn muốn xóa bài kiểm tra <span className="font-bold text-foreground">"{examToDelete?.name}"</span>? 
+              Bạn có chắc chắn muốn xóa bài kiểm tra <span className="font-bold text-foreground">&quot;{examToDelete?.name}&quot;</span>?
               <br />
               <span className="text-sm text-muted-foreground italic">Lưu ý: Hành động này không thể hoàn tác và tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
             <AlertDialogCancel className="rounded-lg font-bold border-border/40 hover:bg-muted">Hủy</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault()
                 handleDelete()

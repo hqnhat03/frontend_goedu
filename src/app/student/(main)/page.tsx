@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { 
-  BookOpen, Video, DollarSign, Award, Star, 
-  ArrowRight, Search, PlayCircle, MoveRight,
-  GraduationCap, Users, Menu, X, Laptop, ShieldCheck, 
-  Globe, Facebook, Twitter, Instagram, Linkedin, CheckCircle2
+import {
+  ArrowRight,
+  Award,
+  DollarSign,
+  Laptop, ShieldCheck,
+  Star,
+  Users
 } from 'lucide-react';
-import Link from 'next/link';
+import Image from 'next/image';
 
 // --- MOCK DATA ---
 
@@ -98,7 +98,7 @@ function HeroSection() {
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
-          
+
           {/* Left Content */}
           <div className="relative z-10 max-w-2xl text-center lg:text-left">
             <Badge className="mb-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 px-4 py-1.5 rounded-full text-sm font-medium">
@@ -110,7 +110,7 @@ function HeroSection() {
             <p className="mb-10 text-lg leading-relaxed text-slate-600 md:text-xl">
               Unlock your potential with world-class courses taught by industry experts. Build the skills you need for the future, today.
             </p>
-            
+
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
               <Button size="lg" className="h-14 w-full rounded-full bg-blue-600 px-8 text-base font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl sm:w-auto">
                 Get Started
@@ -123,9 +123,9 @@ function HeroSection() {
 
             <div className="mt-10 flex items-center justify-center gap-4 text-sm text-slate-500 lg:justify-start">
               <div className="flex -space-x-3">
-                <img className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Student" />
-                <img className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" alt="Student" />
-                <img className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Student" />
+                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Student" />
+                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" alt="Student" />
+                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Student" />
               </div>
               <p>Trusted by <span className="font-semibold text-slate-900">4.9/5</span> rating</p>
             </div>
@@ -134,12 +134,12 @@ function HeroSection() {
           {/* Right Image */}
           <div className="relative z-10 hidden lg:block">
             <div className="relative rounded-3xl bg-white p-2 shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop" 
-                alt="Students learning" 
+              <Image
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop"
+                alt="Students learning"
                 className="rounded-2xl object-cover shadow-inner h-[500px] w-full"
               />
-              
+
               {/* Floating Element */}
               <div className="absolute -left-12 bottom-20 flex animate-bounce items-center gap-4 rounded-2xl bg-white p-4 shadow-xl xl:-left-16" style={{ animationDuration: '3s' }}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
@@ -150,7 +150,7 @@ function HeroSection() {
                   <p className="text-sm text-slate-500">Expert Instructors</p>
                 </div>
               </div>
-              
+
               {/* Overlay Gradient */}
               <div className="absolute inset-0 rounded-3xl shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"></div>
             </div>
@@ -192,7 +192,7 @@ function FeaturesSection() {
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Why Choose EduLearn?</h2>
           <p className="mt-4 text-lg text-slate-600">Everything you need to master new skills and advance your career.</p>
         </div>
-        
+
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {features.map((item, index) => (
             <Card key={index} className="group border-slate-100 bg-white transition-all hover:-translate-y-1 hover:shadow-lg hover:border-blue-100">
@@ -229,17 +229,18 @@ function CoursesSection() {
           {COURSES.map((course) => (
             <Card key={course.id} className="group flex cursor-pointer flex-col overflow-hidden border-slate-100 bg-white transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
               <div className="relative aspect-[4/3] overflow-hidden">
-                <img 
-                  src={course.image} 
-                  alt={course.title} 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                <Image
+                  src={course.image}
+                  alt={course.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <Badge className="absolute left-4 top-4 bg-white text-slate-900 hover:bg-slate-50 shadow-sm font-semibold">
                   {course.badge}
                 </Badge>
                 <div className="absolute inset-0 bg-slate-900/10 transition-opacity group-hover:opacity-0" />
               </div>
-              
+
               <CardContent className="flex flex-1 flex-col p-6">
                 <div className="mb-3 flex items-center justify-between text-sm text-slate-500">
                   <span className="font-medium text-blue-600">{course.category}</span>
@@ -249,13 +250,13 @@ function CoursesSection() {
                     <span>({course.reviews})</span>
                   </div>
                 </div>
-                
+
                 <h3 className="mb-2 line-clamp-2 text-lg font-bold leading-tight text-slate-900 group-hover:text-blue-600 transition-colors">
                   {course.title}
                 </h3>
-                
+
                 <p className="mb-6 text-sm text-slate-600">{course.instructor}</p>
-                
+
                 <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
                   <span className="text-xl font-bold text-slate-900">{course.price}</span>
                   <p className="text-sm font-medium text-blue-600 group-hover:underline">Explore</p>
@@ -327,7 +328,7 @@ function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-16 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Student Success Stories</h2>
-          <p className="mt-4 text-lg text-slate-600">Don't just take our word for it—hear from our graduates.</p>
+          <p className="mt-4 text-lg text-slate-600">Don&apos;t just take our word for it—hear from our graduates.</p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">

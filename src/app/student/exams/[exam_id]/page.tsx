@@ -1,39 +1,32 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import api from '@/lib/axios';
-import {
-  Timer,
-  ChevronLeft,
-  ChevronRight,
-  Send,
-  AlertCircle,
-  HelpCircle,
-  LogOut,
-  CheckCircle2,
-  Clock,
-  LayoutDashboard,
-  Save,
-  Menu
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import api from '@/lib/axios';
+import { AxiosError } from 'axios';
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  Menu,
+  Send,
+  Timer
+} from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 // Interface definitions
 interface Exam {
@@ -113,6 +106,7 @@ export default function ExamQuestionsPage() {
     }
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, examData, loading]);
 
   useEffect(() => {
@@ -158,9 +152,10 @@ export default function ExamQuestionsPage() {
       } else {
         toast.error(response.data.message || 'Có lỗi xảy ra khi nộp bài.');
       }
-    } catch (error: any) {
-      console.error('Lỗi khi nộp bài:', error);
-      toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi nộp bài. Vui lòng kiểm tra lại kết nối.');
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi nộp bài. Vui lòng kiểm tra lại kết nối.');
+      }
     } finally {
       setIsSubmitting(false);
       setIsSubmitDialogOpen(false);

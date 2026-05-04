@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (userData) {
       try {
         return JSON.parse(decodeURIComponent(userData));
-      } catch (e) {
+      } catch {
         return null;
       }
     }

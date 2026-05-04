@@ -1,33 +1,24 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
+import api from "@/lib/axios"
+import { AxiosError } from "axios"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
-import * as z from "zod"
-import { format, isBefore, startOfDay, parseISO } from "date-fns"
-import { vi } from "date-fns/locale"
+import { format, isBefore, parseISO, startOfDay } from "date-fns"
 import {
-  Save,
-  Loader2,
+  AlertCircle,
   BookOpen,
   Clock,
+  Loader2,
+  Save,
   Users,
-  AlertCircle,
 } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import api from "@/lib/axios"
 import { v4 as uuidv4 } from "uuid"
+import * as z from "zod"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldContent,
-} from "@/components/ui/field"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,12 +30,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-import { CourseSelect } from "../../../_components/course-select"
-import { TeacherSelect } from "../../../_components/teacher-select"
-import { SchedulePicker } from "../../../_components/schedule-picker"
 import { useClassStore } from "@/store/class-store"
+import { CourseSelect } from "../../../_components/course-select"
+import { SchedulePicker } from "../../../_components/schedule-picker"
+import { TeacherSelect } from "../../../_components/teacher-select"
 
 const classSchema = z.object({
   class_code: z.string().min(1, "Vui lòng nhập mã lớp"),
@@ -86,25 +86,39 @@ const classSchema = z.object({
 type FormValues = z.infer<typeof classSchema>
 
 const statusOptions = [
-  { 
-    value: "draft", 
-    label: "Bản nháp", 
-    activeClass: "bg-slate-50 border-slate-500 text-slate-700 dark:bg-slate-950 dark:border-slate-500 dark:text-slate-300" 
+  {
+    value: "draft",
+    label: "Bản nháp",
+    activeClass: "bg-slate-50 border-slate-500 text-slate-700 dark:bg-slate-950 dark:border-slate-500 dark:text-slate-300"
   },
-  { 
-    value: "published", 
-    label: "Xuất bản", 
-    activeClass: "bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-500 dark:text-emerald-300" 
+  {
+    value: "published",
+    label: "Xuất bản",
+    activeClass: "bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-500 dark:text-emerald-300"
   },
-  { 
-    value: "archived", 
-    label: "Lưu trữ", 
-    activeClass: "bg-blue-50 border-blue-500 text-blue-700 dark:bg-blue-950 dark:border-blue-500 dark:text-blue-300" 
+  {
+    value: "archived",
+    label: "Lưu trữ",
+    activeClass: "bg-blue-50 border-blue-500 text-blue-700 dark:bg-blue-950 dark:border-blue-500 dark:text-blue-300"
   },
 ]
 
+interface InitialClassData {
+  class_code?: string;
+  start_day?: string;
+  end_day?: string;
+  max_student?: number;
+  meeting_url?: string;
+  status?: string;
+  course_id?: number;
+  class_teaches?: { id?: string; teacher_id: number }[];
+  class_teachers?: { id?: string; teacher_id: number }[];
+  class_schedules?: { id?: string; day_of_week: string; start_time?: string; end_time?: string }[];
+  students?: unknown[];
+}
+
 interface ClassFormProps {
-  initialData: any
+  initialData: InitialClassData
 }
 
 export function ClassForm({ initialData }: ClassFormProps) {
@@ -116,6 +130,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
   const [showConfirm, setShowConfirm] = React.useState(false)
 
   const form = useForm<FormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(classSchema as any),
     defaultValues: {
       class_code: initialData.class_code || "",
@@ -125,11 +140,11 @@ export function ClassForm({ initialData }: ClassFormProps) {
       meeting_url: initialData.meeting_url || "",
       status: initialData.status || "published",
       course_id: initialData.course_id || Number(params.id),
-      class_teachers: (initialData.class_teaches || initialData.class_teachers || []).map((t: any) => ({
+      class_teachers: (initialData.class_teaches || initialData.class_teachers || []).map((t) => ({
         id: t.id || uuidv4(),
         teacher_id: t.teacher_id
       })),
-      class_schedules: (initialData.class_schedules || []).map((s: any) => ({
+      class_schedules: (initialData.class_schedules || []).map((s) => ({
         id: s.id || uuidv4(),
         day_of_week: s.day_of_week,
         start_time: s.start_time?.substring(0, 5),
@@ -164,7 +179,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
 
 
       const response = await api.put(`/admin/classes/${classId}`, payload)
-      
+
       // Save data to store for use in detail page
       if (response.data?.data) {
         useClassStore.getState().setClassDetail(response.data.data)
@@ -173,9 +188,13 @@ export function ClassForm({ initialData }: ClassFormProps) {
       toast.success("Cập nhật lớp học thành công!")
       router.push(`/admin/courses/${params.id}/classes/${classId}`)
       router.refresh()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      toast.error(err.response?.data?.message || err.message || "Có lỗi xảy ra khi cập nhật lớp học")
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message || err.message || "Có lỗi xảy ra khi cập nhật lớp học")
+      } else {
+        toast.error("Có lỗi xảy ra khi cập nhật lớp học")
+      }
       setIsSubmitting(false)
     }
   }

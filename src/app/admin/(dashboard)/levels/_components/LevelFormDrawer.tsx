@@ -1,22 +1,23 @@
 "use client"
 
-import * as React from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Save, Loader2, Layers, LayoutGrid, Activity, Plus } from "lucide-react"
-import { toast } from "sonner"
 import api from "@/lib/axios"
 import { Level } from "@/store/level-store"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Activity, Layers, LayoutGrid, Loader2, Plus, Save } from "lucide-react"
+import * as React from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
     Field,
-    FieldLabel,
-    FieldError,
     FieldContent,
+    FieldError,
+    FieldLabel,
 } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
     Sheet,
     SheetContent,
@@ -24,7 +25,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { AxiosError } from "axios"
 
 const levelSchema = z.object({
     name: z.string().min(1, "Tên trình độ không được để trống"),
@@ -35,6 +36,13 @@ const levelSchema = z.object({
 })
 
 type FormValues = z.infer<typeof levelSchema>
+
+type LevelType = {
+    id: number
+    level: string
+    education_level: string
+    status: string
+}
 
 const statusOptions = [
     {
@@ -100,15 +108,8 @@ export function LevelFormDrawer({
             const result = response.data
             if (response.status === 200) {
                 const data = result.data || []
-                const levels = data.map((item: any) => {
-                    if (typeof item === "string") return item
-                    return (
-                        item.education_level ||
-                        item.name ||
-                        (typeof item === "object"
-                            ? Object.values(item)[0]
-                            : String(item))
-                    )
+                const levels = data.map((item: LevelType) => {
+                    return item.education_level
                 })
                 setEducationLevels(levels)
             }
@@ -162,12 +163,10 @@ export function LevelFormDrawer({
 
             setOpen(false)
             onSuccess?.()
-        } catch (err: any) {
-            toast.error(
-                err?.response?.data?.message ||
-                    err?.message ||
-                    "Không thể kết nối đến máy chủ"
-            )
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Không thể kết nối đến máy chủ")
+            }
         } finally {
             setIsSubmitting(false)
         }
@@ -315,7 +314,7 @@ export function LevelFormDrawer({
                                                 key={opt.value}
                                                 type="button"
                                                 onClick={() =>
-                                                    form.setValue("status", opt.value as any, {
+                                                    form.setValue("status", opt.value as "draft" | "published" | "archived", {
                                                         shouldValidate: true,
                                                     })
                                                 }

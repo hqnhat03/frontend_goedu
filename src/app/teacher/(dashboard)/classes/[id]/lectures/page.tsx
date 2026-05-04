@@ -1,68 +1,30 @@
 "use client"
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
   BookOpen,
-  ChevronRight,
-  Plus,
-  MoreVertical,
   Calendar,
-  FileText,
+  ChevronRight,
   Clock,
-  PlayCircle,
+  CloudUpload,
   Download,
-  Trash2,
   Edit,
   Eye,
-  Loader2,
-  Upload,
+  FileSpreadsheet,
+  FileText,
   FileUp,
   Info,
-  HelpCircle,
-  FileSpreadsheet,
-  CloudUpload
+  Loader2,
+  PlayCircle,
+  Plus,
+  Trash2,
+  Upload
 } from "lucide-react"
+import { useParams } from "next/navigation"
+import * as React from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldGroup,
-  FieldContent
-} from "@/components/ui/field"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,12 +35,39 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import api from "@/lib/axios"
-import { toast } from "sonner"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
-import { useLectureStore } from "@/store/lecture-store"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { StatusBadge } from "@/components/ui/status-badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Textarea } from "@/components/ui/textarea"
+import api from "@/lib/axios"
+import { useLectureStore } from "@/store/lecture-store"
+import { AxiosError } from "axios"
+import { toast } from "sonner"
 
 // Zod Schema for Lecture
 const lectureSchema = z.object({
@@ -106,7 +95,6 @@ interface Lecture {
 
 export default function ClassLecturesPage() {
   const params = useParams()
-  const router = useRouter()
   const [lectures, setLectures] = React.useState<Lecture[]>([])
   const [loading, setLoading] = React.useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
@@ -184,9 +172,10 @@ export default function ClassLecturesPage() {
       } else {
         toast.error(response.data?.message || "Không thể tạo bài giảng")
       }
-    } catch (error: any) {
-      console.error("Failed to create lecture:", error)
-      toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi tạo bài giảng")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi tạo bài giảng")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -209,9 +198,10 @@ export default function ClassLecturesPage() {
       } else {
         toast.error(response.data?.message || "Không thể cập nhật bài giảng")
       }
-    } catch (error: any) {
-      console.error("Failed to update lecture:", error)
-      toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi cập nhật bài giảng")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi cập nhật bài giảng")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -242,9 +232,10 @@ export default function ClassLecturesPage() {
       } else {
         toast.error(response.data?.message || "Không thể nhập danh sách bài giảng")
       }
-    } catch (error: any) {
-      console.error("Failed to import lectures:", error)
-      toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi nhập danh sách")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi nhập danh sách")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -264,9 +255,10 @@ export default function ClassLecturesPage() {
       } else {
         toast.error(response.data?.message || "Không thể xóa bài giảng")
       }
-    } catch (error: any) {
-      console.error("Failed to delete lecture:", error)
-      toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi xóa bài giảng")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Đã có lỗi xảy ra khi xóa bài giảng")
+      }
     } finally {
       setIsDeleting(false)
     }
@@ -384,7 +376,7 @@ export default function ClassLecturesPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={lecture.status as any} className="rounded-sm" />
+                    <StatusBadge status={lecture.status} className="rounded-sm" />
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground font-medium">
                     <div className="flex items-center gap-2">
@@ -721,7 +713,7 @@ export default function ClassLecturesPage() {
                   <Badge className="bg-primary/10 text-primary border-none hover:bg-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wider">
                     Bài học {selectedLecture.lecture_number}
                   </Badge>
-                  <StatusBadge status={selectedLecture.status as any} className="rounded-sm" />
+                  <StatusBadge status={selectedLecture.status} className="rounded-sm" />
                 </div>
                 <DialogTitle className="text-3xl font-black tracking-tight">{selectedLecture.name}</DialogTitle>
                 <div className="flex items-center gap-4 mt-2 text-muted-foreground font-medium text-sm">
@@ -828,7 +820,7 @@ export default function ClassLecturesPage() {
           <DialogHeader className="p-8 pb-0">
             <DialogTitle className="text-2xl font-black tracking-tight">Chỉnh sửa bài giảng</DialogTitle>
             <DialogDescription className="text-muted-foreground font-medium">
-              Cập nhật thông tin cho bài giảng "{editingLecture?.name}".
+              Cập nhật thông tin cho bài giảng &quot;{editingLecture?.name}&quot;.
             </DialogDescription>
           </DialogHeader>
 
@@ -956,7 +948,7 @@ export default function ClassLecturesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-black tracking-tight">Xác nhận xóa bài giảng</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground font-medium pt-2">
-              Bạn có chắc chắn muốn xóa bài giảng <span className="font-bold text-foreground">"{lectureToDelete?.name}"</span>?
+              Bạn có chắc chắn muốn xóa bài giảng <span className="font-bold text-foreground">&quot;{lectureToDelete?.name}&quot;</span>?
               Hành động này không thể hoàn tác và tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.
             </AlertDialogDescription>
           </AlertDialogHeader>

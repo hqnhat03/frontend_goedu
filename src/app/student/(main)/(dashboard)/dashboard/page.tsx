@@ -1,19 +1,18 @@
 "use client"
 
-import React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { useAuthStore } from "@/store/auth-store"
 import {
-  BookOpen,
-  Calendar,
-  Clock,
-  Trophy,
   ArrowRight,
-  PlayCircle,
+  BookOpen,
   CheckCircle2,
+  Clock,
+  PlayCircle,
+  Trophy,
   Users
 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function StudentDashboardPage() {
@@ -68,7 +67,7 @@ export default function StudentDashboardPage() {
               <Card key={i} className="group border-none shadow-sm hover:shadow-md transition-all bg-white overflow-hidden">
                 <CardContent className="p-0 flex flex-col md:flex-row">
                   <div className="w-full md:w-48 h-32 relative shrink-0">
-                    <img
+                    <Image
                       src={`https://images.unsplash.com/photo-${i === 1 ? '1516321318423-f06f85e504b3' : '1501504905953-f83149be9900'}?q=80&w=300&auto=format&fit=crop`}
                       alt="Course thumbnail"
                       className="h-full w-full object-cover"

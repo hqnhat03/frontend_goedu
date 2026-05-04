@@ -1,15 +1,16 @@
 "use client"
 
-import * as React from "react"
-import { ArrowLeft, Save, Loader2, Shield, KeyRound, AlertCircle } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import api from "@/lib/axios"
-import { toast } from "sonner"
+import { AxiosError } from "axios"
+import { ArrowLeft, KeyRound, Loader2, Save, Shield } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
 
 export default function SecurityPage() {
   const router = useRouter()
@@ -45,9 +46,10 @@ export default function SecurityPage() {
       } else {
         toast.error("Cập nhật thất bại. Vui lòng thử lại.")
       }
-    } catch (error: any) {
-      console.error("Change password error:", error)
-      toast.error(error.response?.data?.message || "Cập nhật thất bại. Có thể mật khẩu hiện tại không đúng.")
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Cập nhật thất bại. Có thể mật khẩu hiện tại không đúng.")
+      }
     } finally {
       setUpdateLoading(false)
     }

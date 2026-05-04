@@ -1,25 +1,9 @@
 "use client"
 
-import * as React from "react"
-import dynamic from "next/dynamic"
-import { useParams, useRouter } from "next/navigation"
-import {
-  Plus,
-  Trash2,
-  Save,
-  Image as ImageIcon,
-  ChevronLeft,
-  HelpCircle,
-  CheckCircle2,
-  AlertCircle,
-  Layout,
-  Edit2,
-  GripVertical,
-} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -27,10 +11,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
 import api from "@/lib/axios"
+import {
+  AlertCircle,
+  ChevronLeft,
+  Edit2,
+  GripVertical,
+  HelpCircle,
+  Plus,
+  Save,
+  Trash2
+} from "lucide-react"
+import dynamic from "next/dynamic"
+import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 
 // Dynamic import — Quill touches `document` so we skip SSR

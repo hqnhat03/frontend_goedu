@@ -1,20 +1,21 @@
 "use client"
 
-import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Activity, BookOpen, Layers, Loader2, Plus, Save } from "lucide-react"
+import * as React from "react"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Save, Loader2, BookOpen, Layers, Activity, Plus } from "lucide-react"
 import { toast } from "sonner"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
     Field,
-    FieldLabel,
-    FieldError,
     FieldContent,
+    FieldError,
+    FieldLabel,
 } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
     Sheet,
     SheetContent,
@@ -23,9 +24,9 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import api from "@/lib/axios"
 import { Subject } from "@/store/subject-store"
+import { AxiosError } from "axios"
 
 const subjectSchema = z.object({
     name: z.string().min(2, "Tên môn học phải có ít nhất 2 ký tự"),
@@ -128,8 +129,10 @@ export function SubjectFormDrawer({
             }
             setOpen(false)
             onSuccess?.()
-        } catch (err: any) {
-            toast.error(err?.response?.data?.message || err?.message || "Không thể kết nối đến máy chủ")
+        } catch (err: unknown) {
+            if (err instanceof AxiosError) {
+                toast.error(err.response?.data?.message || "Đã có lỗi xảy ra")
+            }
         } finally {
             setIsSubmitting(false)
         }
@@ -158,161 +161,161 @@ export function SubjectFormDrawer({
                 {triggerEl}
             </span>
             <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent className="w-full sm:max-w-lg overflow-y-auto px-6 pb-6">
-                <SheetHeader className="mb-6">
-                    <SheetTitle className="flex items-center gap-2 text-xl">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <BookOpen className="h-4 w-4" />
-                        </div>
-                        {isEdit ? "Chỉnh sửa môn học" : "Thêm môn học mới"}
-                    </SheetTitle>
-                    <SheetDescription>
-                        {isEdit
-                            ? `Cập nhật thông tin môn học.`
-                            : "Điền thông tin chi tiết để tạo một môn học mới."}
-                    </SheetDescription>
-                </SheetHeader>
-
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    {/* Subject Name */}
-                    <Field>
-                        <FieldLabel className="flex items-center gap-2">
-                            Tên môn học <span className="text-destructive">*</span>
-                        </FieldLabel>
-                        <FieldContent>
-                            <Input
-                                placeholder="VD: Toán học cao cấp, Tiếng Anh giao tiếp..."
-                                className="focus-visible:ring-primary/30"
-                                {...form.register("name")}
-                            />
-                        </FieldContent>
-                        <FieldError errors={[{ message: form.formState.errors.name?.message }]} />
-                    </Field>
-
-                    {/* Category */}
-                    <Field>
-                        <FieldLabel className="flex items-center gap-2">
-                            <Layers className="h-4 w-4 text-muted-foreground" />
-                            Danh mục <span className="text-destructive">*</span>
-                        </FieldLabel>
-                        <FieldContent>
-                            {isLoadingCategories ? (
-                                <Skeleton className="h-10 w-full" />
-                            ) : (
-                                <Popover
-                                    open={isCatPopoverOpen && filteredCategories.length > 0}
-                                    onOpenChange={setIsCatPopoverOpen}
-                                >
-                                    <PopoverTrigger
-                                        render={
-                                            <button className="relative w-full">
-                                                <Input
-                                                    placeholder="Chọn hoặc nhập danh mục mới..."
-                                                    className="focus-visible:ring-primary/30"
-                                                    {...form.register("category", {
-                                                        onChange: (e) =>
-                                                            setIsCatPopoverOpen(
-                                                                e.target.value.length > 0
-                                                            ),
-                                                    })}
-                                                    autoComplete="off"
-                                                />
-                                            </button>
-                                        }
-                                    />
-                                    <PopoverContent
-                                        className="p-1 w-[var(--radix-popover-trigger-width)] max-h-[300px] overflow-auto shadow-xl border-muted-foreground/20"
-                                        align="start"
-                                        initialFocus={false}
-                                    >
-                                        <div className="flex flex-col gap-0.5">
-                                            <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                                                Gợi ý danh mục
-                                            </p>
-                                            {filteredCategories.map((cat) => (
-                                                <Button
-                                                    key={cat.slug}
-                                                    variant="ghost"
-                                                    type="button"
-                                                    className="justify-start font-normal h-9 px-2 hover:bg-primary/10 hover:text-primary transition-colors text-sm"
-                                                    onClick={() => {
-                                                        form.setValue("category", cat.name, { shouldValidate: true })
-                                                        setIsCatPopoverOpen(false)
-                                                    }}
-                                                >
-                                                    {cat.name}
-                                                </Button>
-                                            ))}
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            )}
-                        </FieldContent>
-                        <FieldError errors={[{ message: form.formState.errors.category?.message }]} />
-                    </Field>
-
-                    {/* Status */}
-                    <Field>
-                        <FieldLabel className="flex items-center gap-2">
-                            <Activity className="h-4 w-4 text-muted-foreground" />
-                            Trạng thái <span className="text-destructive">*</span>
-                        </FieldLabel>
-                        <FieldContent>
-                            <div className="flex gap-2">
-                                {statusOptions.map((opt) => {
-                                    const isSelected = form.watch("status") === opt.value
-                                    return (
-                                        <button
-                                            key={opt.value}
-                                            type="button"
-                                            onClick={() => form.setValue("status", opt.value as any, { shouldValidate: true })}
-                                            className={[
-                                                "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
-                                                isSelected
-                                                    ? opt.activeClass
-                                                    : "border-input bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
-                                            ].join(" ")}
-                                        >
-                                            {opt.label}
-                                        </button>
-                                    )
-                                })}
+                <SheetContent className="w-full sm:max-w-lg overflow-y-auto px-6 pb-6">
+                    <SheetHeader className="mb-6">
+                        <SheetTitle className="flex items-center gap-2 text-xl">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <BookOpen className="h-4 w-4" />
                             </div>
-                        </FieldContent>
-                        <FieldError errors={[{ message: form.formState.errors.status?.message }]} />
-                    </Field>
+                            {isEdit ? "Chỉnh sửa môn học" : "Thêm môn học mới"}
+                        </SheetTitle>
+                        <SheetDescription>
+                            {isEdit
+                                ? `Cập nhật thông tin môn học.`
+                                : "Điền thông tin chi tiết để tạo một môn học mới."}
+                        </SheetDescription>
+                    </SheetHeader>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                        <Button
-                            variant="ghost"
-                            type="button"
-                            onClick={() => setOpen(false)}
-                            className="hover:bg-muted"
-                            disabled={isSubmitting}
-                        >
-                            Hủy bỏ
-                        </Button>
-                        <Button
-                            type="submit"
-                            className="min-w-[140px] shadow-md shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Đang xử lý...
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="mr-2 h-4 w-4" />
-                                    {isEdit ? "Lưu thay đổi" : "Lưu môn học"}
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                </form>
-            </SheetContent>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Subject Name */}
+                        <Field>
+                            <FieldLabel className="flex items-center gap-2">
+                                Tên môn học <span className="text-destructive">*</span>
+                            </FieldLabel>
+                            <FieldContent>
+                                <Input
+                                    placeholder="VD: Toán học cao cấp, Tiếng Anh giao tiếp..."
+                                    className="focus-visible:ring-primary/30"
+                                    {...form.register("name")}
+                                />
+                            </FieldContent>
+                            <FieldError errors={[{ message: form.formState.errors.name?.message }]} />
+                        </Field>
+
+                        {/* Category */}
+                        <Field>
+                            <FieldLabel className="flex items-center gap-2">
+                                <Layers className="h-4 w-4 text-muted-foreground" />
+                                Danh mục <span className="text-destructive">*</span>
+                            </FieldLabel>
+                            <FieldContent>
+                                {isLoadingCategories ? (
+                                    <Skeleton className="h-10 w-full" />
+                                ) : (
+                                    <Popover
+                                        open={isCatPopoverOpen && filteredCategories.length > 0}
+                                        onOpenChange={setIsCatPopoverOpen}
+                                    >
+                                        <PopoverTrigger
+                                            render={
+                                                <button className="relative w-full">
+                                                    <Input
+                                                        placeholder="Chọn hoặc nhập danh mục mới..."
+                                                        className="focus-visible:ring-primary/30"
+                                                        {...form.register("category", {
+                                                            onChange: (e) =>
+                                                                setIsCatPopoverOpen(
+                                                                    e.target.value.length > 0
+                                                                ),
+                                                        })}
+                                                        autoComplete="off"
+                                                    />
+                                                </button>
+                                            }
+                                        />
+                                        <PopoverContent
+                                            className="p-1 w-[var(--radix-popover-trigger-width)] max-h-[300px] overflow-auto shadow-xl border-muted-foreground/20"
+                                            align="start"
+                                            initialFocus={false}
+                                        >
+                                            <div className="flex flex-col gap-0.5">
+                                                <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                                                    Gợi ý danh mục
+                                                </p>
+                                                {filteredCategories.map((cat) => (
+                                                    <Button
+                                                        key={cat.slug}
+                                                        variant="ghost"
+                                                        type="button"
+                                                        className="justify-start font-normal h-9 px-2 hover:bg-primary/10 hover:text-primary transition-colors text-sm"
+                                                        onClick={() => {
+                                                            form.setValue("category", cat.name, { shouldValidate: true })
+                                                            setIsCatPopoverOpen(false)
+                                                        }}
+                                                    >
+                                                        {cat.name}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                )}
+                            </FieldContent>
+                            <FieldError errors={[{ message: form.formState.errors.category?.message }]} />
+                        </Field>
+
+                        {/* Status */}
+                        <Field>
+                            <FieldLabel className="flex items-center gap-2">
+                                <Activity className="h-4 w-4 text-muted-foreground" />
+                                Trạng thái <span className="text-destructive">*</span>
+                            </FieldLabel>
+                            <FieldContent>
+                                <div className="flex gap-2">
+                                    {statusOptions.map((opt) => {
+                                        const isSelected = form.watch("status") === opt.value
+                                        return (
+                                            <button
+                                                key={opt.value}
+                                                type="button"
+                                                onClick={() => form.setValue("status", opt.value as FormValues["status"], { shouldValidate: true })}
+                                                className={[
+                                                    "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
+                                                    isSelected
+                                                        ? opt.activeClass
+                                                        : "border-input bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
+                                                ].join(" ")}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </FieldContent>
+                            <FieldError errors={[{ message: form.formState.errors.status?.message }]} />
+                        </Field>
+
+                        {/* Actions */}
+                        <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                            <Button
+                                variant="ghost"
+                                type="button"
+                                onClick={() => setOpen(false)}
+                                className="hover:bg-muted"
+                                disabled={isSubmitting}
+                            >
+                                Hủy bỏ
+                            </Button>
+                            <Button
+                                type="submit"
+                                className="min-w-[140px] shadow-md shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Đang xử lý...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="mr-2 h-4 w-4" />
+                                        {isEdit ? "Lưu thay đổi" : "Lưu môn học"}
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                </SheetContent>
             </Sheet>
         </>
     )

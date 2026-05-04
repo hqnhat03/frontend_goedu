@@ -1,29 +1,18 @@
 "use client"
 
-import * as React from "react"
 import {
-  Users,
-  MoreHorizontal,
-  Search,
+  BookOpen,
   Eye,
   Pencil,
-  BookOpen,
-  ArrowUpDown,
-  Loader2,
-  ExternalLink,
-  ChevronRight
+  Search
 } from "lucide-react"
 import Link from "next/link"
+import * as React from "react"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -32,15 +21,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import api from "@/lib/axios"
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 
 interface Class {
   id: number;

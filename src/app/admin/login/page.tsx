@@ -1,25 +1,24 @@
 "use client";
 
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Chrome, Github, Lock, LogIn, Mail, MoveLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoveLeft, Mail, Lock, LogIn, Github, Chrome } from "lucide-react";
+import React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
-  FieldError,
 } from "@/components/ui/field";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/auth-store";
 
 const loginSchema = z.object({
@@ -75,7 +74,7 @@ export default function LoginPage() {
 
         if (result.data) {
           useAuthStore.getState().setAuth(result.data.user, result.data.access_token);
-          
+
           // Lưu vào localStorage để hỗ trợ các components cũ
           localStorage.setItem("access_token", result.data.access_token);
           localStorage.setItem("user_info", JSON.stringify(result.data.user));
@@ -93,8 +92,7 @@ export default function LoginPage() {
         // Nếu có lỗi cụ thể cho từng field từ server
         if (result.errors && typeof result.errors === 'object') {
           Object.keys(result.errors).forEach((key) => {
-            // @ts-ignore
-            form.setError(key, { message: result.errors[key][0] });
+            form.setError(key as keyof LoginFormValues, { message: result.errors[key][0] });
           });
         }
       }
