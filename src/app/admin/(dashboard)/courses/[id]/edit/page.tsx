@@ -95,7 +95,7 @@ export default function EditCoursePage() {
     React.useEffect(() => {
         if (!hasPermission("course_edit")) {
             toast.error("Bạn không có quyền thực hiện chức năng này")
-            router.push("/admin/courses")
+            router.push("/courses")
         }
     }, [hasPermission, router])
 
@@ -188,7 +188,7 @@ export default function EditCoursePage() {
             } catch (error) {
                 console.error("Fetch data failed", error);
                 toast.error("Không thể tải dữ liệu khóa học");
-                router.push("/admin/courses")
+                router.push("/courses")
             } finally {
                 setIsLoadingInit(false)
             }
@@ -210,7 +210,7 @@ export default function EditCoursePage() {
             await api.put(`/admin/courses/${courseId}`, payload)
 
             toast.success("Cập nhật khóa học thành công!")
-            router.push("/admin/courses")
+            router.push("/courses")
             router.refresh()
         } catch (err: unknown) {
             if (err instanceof AxiosError) {

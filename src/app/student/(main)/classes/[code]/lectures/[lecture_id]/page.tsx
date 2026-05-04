@@ -100,7 +100,7 @@ export default function LectureWatchPage() {
             {/* Header/Back Button */}
             <div className="p-4 border-b flex items-center gap-4 bg-white sticky top-0 z-20">
                 <Button variant="ghost" size="sm">
-                    <Link href={`/student/classes/${code}/lectures`} className="flex items-center">
+                    <Link href={`/classes/${code}/lectures`} className="flex items-center">
                         <ChevronLeft className="w-4 h-4 mr-1" />
                         Quay lại danh sách
                     </Link>

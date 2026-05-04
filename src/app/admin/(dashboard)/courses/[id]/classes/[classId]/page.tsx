@@ -247,7 +247,7 @@ export default function ClassDetailPage() {
             <Copy className="mr-2 h-4 w-4" /> Copy link học
           </Button>
           <Can permission="class_edit">
-            <Link href={`/admin/courses/${params.id}/classes/${params.classId}/edit`}>
+            <Link href={`/courses/${params.id}/classes/${params.classId}/edit`}>
               <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
                 <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
               </Button>

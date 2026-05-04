@@ -7,7 +7,7 @@ export default function CreateGuardianPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/admin/guardians");
+    router.replace("/guardians");
   }, [router]);
 
   return null;

@@ -75,7 +75,7 @@ export default function WatchLayout({ children }: { children: React.ReactNode })
                                 return (
                                     <Link
                                         key={lecture.id}
-                                        href={`/student/classes/${code}/lectures/${lecture.id}`}
+                                        href={`/classes/${code}/lectures/${lecture.id}`}
                                         className={`flex items-start gap-4 p-4 rounded-xl transition-all group border ${isActive
                                             ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200'
                                             : 'hover:bg-white text-slate-600 border-transparent bg-transparent hover:shadow-sm'

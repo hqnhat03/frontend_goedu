@@ -268,7 +268,7 @@ export default function ExamQuestionsPage() {
     try {
       await api.put(`/teacher/exams/${examId}/questions`, { questions })
       toast.success("Cập nhật câu hỏi thành công")
-      router.push("/teacher/exams")
+      router.push("/exams")
     } catch (error) {
       console.error("Failed to save questions:", error)
       toast.error("Có lỗi xảy ra khi lưu câu hỏi")

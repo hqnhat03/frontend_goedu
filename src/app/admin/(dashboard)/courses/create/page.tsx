@@ -87,7 +87,7 @@ export default function CreateCoursePage() {
     React.useEffect(() => {
         if (!hasPermission("course_create")) {
             toast.error("Bạn không có quyền thực hiện chức năng này")
-            router.push("/admin/courses")
+            router.push("/courses")
         }
     }, [hasPermission, router])
 
@@ -164,7 +164,7 @@ export default function CreateCoursePage() {
             toast.success("Tạo khóa học thành công!")
             form.reset()
             // Redirect sau khi tạo thành công
-            router.push("/admin/courses")
+            router.push("/courses")
             router.refresh()
         } catch (err: unknown) {
             if (err instanceof AxiosError) {

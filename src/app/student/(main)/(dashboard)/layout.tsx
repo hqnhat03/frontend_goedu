@@ -20,7 +20,7 @@ export default function StudentDashboardLayout({
         const hasToken = document.cookie.includes('access_token')
 
         if (!hasToken) {
-            router.replace('/student/login')
+            router.replace('/login')
         }
     }, [router])
 

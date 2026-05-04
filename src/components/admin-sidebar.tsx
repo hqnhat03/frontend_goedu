@@ -102,7 +102,7 @@ export function AdminSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex items-center py-2 px-5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center transition-all duration-300">
-        <Link href="/ className="flex items-center gap-3 font-bold text-xl group-data-[collapsible=icon]:gap-0">
+        <Link href="/" className="flex items-center gap-3 font-bold text-xl group-data-[collapsible=icon]:gap-0">
           <div className="size-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0 transition-transform hover:scale-105 active:scale-95">
             G
           </div>

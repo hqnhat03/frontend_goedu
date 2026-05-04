@@ -71,7 +71,7 @@ export default function EditProfilePage() {
           );
         }
 
-        router.push("/admin/profile")
+        router.push("/profile")
       } else {
         toast.error("Cập nhật thất bại. Vui lòng thử lại.")
       }

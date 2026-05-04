@@ -392,7 +392,7 @@ export default function CoursesPage() {
                     <TableCell className="text-right py-4">
                       <div className="flex justify-end gap-1">
                         <Can permission="course_detail">
-                          <Link href={`/admin/courses/${item.id}`}>
+                          <Link href={`/courses/${item.id}`}>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -404,7 +404,7 @@ export default function CoursesPage() {
                           </Link>
                         </Can>
                         <Can permission="class_list">
-                          <Link href={`/admin/courses/${item.id}/classes`}>
+                          <Link href={`/courses/${item.id}/classes`}>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -417,7 +417,7 @@ export default function CoursesPage() {
                         </Can>
                         <Can permission="course_edit">
                           <Link
-                            href={`/admin/courses/${item.id}/edit`}
+                            href={`/courses/${item.id}/edit`}
                             onClick={() => setEditingCourse(item)}
                           >
                             <Button

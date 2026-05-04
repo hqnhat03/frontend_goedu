@@ -126,7 +126,7 @@ export default function CourseClassesPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-background p-4 rounded-xl border shadow-sm">
         <div className="flex items-center gap-4">
-          <Link href={`/admin/courses/${params.id}`}>
+          <Link href={`/courses/${params.id}`}>
             <Button variant="ghost" size="icon" className="hover:bg-muted/50 transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -145,7 +145,7 @@ export default function CourseClassesPage() {
         <Can permission="class_create">
           <div className="flex items-center gap-3">
             {/* Link to create class within this course context */}
-            <Link href={`/admin/courses/${params.id}/classes/create`}>
+            <Link href={`/courses/${params.id}/classes/create`}>
               <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap">
                 <Plus className="mr-2 h-4 w-4" /> Thêm lớp học
               </Button>
@@ -266,7 +266,7 @@ export default function CourseClassesPage() {
                         <StatusBadge status={mappedStatus} className="shadow-none" />
                       </TableCell>
                       <TableCell className="text-right py-4">
-                        <Link href={`/admin/courses/${params.id}/classes/${item.id}`}>
+                        <Link href={`/courses/${params.id}/classes/${item.id}`}>
                           <Button
                             variant="ghost"
                             size="sm"

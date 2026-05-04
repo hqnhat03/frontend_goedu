@@ -67,7 +67,7 @@ export default function CourseDetailPage() {
   React.useEffect(() => {
     if (!hasPermission("course_detail")) {
       toast.error("Bạn không có quyền truy cập trang này")
-      router.push("/admin/courses")
+      router.push("/courses")
     }
   }, [hasPermission, router])
 
@@ -84,7 +84,7 @@ export default function CourseDetailPage() {
         setCourse(result.data)
       } else {
         toast.error(result.message || "Không thể tải thông tin khóa học")
-        router.push("/admin/courses")
+        router.push("/courses")
       }
     } catch (error) {
       console.error("Failed to fetch course details:", error)
@@ -146,7 +146,7 @@ export default function CourseDetailPage() {
 
         <div className="flex items-center gap-3">
           <Can permission="class_list">
-            <Link href={`/admin/courses/${course.id}/classes`}>
+            <Link href={`/courses/${course.id}/classes`}>
               <Button variant="outline" className="gap-2 shadow-sm bg-background hover:bg-primary/5 hover:text-primary border-primary/20 transition-all">
                 <LayoutGrid className="h-4 w-4" />
                 Lớp học
@@ -154,7 +154,7 @@ export default function CourseDetailPage() {
             </Link>
           </Can>
           <Can permission="student_in_course_list">
-            <Link href={`/admin/courses/${course.id}/students`}>
+            <Link href={`/courses/${course.id}/students`}>
               <Button variant="outline" className="gap-2 shadow-sm bg-background hover:bg-primary/5 hover:text-primary border-primary/20 transition-all">
                 <Users className="h-4 w-4" />
                 Học sinh
@@ -213,13 +213,13 @@ export default function CourseDetailPage() {
                   </span>
                   <span className="text-xl font-bold">{course.lesson_count}</span>
                 </div>
-                <Link href={`/admin/courses/${course.id}/classes`} className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all group">
+                <Link href={`/courses/${course.id}/classes`} className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all group">
                   <span className="text-sm text-muted-foreground flex items-center justify-between gap-1.5 group-hover:text-primary/70">
                     <span className="flex items-center gap-1.5"><LayoutGrid className="w-4 h-4" /> Lớp học</span>
                   </span>
                   <span className="text-xl font-bold group-hover:text-primary">{course.class_rooms_count}</span>
                 </Link>
-                <Link href={`/admin/courses/${course.id}/students`} className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm hover:border-indigo-500/50 hover:bg-indigo-500/5 cursor-pointer transition-all group">
+                <Link href={`/courses/${course.id}/students`} className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm hover:border-indigo-500/50 hover:bg-indigo-500/5 cursor-pointer transition-all group">
                   <span className="text-sm text-muted-foreground flex items-center justify-between gap-1.5 group-hover:text-indigo-600/70">
                     <span className="flex items-center gap-1.5"><Users className="w-4 h-4" /> Học sinh</span>
                   </span>

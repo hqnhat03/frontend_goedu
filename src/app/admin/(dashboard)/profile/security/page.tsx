@@ -41,7 +41,7 @@ export default function SecurityPage() {
 
       if (res.data?.success || res.status === 200 || res.status === 204) {
         toast.success("Thay đổi mật khẩu thành công!")
-        router.push("/admin/profile")
+        router.push("/profile")
       } else {
         toast.error("Cập nhật thất bại. Vui lòng thử lại.")
       }

@@ -82,7 +82,7 @@ export default function EditTeacherProfilePage() {
           );
         }
 
-        router.push("/teacher/profile")
+        router.push("/profile")
       } else {
         toast.error("Cập nhật thất bại. Vui lòng thử lại.")
       }

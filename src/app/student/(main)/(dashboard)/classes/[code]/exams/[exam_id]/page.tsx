@@ -122,7 +122,7 @@ export default function ExamResultPage() {
                 <p className="text-slate-500 max-w-md text-center">
                     {error || 'Bài kiểm tra không tồn tại hoặc bạn chưa hoàn thành bài làm này.'}
                 </p>
-                <Link href={`/student/classes/${code}/detail`}>
+                <Link href={`/classes/${code}/detail`}>
                     <Button variant="outline" className="gap-2">
                         <ChevronLeft className="w-4 h-4" /> Quay lại lớp học
                     </Button>

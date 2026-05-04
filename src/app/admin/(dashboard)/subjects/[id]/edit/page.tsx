@@ -11,7 +11,7 @@ export default function EditSubjectPage() {
     const router = useRouter()
 
     useEffect(() => {
-        router.replace("/admin/subjects")
+        router.replace("/subjects")
     }, [router])
 
     return null

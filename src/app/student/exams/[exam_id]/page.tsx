@@ -314,7 +314,7 @@ export default function ExamQuestionsPage() {
               <span className="text-slate-400">CÒN LẠI:</span>
               <span className="text-red-400">{examData.questions.length - Object.keys(answers).length}</span>
             </div>
-            <Button variant="ghost" className="w-full justify-start h-8 px-2 text-[10px] font-bold text-red-500 hover:bg-red-50" onClick={() => router.push('/student/dashboard')}>
+            <Button variant="ghost" className="w-full justify-start h-8 px-2 text-[10px] font-bold text-red-500 hover:bg-red-50" onClick={() => router.push('/dashboard')}>
               <LogOut className="w-3.5 h-3.5 mr-2" /> THOÁT PHÒNG THI
             </Button>
           </div>

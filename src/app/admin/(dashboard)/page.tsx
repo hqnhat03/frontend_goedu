@@ -15,7 +15,7 @@ export default function AdminRootPage() {
 
     React.useEffect(() => {
         if (hasPermission("dashboard")) {
-            router.replace("/admin/dashboard")
+            router.replace("/dashboard")
         } else {
             setChecking(false)
         }

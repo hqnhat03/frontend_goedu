@@ -40,7 +40,7 @@ export default function DashboardPage() {
   React.useEffect(() => {
     if (!hasPermission("dashboard")) {
       toast.error("Bạn không có quyền truy cập trang này")
-      router.push("/admin/profile")
+      router.push("/profile")
     }
   }, [hasPermission, router])
 

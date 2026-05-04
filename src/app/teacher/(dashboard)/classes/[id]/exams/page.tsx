@@ -195,7 +195,7 @@ export default function ClassExamsPage() {
                                     </TableCell>
                                     <TableCell className="text-right pr-8">
                                         <div className="flex items-center justify-end gap-2">
-                                            <Link href={`/teacher/classes/${params.id}/exams/${exam.id}`}>
+                                            <Link href={`/classes/${params.id}/exams/${exam.id}`}>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"

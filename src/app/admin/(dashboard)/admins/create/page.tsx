@@ -105,7 +105,7 @@ export default function CreateAdminPage() {
       const response = await api.post("/admin/admins", data)
       if (response.status === 201 || response.status === 200 || response.data?.success) {
         toast.success("Thêm quản trị viên thành công")
-        router.push("/admin/admins")
+        router.push("/admins")
         router.refresh()
       }
     } catch (error: unknown) {

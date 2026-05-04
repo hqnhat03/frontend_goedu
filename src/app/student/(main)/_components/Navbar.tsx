@@ -44,7 +44,7 @@ export function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push('/student/login');
+    router.push('/login');
   };
 
   const navLinks = [

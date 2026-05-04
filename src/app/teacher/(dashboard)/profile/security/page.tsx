@@ -42,7 +42,7 @@ export default function SecurityTeacherPage() {
 
       if (res.data?.success || res.status === 200 || res.status === 204) {
         toast.success("Thay đổi mật khẩu thành công!")
-        router.push("/teacher/profile")
+        router.push("/profile")
       } else {
         toast.error("Cập nhật thất bại. Vui lòng thử lại.")
       }

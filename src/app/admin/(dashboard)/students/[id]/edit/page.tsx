@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 export default function EditStudentPage() {
     const router = useRouter()
     useEffect(() => {
-        router.replace("/admin/students")
+        router.replace("/students")
     }, [router])
     return null
 }

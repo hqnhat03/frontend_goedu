@@ -125,7 +125,7 @@ export default function LecturesPage() {
                     {lectures.map((lecture) => (
                         <Link
                             key={lecture.id}
-                            href={`/student/classes/${code}/lectures/${lecture.id}`}
+                            href={`/classes/${code}/lectures/${lecture.id}`}
                             className="block"
                         >
                             <Card
