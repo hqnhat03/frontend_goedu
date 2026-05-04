@@ -1,15 +1,16 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
   const token = request.cookies.get('access_token')?.value;
 
-  // Define domains
-  const adminDomain = 'goedu.demo.vn';
-  const teacherDomain = 'teacher-goedu.demo.vn';
-  const studentDomain = 'student-goedu.demo.vn';
+  // Define domains from env
+  const baseDomain = process.env.NEXT_PUBLIC_DOMAIN;
+  const adminDomain = baseDomain;
+  const teacherDomain = `teacher.${baseDomain}`;
+  const studentDomain = `student.${baseDomain}`;
 
   // Extract the main part of the hostname (removing port if present)
   const currentHost = hostname.split(':')[0];
@@ -23,7 +24,7 @@ export function middleware(request: NextRequest) {
         ? pathname === '/' || pathname === ''
         : pathname === route || pathname.startsWith(`${route}/`)
     );
-    
+
     // If no token and trying to access protected page, redirect to login
     if (!token && !isAuthPage && !isPublicRoute) {
       url.pathname = '/login';
@@ -58,10 +59,22 @@ export function middleware(request: NextRequest) {
   }
 
   if (currentHost === teacherDomain) {
+    // Nếu truy cập domain teacher mà có prefix /teacher thì redirect bỏ prefix đó đi
+    if (pathname === '/teacher' || pathname.startsWith('/teacher/')) {
+      const newPathname = pathname.replace(/^\/teacher/, '') || '/';
+      url.pathname = newPathname;
+      return NextResponse.redirect(url);
+    }
     return handleProtectedDomain('/teacher');
   }
 
   if (currentHost === studentDomain) {
+    // Nếu truy cập domain student mà có prefix /student thì redirect bỏ prefix đó đi
+    if (pathname === '/student' || pathname.startsWith('/student/')) {
+      const newPathname = pathname.replace(/^\/student/, '') || '/';
+      url.pathname = newPathname;
+      return NextResponse.redirect(url);
+    }
     return handleProtectedDomain('/student', ['/', '/courses']);
   }
 

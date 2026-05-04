@@ -226,7 +226,7 @@ export default function TeacherProfilePage() {
             </CardContent>
           </Card>
 
-          <Link href="/teacher/profile/edit" className="block">
+          <Link href="/profile/edit" className="block">
             <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
               <CardHeader className="flex flex-row items-center gap-4 py-5">
                 <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
@@ -243,7 +243,7 @@ export default function TeacherProfilePage() {
             </Card>
           </Link>
 
-          <Link href="/teacher/profile/security" className="block">
+          <Link href="/profile/security" className="block">
             <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
               <CardHeader className="flex flex-row items-center gap-4 py-5">
                 <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">

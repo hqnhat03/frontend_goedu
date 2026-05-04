@@ -180,7 +180,7 @@ export default function ProfilePage() {
 
         {/* Right Column: Settings */}
         <div className="col-span-1 md:col-span-2 space-y-4">
-          <Link href="/admin/profile/edit" className="block">
+          <Link href="/profile/edit" className="block">
             <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
               <CardHeader className="flex flex-row items-center gap-4 py-5">
                 <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
@@ -197,7 +197,7 @@ export default function ProfilePage() {
             </Card>
           </Link>
 
-          <Link href="/admin/profile/security" className="block">
+          <Link href="/profile/security" className="block">
             <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
               <CardHeader className="flex flex-row items-center gap-4 py-5">
                 <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">

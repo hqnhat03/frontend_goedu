@@ -55,7 +55,7 @@ export default function StudentDashboardPage() {
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-slate-900">Lớp học hiện tại</h2>
-            <Link href="/student/dashboard/my-classes">
+            <Link href="/dashboard/my-classes">
               <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                 Xem tất cả <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -107,7 +107,7 @@ export default function StudentDashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-slate-900">Lịch học tiếp theo</h2>
-            <Link href="/student/schedule">
+            <Link href="/schedule">
               <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                 Chi tiết
               </Button>

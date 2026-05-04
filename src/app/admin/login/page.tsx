@@ -205,7 +205,7 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between ml-1">
                   <FieldLabel htmlFor="password" title="password" className="font-semibold text-sm">Mật khẩu</FieldLabel>
                   <Link
-                    href="/admin/forgot-password"
+                    href="/forgot-password"
                     className="text-xs font-semibold text-primary/80 hover:text-primary hover:underline transition-all"
                   >
                     Quên mật khẩu?

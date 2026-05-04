@@ -223,7 +223,7 @@ export default function CoursesPage() {
           </p>
         </div>
         <Can permission="course_create">
-          <Link href="/admin/courses/create">
+          <Link href="/courses/create">
             <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap">
               <Plus className="mr-2 h-4 w-4" /> Thêm khóa học
             </Button>

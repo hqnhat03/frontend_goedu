@@ -128,7 +128,7 @@ export default function CourseDetailPage() {
       {/* Header Info */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-background p-4 rounded-xl border shadow-sm">
         <div className="flex items-center gap-4">
-          <Link href="/admin/courses">
+          <Link href="/courses">
             <Button variant="ghost" size="icon" className="hover:bg-muted/50 transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </Button>

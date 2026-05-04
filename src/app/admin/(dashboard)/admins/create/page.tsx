@@ -131,7 +131,7 @@ export default function CreateAdminPage() {
     <div className="max-w-6xl mx-auto flex flex-col gap-8 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
       <div className="flex items-center gap-4">
-        <Link href="/admin/admins">
+        <Link href="/admins">
           <Button variant="outline" size="icon" className="h-9 w-9 rounded-full border-muted-foreground/20 hover:bg-muted transition-all">
             <ChevronLeft className="h-5 w-5" />
           </Button>

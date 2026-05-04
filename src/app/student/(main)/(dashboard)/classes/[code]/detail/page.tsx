@@ -131,7 +131,7 @@ export default function ClassDetailPage() {
                 <p className="text-slate-500 max-w-md text-center">
                     {error || 'Lớp học không tồn tại hoặc bạn không có quyền truy cập.'}
                 </p>
-                <Link href="/student/classes">
+                <Link href="/classes">
                     <Button variant="outline" className="gap-2">
                         <ChevronLeft className="w-4 h-4" /> Quay lại danh sách
                     </Button>
@@ -145,7 +145,7 @@ export default function ClassDetailPage() {
             {/* Breadcrumb & Navigation */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <Link href="/student/classes">
+                    <Link href="/classes">
                         <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100 transition-colors">
                             <ChevronLeft className="w-6 h-6" />
                         </Button>

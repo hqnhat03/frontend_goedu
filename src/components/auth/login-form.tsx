@@ -24,6 +24,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import api from "@/lib/axios";
+import { APP_LINKS } from "@/lib/links";
 import { useAuthStore } from "@/store/auth-store";
 import { AxiosError } from "axios";
 
@@ -189,7 +190,7 @@ export function LoginForm({ role }: LoginFormProps) {
             <TabsList className="grid w-full grid-cols-2 mb-8 h-12 p-1">
               <TabsTrigger value="student">
                 <Link
-                  href={`http://student-goedu.demo.vn:3000/login?email=${encodeURIComponent(currentEmail)}`}
+                  href={`${APP_LINKS.student}/login?email=${encodeURIComponent(currentEmail)}`}
                   className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
                 >
                   <User className="size-4" />
@@ -198,7 +199,7 @@ export function LoginForm({ role }: LoginFormProps) {
               </TabsTrigger>
               <TabsTrigger value="teacher">
                 <Link
-                  href={`http://teacher-goedu.demo.vn:3000/login?email=${encodeURIComponent(currentEmail)}`}
+                  href={`${APP_LINKS.teacher}/login?email=${encodeURIComponent(currentEmail)}`}
                   className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
                 >
                   <GraduationCap className="size-4" />

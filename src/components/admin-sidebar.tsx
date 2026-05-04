@@ -32,43 +32,43 @@ import {
 const navItems = [
   {
     title: "Dashboard",
-    url: "/admin/dashboard",
+    url: "/dashboard",
     icon: LayoutDashboard,
     permission: "dashboard",
   },
   {
     title: "Quản lý khóa học",
-    url: "/admin/courses",
+    url: "/courses",
     icon: BookOpen,
     permission: "course_list",
   },
   {
     title: "Quản lý giáo viên",
-    url: "/admin/teachers",
+    url: "/teachers",
     icon: Users,
     permission: "teacher_list",
   },
   {
     title: "Quản lý học sinh",
-    url: "/admin/students",
+    url: "/students",
     icon: GraduationCap,
     permission: "student_list",
   },
   {
     title: "Quản lý phụ huynh",
-    url: "/admin/guardians",
+    url: "/guardians",
     icon: UserCheck,
     permission: "guardian_list",
   },
   {
     title: "Quản lý quản trị viên",
-    url: "/admin/admins",
+    url: "/admins",
     icon: ShieldCheck,
     permission: "admin_list",
   },
   {
     title: "Phân quyền màn hình",
-    url: "/admin/permissions",
+    url: "/permissions",
     icon: ShieldCheck,
     permission: "permission_manage",
   },
@@ -78,17 +78,17 @@ const navItems = [
     items: [
       {
         title: "Quản lý môn học",
-        url: "/admin/subjects",
+        url: "/subjects",
         permission: "subject_list",
       },
       {
         title: "Quản lý trình độ",
-        url: "/admin/levels",
+        url: "/levels",
         permission: "level_list",
       },
       {
         title: "Quản lý vai trò",
-        url: "/admin/roles",
+        url: "/roles",
         permission: "role_list",
       },
     ],
@@ -102,7 +102,7 @@ export function AdminSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex items-center py-2 px-5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center transition-all duration-300">
-        <Link href="/admin" className="flex items-center gap-3 font-bold text-xl group-data-[collapsible=icon]:gap-0">
+        <Link href="/ className="flex items-center gap-3 font-bold text-xl group-data-[collapsible=icon]:gap-0">
           <div className="size-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0 transition-transform hover:scale-105 active:scale-95">
             G
           </div>

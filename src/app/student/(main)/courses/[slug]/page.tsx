@@ -390,7 +390,7 @@ export default function CourseDetailPage() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
-        <Link href="/student/courses" className="hover:text-foreground transition-colors">
+        <Link href="/courses" className="hover:text-foreground transition-colors">
           Khóa học
         </Link>
         <ChevronLeft className="size-4 rotate-180" />

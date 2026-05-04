@@ -138,10 +138,10 @@ export function Navbar() {
             </DropdownMenu>
           ) : (
             <>
-              <Link href="/student/login">
+              <Link href="/login">
                 <Button variant="ghost" className="font-bold text-slate-600 hover:text-slate-900 px-6">Đăng nhập</Button>
               </Link>
-              <Link href="/student/register">
+              <Link href="/register">
                 <Button className="rounded-full bg-blue-600 px-8 font-bold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-95">
                   Đăng ký
                 </Button>
@@ -205,10 +205,10 @@ export function Navbar() {
                 </Button>
               ) : (
                 <div className="flex flex-col gap-3">
-                  <Link href="/student/login" onClick={() => setMobileMenuOpen(false)} className="w-full">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full">
                     <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-slate-200">Đăng nhập</Button>
                   </Link>
-                  <Link href="/student/register" onClick={() => setMobileMenuOpen(false)} className="w-full">
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full">
                     <Button className="w-full bg-blue-600 text-white h-14 rounded-2xl shadow-lg shadow-blue-200 font-bold transition-all hover:bg-blue-700 active:scale-95">
                       Tạo tài khoản mới
                     </Button>

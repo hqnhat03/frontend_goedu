@@ -107,7 +107,7 @@ export default function EditProfilePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-8 px-4 md:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-4 mb-6">
-        <Link href="/student/profile">
+        <Link href="/profile">
           <Button variant="outline" size="icon" className="rounded-xl h-10 w-10 shrink-0">
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -274,7 +274,7 @@ export default function EditProfilePage() {
             )}
 
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t mt-8">
-              <Link href="/student/profile">
+              <Link href="/profile">
                 <Button type="button" variant="outline" className="w-full sm:w-auto h-11 px-6 rounded-xl">
                   Hủy bỏ
                 </Button>
