@@ -67,6 +67,12 @@ const navItems = [
     permission: "admin_list",
   },
   {
+    title: "Quản lý đăng ký",
+    url: "/course-registrations",
+    icon: GraduationCap, // Or another suitable icon
+    permission: "course_registation_list",
+  },
+  {
     title: "Phân quyền màn hình",
     url: "/permissions",
     icon: ShieldCheck,
