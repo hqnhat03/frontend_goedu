@@ -40,7 +40,7 @@ export function CourseCard({ course }: { course: Course }) {
           height={215}
         />
         <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
-          {course.is_published && <Badge variant="secondary" className="bg-white/90 text-[10px] h-5 px-1.5 text-black hover:bg-white shadow-sm">Published</Badge>}
+          {course.is_published && <Badge variant="secondary" className="bg-white/90 text-[10px] h-5 px-1.5 text-black hover:bg-white shadow-sm">Đã xuất bản</Badge>}
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export function CourseCard({ course }: { course: Course }) {
         <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-end mt-4 sm:mt-0 shrink-0">
 
           <div className="font-bold text-2xl text-primary tracking-tight">
-            {isFree ? "Free" : (
+            {isFree ? "Miễn phí" : (
               <>
                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
               </>

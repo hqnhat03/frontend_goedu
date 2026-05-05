@@ -78,10 +78,10 @@ export function FilterSidebar({
     <div className={`space-y-8 ${className}`}>
       <div>
         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-foreground">
-          <Search className="w-4 h-4" /> Search
+          <Search className="w-4 h-4" /> Tìm kiếm
         </h3>
         <Input
-          placeholder="Search courses..."
+          placeholder="Tìm kiếm khóa học..."
           value={filters.keyword}
           onChange={(e) => setFilters(prev => ({ ...prev, keyword: e.target.value }))}
           className="w-full bg-background"
@@ -92,7 +92,7 @@ export function FilterSidebar({
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold mb-3 text-foreground">Subject</h3>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Môn học</h3>
         <div className="space-y-3">
           {isLoadingSubjects ? (
             <div className="space-y-2">
@@ -126,7 +126,7 @@ export function FilterSidebar({
 
 
       <div>
-        <h3 className="text-sm font-semibold mb-3 text-foreground">Level</h3>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Cấp độ</h3>
         <div className="space-y-3">
           {isLoadingLevels ? (
             <div className="space-y-2">
@@ -160,11 +160,11 @@ export function FilterSidebar({
 
       <div className="pt-6 flex flex-col gap-3 border-t">
         <Button onClick={onApply} className="w-full font-medium shadow-sm">
-          Apply Filters
+          Áp dụng bộ lọc
         </Button>
         <Button onClick={onReset} variant="outline" className="w-full font-medium">
           <RefreshCcw className="w-4 h-4 mr-2" />
-          Reset
+          Đặt lại
         </Button>
       </div>
     </div>

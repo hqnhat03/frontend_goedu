@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import api from '@/lib/axios'
 import {
-    CheckCircle2,
     ChevronLeft,
     Clock,
     ExternalLink,
@@ -36,7 +35,6 @@ export default function LectureWatchPage() {
 
     const [loading, setLoading] = useState(true)
     const [currentLecture, setCurrentLecture] = useState<Lecture | null>(null)
-    const [lecturesCount, setLecturesCount] = useState(0)
 
     useEffect(() => {
         const hasToken = document.cookie.includes('access_token')
@@ -54,11 +52,6 @@ export default function LectureWatchPage() {
                     setCurrentLecture(detailRes.data.data)
                 }
 
-                // Lấy số lượng bài học để hiển thị tiến độ (có thể tối ưu sau)
-                const listRes = await api.get(`/student/classes/${code}/lectures`)
-                if (listRes.data.success) {
-                    setLecturesCount(listRes.data.data.length)
-                }
             } catch (error) {
                 console.error('Error fetching data:', error)
             } finally {
@@ -130,26 +123,9 @@ export default function LectureWatchPage() {
                 )}
             </div>
 
-            {/* Course Progress Bar (Below Video) */}
-            <div className="px-6 md:px-8 py-4 bg-slate-50 border-b flex items-center gap-6">
-                <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                            <div className="p-1 bg-blue-100 rounded text-blue-600">
-                                <CheckCircle2 className="w-3 h-3" />
-                            </div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tiến độ khóa học</span>
-                        </div>
-                        <span className="text-[10px] font-black text-blue-600">Bài {currentLecture?.lecture_number} / {lecturesCount} ({Math.round(((currentLecture?.lecture_number || 0) / (lecturesCount || 1)) * 100)}%)</span>
-                    </div>
-                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                        <div className="h-full bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.4)] transition-all duration-1000" style={{ width: `${((currentLecture?.lecture_number || 0) / (lecturesCount || 1)) * 100}%` }} />
-                    </div>
-                </div>
-            </div>
 
             {/* Content Info */}
-            <div className="p-6 md:p-8 max-w-4xl mx-auto w-full">
+            <div className="p-4 md:p-6 w-full">
                 <div className="flex flex-wrap items-center gap-3 mb-6">
                     <Badge className="bg-blue-50 text-blue-600 border-none hover:bg-blue-100 uppercase font-black tracking-wider px-3 text-[10px]">
                         Lớp: {code}

@@ -75,7 +75,7 @@ function CoursesContent() {
             setCourses(response.data.data)
             setMeta(response.data.meta)
          } else {
-            setError("Failed to fetch courses data.")
+            setError("Không thể tải dữ liệu khóa học.")
          }
       } catch (err: unknown) {
          if (err instanceof AxiosError) {
@@ -126,10 +126,10 @@ function CoursesContent() {
          {/* Page Header */}
          <div className="mb-8 md:mb-12">
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
-               Explore Courses
+               Khám phá khóa học
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl">
-               Discover the perfect course to advance your skills. Filter by subject, level, and price to find exactly what you need.
+               Tìm kiếm khóa học hoàn hảo để nâng cao kỹ năng của bạn. Lọc theo môn học, cấp độ và giá cả để tìm thấy chính xác những gì bạn cần.
             </p>
          </div>
 
@@ -137,7 +137,7 @@ function CoursesContent() {
             {/* Desktop Sidebar */}
             <aside className="hidden md:block w-72 shrink-0">
                <div className="sticky top-24 border rounded-xl p-6 bg-card shadow-sm">
-                  <h2 className="font-semibold text-lg mb-6 border-b pb-4">Filters</h2>
+                  <h2 className="font-semibold text-lg mb-6 border-b pb-4">Bộ lọc</h2>
                   <FilterSidebar
                      filters={filters}
                      setFilters={setFilters}
@@ -156,12 +156,12 @@ function CoursesContent() {
                      <Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
                         <SheetTrigger render={() => (
                            <Button variant="outline" className="md:hidden flex items-center gap-2">
-                              <SlidersHorizontal className="w-4 h-4" /> Filters
+                              <SlidersHorizontal className="w-4 h-4" /> Bộ lọc
                            </Button>
                         )}>
                         </SheetTrigger>
                         <SheetContent side="left" className="w-[300px] sm:w-[350px] overflow-y-auto pt-10">
-                           <h2 className="font-semibold text-lg mb-6 border-b pb-4">Filters</h2>
+                           <h2 className="font-semibold text-lg mb-6 border-b pb-4">Bộ lọc</h2>
                            <FilterSidebar
                               filters={filters}
                               setFilters={setFilters}
@@ -175,22 +175,22 @@ function CoursesContent() {
                         {isLoading ? (
                            <Skeleton className="h-5 w-32" />
                         ) : (
-                           <span>Showing <span className="font-semibold text-foreground">{meta?.total || 0}</span> courses</span>
+                           <span>Hiển thị <span className="font-semibold text-foreground">{meta?.total || 0}</span> khóa học</span>
                         )}
                      </div>
                   </div>
 
                   <div className="flex items-center gap-3 w-full sm:w-auto">
-                     <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Sort by</span>
+                     <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Sắp xếp theo</span>
                      <Select value={sortBy} onValueChange={(v) => { setSortBy(v ?? "newest"); setCurrentPage(1) }}>
                         <SelectTrigger className="w-full sm:w-[160px] bg-background">
-                           <SelectValue placeholder="Sort..." />
+                           <SelectValue placeholder="Sắp xếp..." />
                         </SelectTrigger>
                         <SelectContent>
-                           <SelectItem value="newest">Newest First</SelectItem>
-                           <SelectItem value="popular">Most Popular</SelectItem>
-                           <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                           <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                           <SelectItem value="newest">Mới nhất</SelectItem>
+                           <SelectItem value="popular">Phổ biến nhất</SelectItem>
+                           <SelectItem value="price-asc">Giá: Thấp đến Cao</SelectItem>
+                           <SelectItem value="price-desc">Giá: Cao đến Thấp</SelectItem>
                         </SelectContent>
                      </Select>
                   </div>
@@ -224,11 +224,11 @@ function CoursesContent() {
                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                         <Search className="w-8 h-8 text-muted-foreground" />
                      </div>
-                     <h3 className="text-xl font-semibold mb-2">No courses found</h3>
+                     <h3 className="text-xl font-semibold mb-2">Không tìm thấy khóa học nào</h3>
                      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                        We couldn&apos;t find any courses matching your current filters. Try adjusting them or resetting.
+                        Chúng tôi không tìm thấy khóa học nào phù hợp với bộ lọc hiện tại của bạn. Hãy thử điều chỉnh hoặc đặt lại bộ lọc.
                      </p>
-                     <Button onClick={handleResetFilters}>Clear all filters</Button>
+                     <Button onClick={handleResetFilters}>Xóa tất cả bộ lọc</Button>
                   </div>
                ) : (
                   <div className="space-y-10">

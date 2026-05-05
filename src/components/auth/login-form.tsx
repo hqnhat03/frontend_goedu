@@ -1,10 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GraduationCap, Lock, LogIn, Mail, MoveLeft, User } from "lucide-react";
-import Image from "next/image";
+import { Eye, EyeOff, GraduationCap, Lock, LogIn, Mail, MoveLeft, User } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -43,9 +42,9 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ role }: LoginFormProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   // Get email from query params to "persist" form state during tab switching
   const initialEmail = searchParams.get("email") || "";
@@ -93,7 +92,9 @@ export function LoginForm({ role }: LoginFormProps) {
           document.cookie = `user_info=${encodeURIComponent(JSON.stringify(result.data.user))}; path=/; max-age=${maxAge}; samesite=lax`;
         }
 
-        router.push("/");
+        // Sử dụng window.location.href thay vì router.push để đảm bảo 
+        // middleware nhận được cookie mới và redirect chính xác theo role
+        window.location.href = "/";
       } else {
         toast.error(result.message || "Đăng nhập thất bại");
       }
@@ -144,32 +145,6 @@ export function LoginForm({ role }: LoginFormProps) {
             </p>
           </div>
 
-          <div className="pt-8 border-t border-white/20">
-            <div className="flex gap-6 items-center">
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="size-10 rounded-full border-2 border-white/50 bg-slate-200 flex items-center justify-center overflow-hidden transition-all hover:scale-110 hover:z-20 cursor-pointer"
-                  >
-                    <Image
-                      src={`https://i.pravatar.cc/100?u=${i + 20}`}
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      sizes="40px"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div>
-                <p className="text-sm text-white/80">
-                  <span className="text-white font-bold text-lg">5,000+</span>
-                </p>
-                <p className="text-xs text-white/60">Học viên và giảng viên đang tham gia</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -245,11 +220,22 @@ export function LoginForm({ role }: LoginFormProps) {
                     <Input
                       {...register("password")}
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       disabled={isLoading}
-                      className="pl-12 h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
+                      className="pl-12 pr-12 h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-primary transition-colors focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="size-5" />
+                      ) : (
+                        <Eye className="size-5" />
+                      )}
+                    </button>
                   </div>
                   <FieldError errors={[errors.password]} />
                 </Field>

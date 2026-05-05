@@ -30,6 +30,10 @@ interface Exam {
     duration_minutes: number;
     open_at: string;
     close_at: string;
+    has_submitted: boolean;
+    result_id: number | null;
+    result_status: string | null;
+    score: number | null;
 }
 
 export default function ExamsPage() {
@@ -64,10 +68,19 @@ export default function ExamsPage() {
         fetchExams();
     }, [code]);
 
-    const getStatus = (openAt: string, closeAt: string) => {
+    const getStatus = (exam: Exam) => {
+        if (exam.has_submitted) {
+            return {
+                label: 'Đã nộp bài',
+                variant: 'default' as const,
+                icon: <CheckCircle2 className="w-3 h-3 mr-1" />,
+                className: 'bg-blue-50 text-blue-600 border-blue-100'
+            };
+        }
+
         const now = new Date();
-        const start = parseISO(openAt);
-        const end = parseISO(closeAt);
+        const start = parseISO(exam.open_at);
+        const end = parseISO(exam.close_at);
 
         if (isBefore(now, start)) {
             return {
@@ -163,22 +176,23 @@ export default function ExamsPage() {
             ) : (
                 <div className="grid gap-5">
                     {exams.map((exam) => {
-                        const status = getStatus(exam.open_at, exam.close_at);
+                        const status = getStatus(exam);
                         const isEnded = isAfter(new Date(), parseISO(exam.close_at));
                         const isUpcoming = isBefore(new Date(), parseISO(exam.open_at));
                         const isOngoing = !isEnded && !isUpcoming;
+                        const canTakeExam = isOngoing && !exam.has_submitted;
 
                         return (
                             <Link
                                 key={exam.id}
-                                href={isOngoing ? `/exams/${exam.id}` : `/classes/${code}/exams/${exam.id}`}
-                                className={`block group transition-all ${isEnded ? 'opacity-75 grayscale-[0.3]' : ''}`}
+                                href={canTakeExam ? `/exams/${exam.id}` : `/classes/${code}/exams/${exam.id}`}
+                                className={`block group transition-all ${isEnded && !exam.has_submitted ? 'opacity-75 grayscale-[0.3]' : ''}`}
                             >
-                                <Card className="p-0 overflow-hidden border-slate-100 rounded-lg shadow-sm group-hover:shadow-xl group-hover:border-primary/20 group-hover:-translate-y-1 transition-all duration-300">
+                                <Card className={`p-0 overflow-hidden border-slate-100 rounded-lg shadow-sm group-hover:shadow-xl group-hover:border-primary/20 group-hover:-translate-y-1 transition-all duration-300 ${exam.has_submitted ? 'bg-blue-50/10' : ''}`}>
                                     <CardContent className="p-0">
                                         <div className="flex flex-col md:flex-row items-stretch md:items-center">
                                             {/* Status Indicator Bar */}
-                                            <div className={`w-full md:w-2 h-2 md:h-auto shrink-0 ${isOngoing ? 'bg-emerald-500' : isUpcoming ? 'bg-amber-500' : 'bg-slate-300'
+                                            <div className={`w-full md:w-2 h-2 md:h-auto shrink-0 ${exam.has_submitted ? 'bg-blue-500' : isOngoing ? 'bg-emerald-500' : isUpcoming ? 'bg-amber-500' : 'bg-slate-300'
                                                 }`} />
 
                                             <div className="flex-1 p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -192,6 +206,11 @@ export default function ExamsPage() {
                                                             {status.icon}
                                                             {status.label}
                                                         </Badge>
+                                                        {exam.has_submitted && (
+                                                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100 font-black">
+                                                                Điểm: {exam.score !== null ? exam.score : '--'}
+                                                            </Badge>
+                                                        )}
                                                     </div>
 
                                                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-medium text-slate-500">
@@ -224,7 +243,15 @@ export default function ExamsPage() {
 
                                                 {/* Action Section */}
                                                 <div className="w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-slate-100 flex items-center justify-between md:justify-end gap-4 min-w-[140px]">
-                                                    {isOngoing ? (
+                                                    {exam.has_submitted ? (
+                                                        <Button
+                                                            variant="outline"
+                                                            className="w-full md:w-auto border-blue-200 text-blue-600 font-bold rounded-md px-6 h-11 bg-blue-50/50 hover:bg-blue-50 transition-all"
+                                                        >
+                                                            Xem kết quả
+                                                            <ChevronRight className="w-4 h-4 ml-1" />
+                                                        </Button>
+                                                    ) : canTakeExam ? (
                                                         <Button
                                                             className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white font-bold rounded-md px-6 h-11 shadow-md shadow-primary/20 group-hover:scale-105 transition-all"
                                                         >

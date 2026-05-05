@@ -46,7 +46,7 @@ export default function WatchLayout({ children }: { children: React.ReactNode })
     }, [code])
 
     return (
-        <div className="flex flex-col lg:flex-row h-screen lg:h-[calc(100vh-64px)] bg-white overflow-hidden border">
+        <div className="flex flex-col lg:flex-row h-screen bg-white overflow-hidden border">
             {/* Main Content Area (Children) */}
             <div className="flex-1 flex flex-col h-full overflow-y-auto bg-white border-r">
                 {children}
@@ -99,14 +99,6 @@ export default function WatchLayout({ children }: { children: React.ReactNode })
                         )}
                     </div>
                 </ScrollArea>
-
-                {/* Sidebar Footer Support */}
-                <div className="p-5 bg-white border-t mt-auto text-center shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Cần hỗ trợ?</p>
-                    <Link href="#" className="text-[10px] font-black text-blue-600 uppercase hover:underline">
-                        Liên hệ giáo viên
-                    </Link>
-                </div>
             </div>
         </div>
     )

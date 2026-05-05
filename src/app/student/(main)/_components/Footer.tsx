@@ -17,7 +17,7 @@ export function Footer() {
               <span className="text-xl font-bold tracking-tight text-slate-900">EduLearn</span>
             </div>
             <p className="mb-6 text-slate-500 leading-relaxed">
-              Empowering learners globally with high-quality, accessible, and forward-thinking education. Building the leaders of tomorrow.
+              Cung cấp cho người học trên toàn cầu nền giáo dục chất lượng cao, dễ tiếp cận và tiên tiến. Kiến tạo những nhà lãnh đạo tương lai.
             </p>
             <div className="flex gap-4">
               <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors">
@@ -37,44 +37,44 @@ export function Footer() {
 
           {/* Links Col 1 */}
           <div>
-            <h4 className="mb-6 font-bold text-slate-900">About</h4>
+            <h4 className="mb-6 font-bold text-slate-900">Về chúng tôi</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Company Info</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Careers</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Press & Media</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Our Blog</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Thông tin công ty</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Tuyển dụng</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Báo chí & Truyền thông</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Blog của chúng tôi</Link></li>
             </ul>
           </div>
 
           {/* Links Col 2 */}
           <div>
-            <h4 className="mb-6 font-bold text-slate-900">Courses</h4>
+            <h4 className="mb-6 font-bold text-slate-900">Khóa học</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Web Development</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Data Science</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Digital Marketing</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">UI/UX Design</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Phát triển Web</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Khoa học Dữ liệu</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Tiếp thị Kỹ thuật số</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Thiết kế UI/UX</Link></li>
             </ul>
           </div>
 
           {/* Links Col 3 */}
           <div>
-            <h4 className="mb-6 font-bold text-slate-900">Support</h4>
+            <h4 className="mb-6 font-bold text-slate-900">Hỗ trợ</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Help Center</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Contact Us</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Terms of Service</Link></li>
-              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Privacy Policy</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Trung tâm trợ giúp</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Liên hệ với chúng tôi</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Điều khoản dịch vụ</Link></li>
+              <li><Link href="#" className="text-slate-500 hover:text-blue-600">Chính sách bảo mật</Link></li>
             </ul>
           </div>
 
         </div>
 
         <div className="border-t border-slate-100 flex flex-col md:flex-row items-center justify-between pt-8 text-sm text-slate-500">
-          <p>© {new Date().getFullYear()} EduLearn. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} EduLearn. Bảo lưu mọi quyền.</p>
           <div className="mt-4 flex space-x-6 md:mt-0">
-            <Link href="#" className="hover:text-slate-900">Privacy</Link>
-            <Link href="#" className="hover:text-slate-900">Terms</Link>
+            <Link href="#" className="hover:text-slate-900">Quyền riêng tư</Link>
+            <Link href="#" className="hover:text-slate-900">Điều khoản</Link>
             <Link href="#" className="hover:text-slate-900">Cookies</Link>
           </div>
         </div>

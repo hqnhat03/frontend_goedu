@@ -1,10 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock, Mail, MoveLeft, Phone, UserCircle, UserPlus } from "lucide-react";
-import Image from "next/image";
+import { Eye, EyeOff, Lock, Mail, MoveLeft, Phone, UserCircle, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -36,8 +34,9 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -85,7 +84,8 @@ export function RegisterForm() {
           document.cookie = `user_info=${encodeURIComponent(JSON.stringify(result.data.user))}; path=/; max-age=${maxAge}; samesite=lax`;
         }
 
-        router.push("/");
+        // Sử dụng window.location.href thay vì router.push để đảm bảo middleware nhận cookie
+        window.location.href = "/";
       } else {
         toast.error(result.message || "Đăng ký thất bại");
       }
@@ -131,36 +131,9 @@ export function RegisterForm() {
             <h1 className="text-6xl font-extrabold tracking-tight mb-4 drop-shadow-xl">Tham gia GoEdu</h1>
             <p className="text-xl text-white/90 leading-relaxed font-light">
               Bắt đầu hành trình chinh phục kiến thức mới ngay hôm nay.
-              Gia nhập cộng đồng 5,000+ học viên đang phát triển cùng chúng tôi.
             </p>
           </div>
 
-          <div className="pt-8 border-t border-white/20">
-            <div className="flex gap-6 items-center">
-              <div className="flex -space-x-3">
-                {[5, 6, 7, 8].map((i) => (
-                  <div
-                    key={i}
-                    className="size-10 rounded-full border-2 border-white/50 bg-slate-200 flex items-center justify-center overflow-hidden transition-all hover:scale-110 hover:z-20 cursor-pointer"
-                  >
-                    <Image
-                      src={`https://i.pravatar.cc/100?u=${i + 40}`}
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      sizes="40px"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div>
-                <p className="text-sm text-white/80">
-                  <span className="text-white font-bold text-lg">98%</span>
-                </p>
-                <p className="text-xs text-white/60">Học viên hài lòng với chất lượng khóa học</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -242,11 +215,22 @@ export function RegisterForm() {
                     <Input
                       {...register("password")}
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       disabled={isLoading}
-                      className="pl-12 h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
+                      className="pl-12 pr-12 h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-primary transition-colors focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="size-5" />
+                      ) : (
+                        <Eye className="size-5" />
+                      )}
+                    </button>
                   </div>
                   <FieldError errors={[errors.password]} />
                 </Field>
@@ -260,11 +244,22 @@ export function RegisterForm() {
                     <Input
                       {...register("confirmPassword")}
                       id="confirmPassword"
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
                       disabled={isLoading}
-                      className="pl-12 h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
+                      className="pl-12 pr-12 h-12 bg-muted/30 border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all rounded-xl"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-primary transition-colors focus:outline-none"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="size-5" />
+                      ) : (
+                        <Eye className="size-5" />
+                      )}
+                    </button>
                   </div>
                   <FieldError errors={[errors.confirmPassword]} />
                 </Field>
