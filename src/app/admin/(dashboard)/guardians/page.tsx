@@ -17,6 +17,7 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 import {
   AlertDialog,
@@ -40,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -86,9 +88,9 @@ export default function GuardiansPage() {
   const [isDeleting, setIsDeleting] = React.useState(false)
 
   const statusLabels: Record<string, string> = {
-    all: "Tất cả",
-    active: "Đang hoạt động",
-    inactive: "Bị khóa",
+    "all": "Tất cả trạng thái",
+    "active": "Đang hoạt động",
+    "inactive": "Bị khóa",
   }
 
   const fetchGuardians = React.useCallback(async () => {
@@ -197,7 +199,13 @@ export default function GuardiansPage() {
               />
             </div>
 
-            <Select value={statusLabels[status]} onValueChange={(value) => setStatus(value as "all" | "active" | "inactive")}>
+            <Select
+              value={statusLabels[status]}
+              onValueChange={(val) => {
+                const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
+                setStatus(key || "all");
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4 text-muted-foreground" />
@@ -205,9 +213,9 @@ export default function GuardiansPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                <SelectItem value="active">Đang hoạt động</SelectItem>
-                <SelectItem value="inactive">Không hoạt động</SelectItem>
+                <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                <SelectItem value="Bị khóa">Bị khóa</SelectItem>
               </SelectContent>
             </Select>
 
@@ -238,16 +246,19 @@ export default function GuardiansPage() {
               <TableHead className="text-right font-semibold">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-sm" />
-                    <p className="text-muted-foreground font-medium animate-pulse">Đang tải dữ liệu...</p>
-                  </div>
-                </TableCell>
-              </TableRow>
+          <TableBody className={cn(isLoading && guardians.length > 0 && "opacity-50 transition-opacity duration-300")}>
+            {isLoading && guardians.length === 0 ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
+                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                </TableRow>
+              ))
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-32 text-center">

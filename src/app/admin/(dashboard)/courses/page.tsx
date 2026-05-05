@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
+import { cn } from "@/lib/utils"
 
 import { Can } from "@/components/auth/can"
 import {
@@ -39,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { StatusBadge } from "@/components/ui/status-badge"
 import {
   Table,
@@ -114,6 +116,7 @@ export default function CoursesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
   const [courseToDelete, setCourseToDelete] = React.useState<Course | null>(null)
   const [isDeleting, setIsDeleting] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
 
   const { setEditingCourse } = useCourseStore()
 
@@ -150,6 +153,7 @@ export default function CoursesPage() {
 
   const fetchCourses = React.useCallback(async () => {
     setIsLoading(true)
+    setError(null)
     try {
       const queryParams = new URLSearchParams({
         name: search,
@@ -166,6 +170,7 @@ export default function CoursesPage() {
       }
     } catch (error) {
       console.error("Failed to fetch courses:", error)
+      setError("Không thể tải danh sách khóa học")
       toast.error("Không thể tải danh sách khóa học")
     } finally {
       setIsLoading(false)
@@ -245,7 +250,13 @@ export default function CoursesPage() {
               />
             </div>
 
-            <Select value={statusLabel[status]} onValueChange={(val: string | null) => setStatus(val || "all")}>
+            <Select
+              value={statusLabel[status]}
+              onValueChange={(val) => {
+                const key = Object.keys(statusLabel).find(k => statusLabel[k] === val);
+                setStatus(key || "all");
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Settings2 className="h-4 w-4" />
@@ -253,14 +264,20 @@ export default function CoursesPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                <SelectItem value="draft">Bản nháp</SelectItem>
-                <SelectItem value="published">Đã xuất bản</SelectItem>
-                <SelectItem value="archived">Lưu trữ</SelectItem>
+                <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                <SelectItem value="Bản nháp">Bản nháp</SelectItem>
+                <SelectItem value="Đã xuất bản">Đã xuất bản</SelectItem>
+                <SelectItem value="Lưu trữ">Lưu trữ</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={targetStudentLabel[targetStudent]} onValueChange={(val: string | null) => setTargetStudent(val || "all")}>
+            <Select
+              value={targetStudentLabel[targetStudent]}
+              onValueChange={(val) => {
+                const key = Object.keys(targetStudentLabel).find(k => targetStudentLabel[k] === val);
+                setTargetStudent(key || "all");
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <GraduationCap className="h-4 w-4" />
@@ -268,15 +285,22 @@ export default function CoursesPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả đối tượng</SelectItem>
-                <SelectItem value="student">Học sinh</SelectItem>
-                <SelectItem value="employee">Nhân viên</SelectItem>
+                <SelectItem value="Tất cả đối tượng">Tất cả đối tượng</SelectItem>
+                <SelectItem value="Học sinh">Học sinh</SelectItem>
+                <SelectItem value="Nhân viên">Nhân viên</SelectItem>
               </SelectContent>
             </Select>
 
             <Select
               value={subject == "all" ? "Tất cả môn học" : subjectMapper[subject]}
-              onValueChange={(val) => setSubject(val === "all" ? "all" : String(val))}
+              onValueChange={(val) => {
+                if (val === "Tất cả môn học") {
+                  setSubject("all");
+                } else {
+                  const id = Object.keys(subjectMapper).find(key => subjectMapper[key] === val);
+                  setSubject(id || "all");
+                }
+              }}
             >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -285,16 +309,23 @@ export default function CoursesPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả môn học</SelectItem>
+                <SelectItem value="Tất cả môn học">Tất cả môn học</SelectItem>
                 {subjectsFilter.map((s) => (
-                  <SelectItem key={String(s.id)} value={String(s.id)}>{s.name}</SelectItem>
+                  <SelectItem key={String(s.id)} value={s.name}>{s.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             <Select
               value={level == "all" ? "Tất cả trình độ" : levelMapper[level]}
-              onValueChange={(val) => setLevel(val === "all" ? "all" : String(val))}
+              onValueChange={(val) => {
+                if (val === "Tất cả trình độ") {
+                  setLevel("all");
+                } else {
+                  const id = Object.keys(levelMapper).find(key => levelMapper[key] === val);
+                  setLevel(id || "all");
+                }
+              }}
             >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -303,9 +334,9 @@ export default function CoursesPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả trình độ</SelectItem>
+                <SelectItem value="Tất cả trình độ">Tất cả trình độ</SelectItem>
                 {levelsFilter.map((l) => (
-                  <SelectItem key={String(l.id)} value={String(l.id)}>{l.name}</SelectItem>
+                  <SelectItem key={String(l.id)} value={l.name}>{l.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -335,22 +366,45 @@ export default function CoursesPage() {
                 <TableHead className="text-right font-semibold py-4">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {isLoading ? (
+            <TableBody className={cn(isLoading && items.length > 0 && "opacity-50 transition-opacity duration-300")}>
+              {isLoading && items.length === 0 ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded-lg" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-40" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24 rounded-md" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto rounded-md" /></TableCell>
+                  </TableRow>
+                ))
+              ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <RefreshCw className="h-8 w-8 animate-spin opacity-20" />
-                      <p>Đang tải dữ liệu...</p>
+                  <TableCell colSpan={6} className="h-64 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4 text-destructive">
+                      <RefreshCw className="h-12 w-12 opacity-50" />
+                      <p className="font-medium">{error}</p>
+                      <Button variant="outline" size="sm" onClick={fetchCourses}>Thử lại</Button>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <BookOpen className="h-8 w-8 opacity-20" />
-                      <p>Không tìm thấy khóa học nào phù hợp.</p>
+                  <TableCell colSpan={6} className="h-64 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                      <BookOpen className="h-12 w-12 opacity-20" />
+                      <div className="space-y-1">
+                        <p className="text-lg font-medium">Không tìm thấy khóa học nào</p>
+                        <p className="text-sm">Hãy thử điều chỉnh từ khóa tìm kiếm hoặc bộ lọc của bạn.</p>
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>

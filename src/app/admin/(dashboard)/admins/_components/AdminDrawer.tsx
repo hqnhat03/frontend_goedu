@@ -351,7 +351,7 @@ export function AdminDrawer({
                                 <div className="text-center">
                                     <h3 className="text-lg font-bold">{watch("name")}</h3>
                                     <Badge className={cn("mt-1", watch("status") === "active" ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600")} variant="outline">
-                                        {watch("status") === "active" ? "Đang hoạt động" : "Vô hiệu hóa"}
+                                        {watch("status") === "active" ? "Đang hoạt động" : "Bị khóa"}
                                     </Badge>
                                 </div>
                             </div>
@@ -466,7 +466,7 @@ export function AdminDrawer({
                                                 watch("status") === "inactive" ? "bg-rose-50 border-rose-500 text-rose-700" : "border-input bg-transparent text-muted-foreground"
                                             )}
                                         >
-                                            Vô hiệu hóa
+                                            Bị khóa
                                         </button>
                                     </div>
                                 </Field>

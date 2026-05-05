@@ -15,6 +15,7 @@ import {
   UserX
 } from "lucide-react"
 import * as React from "react"
+import { cn } from "@/lib/utils"
 
 import { Can } from "@/components/auth/can"
 import {
@@ -59,6 +60,12 @@ import { AdminDrawer, type Admin } from "./_components/AdminDrawer"
 export default function AdminsPage() {
   const router = useRouter()
   const { hasPermission } = usePermission()
+
+  const statusLabel: Record<string, string> = {
+    "all": "Tất cả trạng thái",
+    "active": "Đang hoạt động",
+    "inactive": "Bị khóa",
+  }
 
   // Kiểm tra quyền truy cập trang danh sách
   React.useEffect(() => {
@@ -189,7 +196,13 @@ export default function AdminsPage() {
             </div>
 
             <div className="w-full md:w-64">
-              <Select value={status} onValueChange={(val) => setStatus(val || "all")}>
+              <Select
+                value={statusLabel[status]}
+                onValueChange={(val) => {
+                  const key = Object.keys(statusLabel).find(k => statusLabel[k] === val);
+                  setStatus(key || "all");
+                }}
+              >
                 <SelectTrigger className="bg-background border-muted-foreground/20">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Activity className="h-4 w-4" />
@@ -197,9 +210,9 @@ export default function AdminsPage() {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                  <SelectItem value="active">Đang hoạt động</SelectItem>
-                  <SelectItem value="inactive">Đã vô hiệu hóa</SelectItem>
+                  <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                  <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                  <SelectItem value="Bị khóa">Bị khóa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -240,8 +253,8 @@ export default function AdminsPage() {
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {isLoading ? (
+            <TableBody className={cn(isLoading && admins.length > 0 && "opacity-50 transition-opacity duration-300")}>
+              {isLoading && admins.length === 0 ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell><div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div></div></TableCell>
@@ -343,7 +356,7 @@ export default function AdminsPage() {
                         </Badge>
                       ) : (
                         <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-rose-200 transition-colors cursor-default">
-                          <UserX className="h-3 w-3 mr-1" /> Vô hiệu hóa
+                          <UserX className="h-3 w-3 mr-1" /> Bị khóa
                         </Badge>
                       )}
                     </TableCell>

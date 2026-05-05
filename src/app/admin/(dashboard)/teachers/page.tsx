@@ -9,6 +9,7 @@ import {
   Trash2
 } from "lucide-react"
 import * as React from "react"
+import { cn } from "@/lib/utils"
 
 import { Can } from "@/components/auth/can"
 import {
@@ -33,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -62,10 +64,11 @@ export default function TeachersPage() {
 
   const [search, setSearch] = React.useState("")
   const [status, setStatus] = React.useState("all")
+
   const statusLabels: Record<string, string> = {
-    all: "Tất cả",
-    active: "Đang hoạt động",
-    inactive: "Bị khóa",
+    "all": "Tất cả trạng thái",
+    "active": "Đang hoạt động",
+    "inactive": "Bị khóa",
   }
   const targetStudentLabels: Record<string, string> = {
     all: "Tất cả",
@@ -188,18 +191,19 @@ export default function TeachersPage() {
 
             <div>
               <Select
-                value={status}
-                onValueChange={(val: string | null) => setStatus(val ?? "all")}
+                value={statusLabels[status]}
+                onValueChange={(val) => {
+                  const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
+                  setStatus(key || "all");
+                }}
               >
                 <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Trạng thái">
-                    {statusLabels[status]}
-                  </SelectValue>
+                  <SelectValue placeholder="Trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="active">Đang hoạt động</SelectItem>
-                  <SelectItem value="inactive">Bị khóa</SelectItem>
+                  <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                  <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                  <SelectItem value="Bị khóa">Bị khóa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -242,16 +246,20 @@ export default function TeachersPage() {
               <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className={cn(isLoading && teachers.length > 0 && "opacity-50 transition-opacity duration-300")}>
             {isLoading && teachers.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                    <p className="text-muted-foreground animate-pulse">Đang tải dữ liệu...</p>
-                  </div>
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-36" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
+                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                </TableRow>
+              ))
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={8} className="h-24 text-center text-destructive">

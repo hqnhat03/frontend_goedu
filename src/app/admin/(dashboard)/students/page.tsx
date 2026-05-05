@@ -17,6 +17,7 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 import { StudentDrawer } from "./_components/StudentDrawer"
 
 import {
@@ -41,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -106,13 +108,14 @@ export default function StudentsPage() {
   const [selectedStudentId, setSelectedStudentId] = React.useState<string | number | null>(null)
 
   const studentTypeLabels: Record<string, string> = {
-    all: "Tất cả",
-    student: "Học sinh",
-    employee: "Nhân viên",
+    "all": "Tất cả loại",
+    "student": "Học sinh",
+    "employee": "Nhân viên",
   }
   const statusLabels: Record<string, string> = {
-    active: "Đang hoạt động",
-    inactive: "Bị khóa",
+    "all": "Tất cả trạng thái",
+    "active": "Đang hoạt động",
+    "inactive": "Bị khóa",
   }
 
   const fetchStudents = React.useCallback(async () => {
@@ -230,7 +233,13 @@ export default function StudentsPage() {
               />
             </div>
 
-            <Select value={statusLabels[status]} onValueChange={(value) => setStatus(value as "all" | "active" | "inactive")}>
+            <Select
+              value={statusLabels[status]}
+              onValueChange={(val) => {
+                const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
+                setStatus(key || "all");
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4 text-muted-foreground" />
@@ -238,13 +247,19 @@ export default function StudentsPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                <SelectItem value="active">Đang hoạt động</SelectItem>
-                <SelectItem value="inactive">Không hoạt động</SelectItem>
+                <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                <SelectItem value="Bị khóa">Bị khóa</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={studentTypeLabels[studentType]} onValueChange={(value) => setStudentType(value as "all" | "student" | "employee")}>
+            <Select
+              value={studentTypeLabels[studentType]}
+              onValueChange={(val) => {
+                const key = Object.keys(studentTypeLabels).find(k => studentTypeLabels[k] === val);
+                setStudentType(key || "all");
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
@@ -252,9 +267,9 @@ export default function StudentsPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả loại</SelectItem>
-                <SelectItem value="student">Học sinh</SelectItem>
-                <SelectItem value="employee">Nhân viên</SelectItem>
+                <SelectItem value="Tất cả loại">Tất cả loại</SelectItem>
+                <SelectItem value="Học sinh">Học sinh</SelectItem>
+                <SelectItem value="Nhân viên">Nhân viên</SelectItem>
               </SelectContent>
             </Select>
 
@@ -285,16 +300,19 @@ export default function StudentsPage() {
               <TableHead className="text-right font-semibold">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-sm" />
-                    <p className="text-muted-foreground font-medium animate-pulse">Đang tải dữ liệu...</p>
-                  </div>
-                </TableCell>
-              </TableRow>
+          <TableBody className={cn(isLoading && students.length > 0 && "opacity-50 transition-opacity duration-300")}>
+            {isLoading && students.length === 0 ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
+                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                </TableRow>
+              ))
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={8} className="h-32 text-center">
