@@ -3,7 +3,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import api from '@/lib/axios';
 import { cn } from '@/lib/utils';
@@ -133,7 +132,6 @@ export default function ExamResultPage() {
 
     const { exam, result, details } = resultData;
     const totalPossibleScore = details.reduce((acc, curr) => acc + curr.question.score, 0);
-    const scorePercentage = (result.score / totalPossibleScore) * 100;
 
     return (
         <div className="container mx-auto p-4 md:p-6 space-y-8 max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -163,40 +161,13 @@ export default function ExamResultPage() {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-                    <div className="text-right">
+                <div className="flex items-center gap-4 p-4 px-8 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <div className="text-center">
                         <p className="text-sm font-medium text-slate-500 mb-1">Điểm số của bạn</p>
-                        <div className="flex items-baseline justify-end gap-1">
+                        <div className="flex items-baseline justify-center gap-1">
                             <span className="text-4xl font-black text-primary">{result.score}</span>
                             <span className="text-slate-400 font-medium pb-1">/ {totalPossibleScore}</span>
                         </div>
-                    </div>
-                    <Separator orientation="vertical" className="h-10" />
-                    <div className="relative w-16 h-16 flex items-center justify-center">
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle
-                                cx="32"
-                                cy="32"
-                                r="28"
-                                stroke="currentColor"
-                                strokeWidth="5"
-                                fill="transparent"
-                                className="text-slate-100"
-                            />
-                            <circle
-                                cx="32"
-                                cy="32"
-                                r="28"
-                                stroke="currentColor"
-                                strokeWidth="5"
-                                fill="transparent"
-                                strokeDasharray={175.92}
-                                strokeDashoffset={175.92 - (175.92 * Math.min(scorePercentage, 100)) / 100}
-                                className="text-primary transition-all duration-1000 ease-out"
-                                strokeLinecap="round"
-                            />
-                        </svg>
-                        <span className="absolute text-[12px] font-bold text-slate-700">{Math.round(scorePercentage)}%</span>
                     </div>
                 </div>
             </div>
@@ -249,8 +220,8 @@ export default function ExamResultPage() {
                                                     : String(detail.answer_content) === String(option);
 
                                                 const isCorrectAnswer = Array.isArray(detail.question.correct_answer)
-                                                    ? detail.question.correct_answer.map(String).includes(String(option)) || detail.question.correct_answer.map(String).includes(optIdx.toString())
-                                                    : (String(detail.question.correct_answer) === optIdx.toString() || String(detail.question.correct_answer) === String(option));
+                                                    ? detail.question.correct_answer.map(String).includes(String(option))
+                                                    : String(detail.question.correct_answer) === String(option);
 
                                                 return (
                                                     <div

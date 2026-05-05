@@ -359,16 +359,9 @@ export default function StudentAnswersPage() {
             const isEssay = detail.question.type === "essay";
 
             // Helper to determine if an option is correct or student's choice
-            const getOptionStatus = (optionValue: string, optionIndex: number) => {
+            const getOptionStatus = (optionValue: string) => {
               const isStudentChoice = detail.answer_content === optionValue;
-
-              // Handle correct answer as either index or value
-              let isCorrectAnswer = false;
-              if (detail.question.correct_answer === optionIndex.toString()) {
-                isCorrectAnswer = true;
-              } else if (detail.question.correct_answer === optionValue) {
-                isCorrectAnswer = true;
-              }
+              const isCorrectAnswer = detail.question.correct_answer === optionValue;
 
               return { isStudentChoice, isCorrectAnswer };
             };
@@ -431,12 +424,12 @@ export default function StudentAnswersPage() {
                   {/* Multiple Choice Options */}
                   {!isEssay && detail.question.options && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                      {detail.question.options.map((option, idx) => {
-                        const { isStudentChoice, isCorrectAnswer } = getOptionStatus(option, idx);
+                      {detail.question.options.map((option) => {
+                        const { isStudentChoice, isCorrectAnswer } = getOptionStatus(option);
 
                         return (
                           <div
-                            key={idx}
+                            key={option}
                             className={cn(
                               "flex items-center justify-between p-3 rounded-xl border-2 transition-all",
                               isStudentChoice && isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" :
@@ -453,7 +446,7 @@ export default function StudentAnswersPage() {
                                     isCorrectAnswer ? "border-emerald-600 text-emerald-600 bg-white" :
                                       "border-slate-300 text-slate-500"
                               )}>
-                                {String.fromCharCode(65 + idx)}
+                                {String.fromCharCode(65)}
                               </div>
                               <span className={cn(
                                 "text-sm",
