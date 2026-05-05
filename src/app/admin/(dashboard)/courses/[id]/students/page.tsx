@@ -66,7 +66,7 @@ const getAvatarUrl = (path?: string | null) => {
     if (!path) return undefined
     if (path.startsWith("http")) return path
     // Base URL from environment variable
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL
     return path.startsWith("/") ? `${baseUrl}${path}` : `${baseUrl}/${path}`
 }
 
@@ -124,12 +124,8 @@ export default function CourseStudentsPage() {
             }
         } catch (error) {
             console.error("Failed to fetch students:", error)
-            // Mock data for demo if API fails
-            setStudents([
-                { id: 1, name: "Nguyễn Văn A", email: "vana@gmail.com", phone: "0905123456", class_code: "L01", class_id: 101, avatar: "", status: "active" },
-                { id: 2, name: "Trần Thị B", email: "thib@gmail.com", phone: "0905654321", class_code: null, class_id: null, avatar: "", status: "active" },
-                { id: 3, name: "Lê Văn C", email: "vanc@gmail.com", phone: "0905999888", class_code: "L02", class_id: 102, avatar: "", status: "active" },
-            ])
+            toast.error("Có lỗi xảy ra khi tải danh sách học sinh")
+            setStudents([])
         } finally {
             setIsLoading(false)
         }
