@@ -19,7 +19,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import api from "@/lib/axios";
 import { useAuthStore } from "@/store/auth-store";
+import { AxiosError } from "axios";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Email không hợp lệ" }).min(1, { message: "Vui lòng nhập email" }),
@@ -55,19 +57,12 @@ export default function LoginPage() {
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
+      const response = await api.post("/auth/login", {
+        email: data.email,
+        password: data.password,
       });
 
-      const result = await response.json();
+      const result = response.data;
 
       if (result.success) {
         toast.success(result.message || "Đăng nhập thành công!");
@@ -96,9 +91,25 @@ export default function LoginPage() {
           });
         }
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const result = error.response?.data;
+        console.log(result);
+        if (result && result.message) {
+          toast.error(result.message);
+
+          // Handle validation errors from axios error response
+          if (result.errors && typeof result.errors === 'object') {
+            Object.keys(result.errors).forEach((key) => {
+              form.setError(key as keyof LoginFormValues, { message: result.errors[key][0] });
+            });
+          }
+        } else {
+          toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+        }
+      } else {
+        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+      }
     } finally {
       setIsLoading(false);
     }

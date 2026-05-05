@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
-import axios, { AxiosError } from "axios"
+import api from "@/lib/axios"
+import { AxiosError } from "axios"
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal } from "lucide-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useCallback, useEffect, useState } from "react"
@@ -68,7 +69,7 @@ function CoursesContent() {
 
          if (sortBy !== "newest") params.sort = sortBy
 
-         const response = await axios.get("http://127.0.0.1:8000/api/student/courses", { params })
+         const response = await api.get("/student/courses", { params })
 
          if (response.data.success) {
             setCourses(response.data.data)

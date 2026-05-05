@@ -138,7 +138,7 @@ export default function ExamQuestionsPage() {
     };
 
     console.group('🚀 [SUBMITTING EXAM]');
-    console.log('📍 URL:', `http://127.0.0.1:8000/api${endpoint}`);
+    console.log('📍 URL:', endpoint);
     console.log('📦 Body:', payload);
     console.groupEnd();
 

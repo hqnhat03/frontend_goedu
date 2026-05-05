@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import axios from "axios"
+import api from "@/lib/axios"
 import { RefreshCcw, Search } from "lucide-react"
 import React, { useEffect, useState } from "react"
 
@@ -42,8 +42,8 @@ export function FilterSidebar({
         setIsLoadingSubjects(true)
 
         const [lvRes, subRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/common/levels"),
-          axios.get("http://127.0.0.1:8000/api/common/subjects")
+          api.get("/common/levels"),
+          api.get("/common/subjects")
         ])
 
         if (lvRes.data.success) setLevels(lvRes.data.data)
