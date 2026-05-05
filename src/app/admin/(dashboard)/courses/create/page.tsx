@@ -125,8 +125,8 @@ export default function CreateCoursePage() {
         const fetchData = async () => {
             try {
                 const [levelRes, subjectRes] = await Promise.all([
-                    api.get("/admin/levels"),
-                    api.get("/admin/subjects")
+                    api.get("/common/levels"),
+                    api.get("/common/subjects")
                 ]);
 
                 // Format: [{ id: number, name: string }]

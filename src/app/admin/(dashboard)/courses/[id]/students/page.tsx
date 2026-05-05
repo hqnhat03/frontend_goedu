@@ -65,9 +65,8 @@ interface Student {
 const getAvatarUrl = (path?: string | null) => {
     if (!path) return undefined
     if (path.startsWith("http")) return path
-    // Base URL from axis is http://127.0.0.1:8000/api
-    // Typically storage is at http://127.0.0.1:8000/storage/ or http://127.0.0.1:8000/
-    const baseUrl = "http://127.0.0.1:8000"
+    // Base URL from environment variable
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     return path.startsWith("/") ? `${baseUrl}${path}` : `${baseUrl}/${path}`
 }
 
