@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '')}/api`,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -57,7 +57,7 @@ api.interceptors.response.use(
         if (token) {
           try {
             // Use axios directly to avoid interceptor loop if /auth/me itself is 403 (unlikely but safe)
-            const res = await axios.get(`${process.env.API_URL}/auth/me`, {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json',
