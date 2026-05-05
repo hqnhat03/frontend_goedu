@@ -171,71 +171,71 @@ export default function CourseDetailPage() {
       </div>
 
       <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
-        {/* Left Column - Main Details */}
         <div className="md:col-span-2 flex flex-col gap-6">
           <Card className="border-none shadow-md overflow-hidden bg-gradient-to-b from-card to-muted/20">
-            <div className="h-48 w-full bg-muted relative border-b">
-              {course.image_url ? (
-                <Image
-                  src={course.image_url}
-                  alt={course.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30 bg-primary/5">
-                  <BookOpen className="h-20 w-20" />
-                </div>
-              )}
-            </div>
             <CardContent className="p-6">
-              <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 shadow-sm transition-all">
-                    {course.subject}
-                  </Badge>
-                  <Badge variant="outline" className="px-3 py-1 text-sm shadow-sm bg-background">
-                    {course.level}
-                  </Badge>
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* Course Image - Portrait / Book ratio */}
+                <div className="w-full md:w-56 shrink-0">
+                  <div className="aspect-[3/4] relative rounded-xl overflow-hidden shadow-xl ring-1 ring-border bg-muted group">
+                    {course.image_url ? (
+                      <Image
+                        src={course.image_url}
+                        alt={course.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        width={300}
+                        height={400}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/30 bg-primary/5 gap-2">
+                        <BookOpen className="h-12 w-12" />
+                        <span className="text-xs font-medium">Chưa có ảnh</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Badge variant="outline" className={`px-3 py-1 text-sm shadow-none font-medium ${targetStudentConfig[course.target_student]?.color || ""}`}>
-                    <Users className="w-3.5 h-3.5 mr-1.5" />
-                    {targetStudentConfig[course.target_student]?.label || course.target_student}
-                  </Badge>
-                  <StatusBadge status={course.status as StatusType} className="px-3 py-1 text-sm shadow-none font-medium rounded-md" />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm">
-                  <span className="text-sm text-muted-foreground flex items-center gap-1.5">
-                    <FileText className="w-4 h-4" /> Số bài học
-                  </span>
-                  <span className="text-xl font-bold">{course.lesson_count}</span>
-                </div>
-                <Link href={`/courses/${course.id}/classes`} className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all group">
-                  <span className="text-sm text-muted-foreground flex items-center justify-between gap-1.5 group-hover:text-primary/70">
-                    <span className="flex items-center gap-1.5"><LayoutGrid className="w-4 h-4" /> Lớp học</span>
-                  </span>
-                  <span className="text-xl font-bold group-hover:text-primary">{course.class_rooms_count}</span>
-                </Link>
-                <Link href={`/courses/${course.id}/students`} className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm hover:border-indigo-500/50 hover:bg-indigo-500/5 cursor-pointer transition-all group">
-                  <span className="text-sm text-muted-foreground flex items-center justify-between gap-1.5 group-hover:text-indigo-600/70">
-                    <span className="flex items-center gap-1.5"><Users className="w-4 h-4" /> Học sinh</span>
-                  </span>
-                  <span className="text-xl font-bold group-hover:text-indigo-600">{course.student_count}</span>
-                </Link>
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-card border shadow-sm">
-                  <span className="text-sm text-muted-foreground flex items-center gap-1.5">
-                    <Clock className="w-4 h-4" /> Thời gian
-                  </span>
-                  <span className="text-xl font-bold">{course.completion_time} <span className="text-sm font-normal text-muted-foreground">phút</span></span>
-                </div>
-                <div className="flex flex-col gap-1 p-3 rounded-xl bg-primary/5 border border-primary/20 shadow-sm text-primary lg:col-span-1">
-                  <span className="text-sm text-primary/70 flex items-center gap-1.5 font-medium">
-                    <Settings2 className="w-4 h-4" /> Giá bán
-                  </span>
-                  <span className="text-xl font-bold">{formattedPrice}</span>
+                <div className="flex-1 flex flex-col justify-between">
+                  <div className="space-y-6">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 shadow-sm transition-all">
+                        {course.subject}
+                      </Badge>
+                      <Badge variant="outline" className="px-3 py-1 text-sm shadow-sm bg-background">
+                        {course.level}
+                      </Badge>
+                      <Badge variant="outline" className={`px-3 py-1 text-sm shadow-none font-medium ${targetStudentConfig[course.target_student]?.color || ""}`}>
+                        <Users className="w-3.5 h-3.5 mr-1.5" />
+                        {targetStudentConfig[course.target_student]?.label || course.target_student}
+                      </Badge>
+                      <StatusBadge status={course.status as StatusType} className="px-3 py-1 text-sm shadow-none font-medium rounded-md ml-auto" />
+                    </div>
+
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-primary" /> Mô tả khóa học
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Khóa học {course.name} cung cấp kiến thức chuyên sâu về {course.subject}, phù hợp với trình độ {course.level}.
+                        Học viên sẽ được tiếp cận với các nội dung thực tế và bài tập ứng dụng cao.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8">
+                    <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-card border shadow-sm">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Bài học</span>
+                      <span className="text-lg font-bold">{course.lesson_count}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-card border shadow-sm">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Thời gian</span>
+                      <span className="text-lg font-bold">{course.completion_time} <span className="text-xs font-normal">phút</span></span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-primary/5 border border-primary/20 shadow-sm text-primary">
+                      <span className="text-[10px] text-primary/70 font-bold uppercase tracking-wider">Giá bán</span>
+                      <span className="text-lg font-bold">{formattedPrice}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>

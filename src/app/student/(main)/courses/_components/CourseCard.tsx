@@ -31,14 +31,16 @@ export function CourseCard({ course }: { course: Course }) {
   const content = (
     <Card className="p-0 flex flex-col sm:flex-row overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group bg-card border-border">
       {/* image header */}
-      <div className="relative w-full sm:w-[320px] shrink-0 aspect-video sm:aspect-auto overflow-hidden bg-muted">
+      <div className="relative w-full sm:w-[160px] shrink-0 aspect-[3/4] sm:aspect-auto overflow-hidden bg-muted">
         <Image
-          src={course.image_url || 'https://placehold.co/600x400?text=No+Image'}
+          src={course.image_url || 'https://placehold.co/300x400?text=No+Image'}
           alt={course.name}
           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+          width={160}
+          height={215}
         />
-        <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
-          {course.is_published && <Badge variant="secondary" className="bg-white/90 text-black hover:bg-white shadow">Published</Badge>}
+        <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
+          {course.is_published && <Badge variant="secondary" className="bg-white/90 text-[10px] h-5 px-1.5 text-black hover:bg-white shadow-sm">Published</Badge>}
         </div>
       </div>
 

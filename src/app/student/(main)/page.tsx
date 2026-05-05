@@ -19,47 +19,47 @@ import Image from 'next/image';
 const COURSES = [
   {
     id: 1,
-    title: 'Complete Web Design: from Figma to Webflow',
+    title: 'Thiết kế Web Toàn diện: từ Figma đến Webflow',
     instructor: 'Jane Doe',
     rating: 4.8,
     reviews: 1240,
     price: '$49.99',
-    badge: 'Best Seller',
+    badge: 'Bán chạy nhất',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=600&auto=format&fit=crop',
-    category: 'Design'
+    category: 'Thiết kế'
   },
   {
     id: 2,
-    title: 'Fullstack React & Next.js Masterclass',
+    title: 'Lớp học Lập trình Fullstack React & Next.js',
     instructor: 'John Smith',
     rating: 4.9,
     reviews: 3120,
     price: '$79.99',
-    badge: 'Popular',
+    badge: 'Phổ biến',
     image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=600&auto=format&fit=crop',
-    category: 'Development'
+    category: 'Phát triển'
   },
   {
     id: 3,
-    title: 'Digital Marketing & SEO Strategy',
+    title: 'Chiến lược Tiếp thị Kỹ thuật số & SEO',
     instructor: 'Sarah Lee',
     rating: 4.7,
     reviews: 840,
-    price: 'Free',
-    badge: 'New',
+    price: 'Miễn phí',
+    badge: 'Mới',
     image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=600&auto=format&fit=crop',
-    category: 'Marketing'
+    category: 'Tiếp thị'
   },
   {
     id: 4,
-    title: 'Data Science Bootcamp 2024',
+    title: 'Khóa huấn luyện Khoa học Dữ liệu 2024',
     instructor: 'Michael Chen',
     rating: 4.8,
     reviews: 2150,
     price: '$99.99',
     badge: 'Hot',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop',
-    category: 'Data Science'
+    category: 'Khoa học Dữ liệu'
   }
 ];
 
@@ -67,22 +67,22 @@ const TESTIMONIALS = [
   {
     id: 1,
     name: 'Emily Watson',
-    role: 'Front-end Developer',
-    text: '"This platform completely changed my career path. The courses are structured perfectly, and the instructors are top-notch."',
+    role: 'Lập trình viên Front-end',
+    text: '"Nền tảng này hoàn toàn thay đổi con đường sự nghiệp của tôi. Các khóa học được cấu trúc hoàn hảo, và đội ngũ giảng viên thật tuyệt vời."',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150'
   },
   {
     id: 2,
     name: 'James Carter',
-    role: 'UI/UX Designer',
-    text: '"I love how practical the lessons are. You build real projects that you can put straight into your portfolio. Highly recommended!"',
+    role: 'Nhà thiết kế UI/UX',
+    text: '"Tôi rất thích những bài học thực tế ở đây. Bạn sẽ được xây dựng các dự án thực tế có thể đưa ngay vào portfolio của mình. Rất đáng để giới thiệu!"',
     avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150'
   },
   {
     id: 3,
     name: 'Sophia Patel',
-    role: 'Marketing Manager',
-    text: '"The marketing courses gave me the exact frameworks I needed to scale our startup. The learning experience is incredibly smooth."',
+    role: 'Giám đốc Tiếp thị',
+    text: '"Các khóa học tiếp thị đã mang lại cho tôi đúng những nền tảng cần thiết để mở rộng quy mô startup của chúng tôi. Trải nghiệm học tập vô cùng mượt mà."',
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150'
   }
 ];
@@ -102,32 +102,32 @@ function HeroSection() {
           {/* Left Content */}
           <div className="relative z-10 max-w-2xl text-center lg:text-left">
             <Badge className="mb-6 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 px-4 py-1.5 rounded-full text-sm font-medium">
-              Join 100,000+ students worldwide
+              Gia nhập cùng 100.000+ học viên trên toàn cầu
             </Badge>
             <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-slate-900 md:text-6xl lg:leading-[1.1]">
-              Learn Anything, <span className="text-blue-600">Anytime</span>, Anywhere
+              Học Bất cứ điều gì, <span className="text-blue-600">Bất cứ lúc nào</span>, Bất cứ đâu
             </h1>
             <p className="mb-10 text-lg leading-relaxed text-slate-600 md:text-xl">
-              Unlock your potential with world-class courses taught by industry experts. Build the skills you need for the future, today.
+              Khai phá tiềm năng của bạn với các khóa học đẳng cấp thế giới được giảng dạy bởi các chuyên gia trong ngành. Xây dựng kỹ năng cần thiết cho tương lai, ngay hôm nay.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
               <Button size="lg" className="h-14 w-full rounded-full bg-blue-600 px-8 text-base font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl sm:w-auto">
-                Get Started
+                Bắt đầu ngay
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" className="h-14 w-full rounded-full border-slate-200 px-8 text-base font-semibold text-slate-700 transition-all hover:bg-slate-50 sm:w-auto">
-                Browse Courses
+                Khám phá Khóa học
               </Button>
             </div>
 
             <div className="mt-10 flex items-center justify-center gap-4 text-sm text-slate-500 lg:justify-start">
               <div className="flex -space-x-3">
-                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Student" />
-                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" alt="Student" />
-                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Student" />
+                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Student" width={10} height={10} />
+                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" alt="Student" width={10} height={10} />
+                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Student" width={10} height={10} />
               </div>
-              <p>Trusted by <span className="font-semibold text-slate-900">4.9/5</span> rating</p>
+              <p>Được tin tưởng với mức đánh giá <span className="font-semibold text-slate-900">4.9/5</span></p>
             </div>
           </div>
 
@@ -138,6 +138,8 @@ function HeroSection() {
                 src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop"
                 alt="Students learning"
                 className="rounded-2xl object-cover shadow-inner h-[500px] w-full"
+                width={1000}
+                height={500}
               />
 
               {/* Floating Element */}
@@ -146,8 +148,8 @@ function HeroSection() {
                   <ShieldCheck size={24} />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900">Certified</p>
-                  <p className="text-sm text-slate-500">Expert Instructors</p>
+                  <p className="font-bold text-slate-900">Được Chứng nhận</p>
+                  <p className="text-sm text-slate-500">Giảng viên Chuyên gia</p>
                 </div>
               </div>
 
@@ -165,23 +167,23 @@ function FeaturesSection() {
   const features = [
     {
       icon: <Users className="h-6 w-6 text-blue-600" />,
-      title: 'Expert Teachers',
-      description: 'Learn from industry professionals with years of real-world experience and deep domain knowledge.'
+      title: 'Giảng viên Chuyên gia',
+      description: 'Học hỏi từ các chuyên gia trong ngành với nhiều năm kinh nghiệm thực tế và kiến thức chuyên sâu.'
     },
     {
       icon: <Laptop className="h-6 w-6 text-indigo-600" />,
-      title: 'Flexible Learning',
-      description: 'Study at your own pace from anywhere using any device. Your schedule, your rules.'
+      title: 'Học tập Linh hoạt',
+      description: 'Học theo nhịp độ của riêng bạn, từ bất cứ đâu, trên bất kỳ thiết bị nào. Lịch trình của bạn, quy tắc của bạn.'
     },
     {
       icon: <DollarSign className="h-6 w-6 text-emerald-600" />,
-      title: 'Affordable Pricing',
-      description: 'High-quality education should be accessible to everyone. We offer highly competitive rates.'
+      title: 'Giá cả Phải chăng',
+      description: 'Giáo dục chất lượng cao nên được tiếp cận bởi tất cả mọi người. Chúng tôi cung cấp mức giá rất cạnh tranh.'
     },
     {
       icon: <Award className="h-6 w-6 text-accent-600 text-purple-600" />,
-      title: 'Certification',
-      description: 'Earn distinguished certificates upon completion to showcase your skills to employers.'
+      title: 'Chứng nhận',
+      description: 'Nhận chứng chỉ danh giá sau khi hoàn thành để thể hiện kỹ năng của bạn với các nhà tuyển dụng.'
     }
   ];
 
@@ -189,8 +191,8 @@ function FeaturesSection() {
     <section className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-16 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Why Choose EduLearn?</h2>
-          <p className="mt-4 text-lg text-slate-600">Everything you need to master new skills and advance your career.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Tại sao chọn EduLearn?</h2>
+          <p className="mt-4 text-lg text-slate-600">Mọi thứ bạn cần để thành thạo các kỹ năng mới và thăng tiến trong sự nghiệp.</p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -217,11 +219,11 @@ function CoursesSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-12 flex flex-col items-center justify-between gap-6 md:flex-row">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Popular Courses</h2>
-            <p className="mt-4 text-lg text-slate-600">Explore our most sought-after programs chosen by thousands.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Khóa học Phổ biến</h2>
+            <p className="mt-4 text-lg text-slate-600">Khám phá những chương trình được tìm kiếm nhiều nhất của chúng tôi, được lựa chọn bởi hàng ngàn người.</p>
           </div>
           <Button variant="outline" className="hidden border-slate-200 text-slate-700 hover:bg-white md:inline-flex">
-            View All Courses
+            Xem Tất cả Khóa học
           </Button>
         </div>
 
@@ -259,7 +261,7 @@ function CoursesSection() {
 
                 <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
                   <span className="text-xl font-bold text-slate-900">{course.price}</span>
-                  <p className="text-sm font-medium text-blue-600 group-hover:underline">Explore</p>
+                  <p className="text-sm font-medium text-blue-600 group-hover:underline">Khám phá</p>
                 </div>
               </CardContent>
             </Card>
@@ -268,7 +270,7 @@ function CoursesSection() {
 
         <div className="mt-12 text-center md:hidden">
           <Button variant="outline" className="w-full border-slate-200 text-slate-700">
-            View All Courses
+            Xem Tất cả Khóa học
           </Button>
         </div>
       </div>
@@ -280,18 +282,18 @@ function HowItWorksSection() {
   const steps = [
     {
       number: '01',
-      title: 'Sign Up',
-      description: 'Create your free account in seconds and get instant access to our platform.'
+      title: 'Đăng ký',
+      description: 'Tạo tài khoản miễn phí chỉ trong vài giây và truy cập ngay vào nền tảng của chúng tôi.'
     },
     {
       number: '02',
-      title: 'Choose Course',
-      description: 'Browse our extensive catalog and find the perfect course for your goals.'
+      title: 'Chọn Khóa học',
+      description: 'Duyệt qua danh mục mở rộng của chúng tôi và tìm khóa học hoàn hảo cho mục tiêu của bạn.'
     },
     {
       number: '03',
-      title: 'Start Learning',
-      description: 'Follow our structured curriculum, complete practical projects, and succeed.'
+      title: 'Bắt đầu Học',
+      description: 'Theo dõi chương trình học có cấu trúc, hoàn thành các dự án thực tế và đạt được thành công.'
     }
   ];
 
@@ -299,8 +301,8 @@ function HowItWorksSection() {
     <section className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-20 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">How It Works</h2>
-          <p className="mt-4 text-lg text-slate-600">Your journey to mastery in 3 simple steps</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Cách thức Hoạt động</h2>
+          <p className="mt-4 text-lg text-slate-600">Hành trình đến với sự thành thạo qua 3 bước đơn giản</p>
         </div>
 
         <div className="relative grid gap-12 md:grid-cols-3 md:gap-8">
@@ -327,8 +329,8 @@ function TestimonialsSection() {
     <section className="bg-slate-50 py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-16 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Student Success Stories</h2>
-          <p className="mt-4 text-lg text-slate-600">Don&apos;t just take our word for it—hear from our graduates.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Câu chuyện Thành công của Học viên</h2>
+          <p className="mt-4 text-lg text-slate-600">Đừng chỉ nghe từ chúng tôi—hãy lắng nghe từ những học viên đã tốt nghiệp.</p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">
@@ -372,17 +374,17 @@ function CtaSection() {
 
         <div className="relative z-10 mx-auto max-w-2xl">
           <h2 className="mb-6 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-            Start Learning Today
+            Bắt đầu Học ngay Hôm nay
           </h2>
           <p className="mb-10 text-lg text-blue-100 md:text-xl md:px-8">
-            Join thousands of successful students and start your journey towards a brighter future. Your first course is just a click away.
+            Gia nhập cùng hàng ngàn học viên thành công và bắt đầu hành trình hướng tới một tương lai tươi sáng hơn. Khóa học đầu tiên của bạn chỉ cách một cú nhấp chuột.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" className="h-14 w-full rounded-full bg-white px-10 text-lg font-bold text-blue-700 shadow-xl transition-transform hover:-translate-y-1 hover:bg-slate-50 sm:w-auto">
-              Join Now
+              Tham gia Ngay
             </Button>
             <p className="mt-4 text-sm font-medium text-blue-200 sm:mt-0 sm:ml-4">
-              No credit card required
+              Không yêu cầu thẻ tín dụng
             </p>
           </div>
         </div>

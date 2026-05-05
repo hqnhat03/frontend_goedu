@@ -389,7 +389,7 @@ export default function CourseDetailPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
+<nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
         <Link href="/courses" className="hover:text-foreground transition-colors">
           Khóa học
         </Link>
@@ -399,51 +399,55 @@ export default function CourseDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* ── Left: Main content ── */}
-        <div className="lg:col-span-2 flex flex-col gap-7">
-          {/* Hero image */}
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-muted shadow-md group">
-            <Image
-              src={course.image_url || "https://placehold.co/1280x720?text=No+Image"}
-              alt={course.name}
-              className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-            />
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            {/* Play button */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="size-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                <PlayCircle className="size-9 text-white" />
+        <div className="lg:col-span-2 flex flex-col gap-8">
+          {/* Hero Section with Portrait Image */}
+          <div className="flex flex-col md:flex-row gap-8 bg-card rounded-2xl p-6 border shadow-sm overflow-hidden">
+            <div className="w-full md:w-64 shrink-0 mx-auto">
+              <div className="aspect-[3/4] relative rounded-xl overflow-hidden shadow-2xl ring-1 ring-border bg-muted group">
+                {/* Glassmorphism Background for handling any image ratio */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-110"
+                  style={{ backgroundImage: `url(${course.image_url})` }}
+                />
+                <Image
+                  src={course.image_url || "https://placehold.co/600x800?text=No+Image"}
+                  alt={course.name}
+                  className="relative object-contain w-full h-full transition-transform duration-700 group-hover:scale-105"
+                  width={400}
+                  height={533}
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute bottom-3 left-3">
+                  <Badge className="bg-primary/90 hover:bg-primary text-primary-foreground text-[10px] uppercase font-bold tracking-wider shadow-lg">
+                    {course.subject?.name ?? "Chung"}
+                  </Badge>
+                </div>
               </div>
             </div>
-            {/* Subject badge */}
-            <div className="absolute bottom-4 left-4">
-              <Badge className="bg-primary/90 hover:bg-primary text-primary-foreground text-sm shadow-lg">
-                {course.subject?.name ?? "Chung"}
-              </Badge>
-            </div>
-          </div>
 
-          {/* Title & meta */}
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-snug mb-3">
-              {course.name}
-            </h1>
+            <div className="flex-1 flex flex-col justify-center py-2">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-xs font-semibold text-primary uppercase tracking-widest">
+                  <Tag className="size-3" />
+                  <span>{course.subject?.category || "Khóa học"}</span>
+                </div>
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
+                  {course.name}
+                </h1>
+                
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <StatBadge icon={BookOpen} label={`${course.lesson_count} bài học`} className="bg-primary/5 text-primary border border-primary/10" />
+                  <StatBadge icon={Clock} label={`${course.completion_time} giờ`} />
+                  <StatBadge icon={Users} label={`${course.enrolled_students_count} học viên`} />
+                </div>
 
-            {course.subject && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                <Tag className="size-4" />
-                <span>
-                  {course.subject.category} • {course.subject.name}
-                </span>
+                <div className="mt-6 p-4 rounded-xl bg-muted/40 border border-dashed border-muted-foreground/20">
+                  <p className="text-sm text-muted-foreground leading-relaxed italic">
+                    "Khám phá lộ trình học tập chuyên nghiệp cùng đội ngũ giáo viên tận tâm tại GoEdu. Khóa học được thiết kế tối ưu cho trình độ của bạn."
+                  </p>
+                </div>
               </div>
-            )}
-
-            {/* Stats row */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              <StatBadge icon={BookOpen} label={`${course.lesson_count} bài học`} />
-              <StatBadge icon={Clock} label={`${course.completion_time} giờ`} />
-              <StatBadge icon={Users} label={`${course.enrolled_students_count} học viên`} />
-              <StatBadge icon={CalendarDays} label={`${course.class_rooms_count} lớp học`} />
             </div>
           </div>
 

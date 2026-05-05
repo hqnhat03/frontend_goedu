@@ -15,7 +15,8 @@ import {
     Loader2,
     Plus,
     Save,
-    Trash2
+    Trash2,
+    Upload
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import * as React from "react"
@@ -102,6 +103,9 @@ export default function EditCoursePage() {
 
     const [isLoadingInit, setIsLoadingInit] = React.useState(true)
     const [isSubmitting, setIsSubmitting] = React.useState(false)
+    const [isUploading, setIsUploading] = React.useState(false)
+    const fileInputRef = React.useRef<HTMLInputElement>(null)
+
     const [levels, setLevels] = React.useState<{ label: string; value: number }[]>([])
     const [subjects, setSubjects] = React.useState<{ label: string; value: number }[]>([])
 
@@ -198,6 +202,36 @@ export default function EditCoursePage() {
             fetchData();
         }
     }, [courseId, form, router]);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setIsUploading(true)
+        const formData = new FormData()
+        formData.append("file", file)
+
+        try {
+            const res = await api.post("/storage/upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
+            // Thử lấy URL từ nhiều vị trí có thể có trong response
+            const url = res.data?.data?.public_url || res.data?.data?.url || res.data?.url
+            
+            if (url) {
+                form.setValue("image_url", url)
+                toast.success("Tải ảnh lên thành công")
+            } else {
+                console.error("Upload response format unknown:", res.data)
+                toast.error("Không nhận được đường dẫn ảnh từ máy chủ")
+            }
+        } catch (error) {
+            console.error("Upload failed", error)
+            toast.error("Không thể tải ảnh lên")
+        } finally {
+            setIsUploading(false)
+        }
+    }
 
     async function onSubmit(data: FormValues) {
         setIsSubmitting(true)
@@ -497,6 +531,84 @@ export default function EditCoursePage() {
 
                     {/* Cột bên phải: Thuộc tính bổ sung */}
                     <div className="space-y-6">
+                        {/* Hình ảnh khóa học - Đưa lên trên */}
+                        <Card className="border-none shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden">
+                            <CardHeader>
+                                <CardTitle className="text-xl flex items-center gap-2">
+                                    <ImageIcon className="h-5 w-5 text-primary" />
+                                    Hình ảnh khóa học
+                                </CardTitle>
+                                <CardDescription>Tải lên hình ảnh đại diện cho khóa học</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                />
+                                
+                                <div 
+                                    className={cn(
+                                        "relative group cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all duration-300",
+                                        "hover:border-primary/50 hover:bg-primary/5",
+                                        imageUrl ? "border-primary/20" : "border-muted-foreground/20 py-12"
+                                    )}
+                                    onClick={() => !isUploading && fileInputRef.current?.click()}
+                                >
+                                    {imageUrl ? (
+                                        <div className="relative aspect-[3/4] w-full max-w-[240px] mx-auto">
+                                            <Image
+                                                src={imageUrl}
+                                                alt="Preview"
+                                                width={300}
+                                                height={400}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-2">
+                                                <Upload className="h-8 w-8" />
+                                                <span className="text-sm font-medium">Thay đổi hình ảnh</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground px-6 text-center">
+                                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
+                                                <Upload className="h-6 w-6" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-foreground">Click để tải ảnh lên</p>
+                                                <p className="text-xs mt-1">PNG, JPG hoặc WebP (Max 2MB)</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {isUploading && (
+                                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10">
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                            <span className="text-sm font-medium">Đang tải lên...</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {imageUrl && (
+                                    <Button 
+                                        type="button" 
+                                        variant="outline" 
+                                        size="sm" 
+                                        className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            form.setValue("image_url", "");
+                                        }}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5 mr-2" /> Xóa ảnh
+                                    </Button>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        {/* Cài đặt thuộc tính */}
                         <Card className="border-none shadow-lg bg-card/50 backdrop-blur-sm">
                             <CardHeader>
                                 <CardTitle className="text-xl flex items-center gap-2">
@@ -653,57 +765,6 @@ export default function EditCoursePage() {
                                         <FieldError errors={[{ message: form.formState.errors.completion_time?.message }]} />
                                     </Field>
                                 </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="border-none shadow-lg bg-card/50 backdrop-blur-sm">
-                            <CardHeader>
-                                <CardTitle className="text-xl flex items-center gap-2">
-                                    <ImageIcon className="h-5 w-5 text-primary" />
-                                    Hình ảnh khóa học
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <Field>
-                                    <FieldContent>
-                                        <Input
-                                            placeholder="https://example.com/image.jpg"
-                                            className="bg-background/50"
-                                            {...form.register("image_url")}
-                                        />
-                                    </FieldContent>
-                                    <FieldError errors={[{ message: form.formState.errors.image_url?.message }]} />
-                                </Field>
-
-                                {imageUrl ? (
-                                    <div className="rounded-lg overflow-hidden border bg-muted flex items-center justify-center min-h-[160px]">
-                                        <Image
-                                            src={imageUrl}
-                                            alt="Preview"
-                                            width={250}
-                                            height={250}
-                                            className="w-full h-auto max-h-[250px]"
-                                            onError={(e) => {
-                                                e.currentTarget.style.display = 'none';
-                                                e.currentTarget.parentElement?.classList.add('p-8');
-                                                const span = document.createElement('span');
-                                                span.className = "text-muted-foreground text-sm flex flex-col items-center gap-2";
-                                                span.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-off h-8 w-8 opacity-50"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.05-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></svg>Hình ảnh không hợp lệ`;
-                                                e.currentTarget.parentElement?.appendChild(span);
-                                            }}
-                                            onLoad={(e) => {
-                                                e.currentTarget.style.display = 'block';
-                                                const errSpan = e.currentTarget.parentElement?.querySelector('span');
-                                                if (errSpan) errSpan.remove();
-                                            }}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="rounded-lg border border-dashed bg-muted/20 flex flex-col items-center justify-center py-10 text-muted-foreground">
-                                        <ImageIcon className="h-8 w-8 mb-2 opacity-50" />
-                                        <span className="text-sm">Chưa có hình ảnh đại diện</span>
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
                     </div>
