@@ -3,13 +3,11 @@
 import {
   ArrowLeft,
   BookOpen,
-  Clock,
   Edit,
   FileText,
   GraduationCap,
   Layers,
   LayoutGrid,
-  Settings2,
   Users
 } from "lucide-react"
 import Link from "next/link"

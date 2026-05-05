@@ -1,17 +1,17 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 import api from '@/lib/axios'
 import {
+    CheckCircle2,
     Play,
     PlayCircle,
-    CheckCircle2,
 } from 'lucide-react'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 
 interface Lecture {
     id: number

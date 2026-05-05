@@ -33,7 +33,7 @@ export function CourseCard({ course }: { course: Course }) {
       {/* image header */}
       <div className="relative w-full sm:w-[160px] shrink-0 aspect-[3/4] sm:aspect-auto overflow-hidden bg-muted">
         <Image
-          src={course.image_url || 'https://placehold.co/300x400?text=No+Image'}
+          src={course.image_url || 'https://placehold.co/300x400.png?text=No+Image'}
           alt={course.name}
           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
           width={160}

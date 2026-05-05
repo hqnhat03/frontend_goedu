@@ -28,10 +28,9 @@ import {
   ChevronLeft,
   Clock,
   GraduationCap,
-  PlayCircle,
   Star,
   Tag,
-  Users,
+  Users
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -389,7 +388,7 @@ export default function CourseDetailPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Breadcrumb */}
-<nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
         <Link href="/courses" className="hover:text-foreground transition-colors">
           Khóa học
         </Link>
@@ -405,12 +404,12 @@ export default function CourseDetailPage() {
             <div className="w-full md:w-64 shrink-0 mx-auto">
               <div className="aspect-[3/4] relative rounded-xl overflow-hidden shadow-2xl ring-1 ring-border bg-muted group">
                 {/* Glassmorphism Background for handling any image ratio */}
-                <div 
+                <div
                   className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-110"
                   style={{ backgroundImage: `url(${course.image_url})` }}
                 />
                 <Image
-                  src={course.image_url || "https://placehold.co/600x800?text=No+Image"}
+                  src={course.image_url || "https://placehold.co/600x800.png?text=No+Image"}
                   alt={course.name}
                   className="relative object-contain w-full h-full transition-transform duration-700 group-hover:scale-105"
                   width={400}
@@ -435,7 +434,7 @@ export default function CourseDetailPage() {
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
                   {course.name}
                 </h1>
-                
+
                 <div className="flex flex-wrap gap-3 mt-4">
                   <StatBadge icon={BookOpen} label={`${course.lesson_count} bài học`} className="bg-primary/5 text-primary border border-primary/10" />
                   <StatBadge icon={Clock} label={`${course.completion_time} giờ`} />
@@ -444,7 +443,7 @@ export default function CourseDetailPage() {
 
                 <div className="mt-6 p-4 rounded-xl bg-muted/40 border border-dashed border-muted-foreground/20">
                   <p className="text-sm text-muted-foreground leading-relaxed italic">
-                    "Khám phá lộ trình học tập chuyên nghiệp cùng đội ngũ giáo viên tận tâm tại GoEdu. Khóa học được thiết kế tối ưu cho trình độ của bạn."
+                    &quot;Khám phá lộ trình học tập chuyên nghiệp cùng đội ngũ giáo viên tận tâm tại GoEdu. Khóa học được thiết kế tối ưu cho trình độ của bạn.&quot;
                   </p>
                 </div>
               </div>
