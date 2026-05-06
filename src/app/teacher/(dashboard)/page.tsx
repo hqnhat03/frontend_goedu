@@ -5,7 +5,9 @@ import {
   Calendar,
   Clock,
   TrendingUp,
-  Users
+  Users,
+  Video,
+  CheckCircle2
 } from "lucide-react"
 import * as React from "react"
 
@@ -14,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
 import { useAuthStore } from "@/store/auth-store"
+import Link from "next/link"
 
 interface DashboardStats {
   total_classes: number;
@@ -194,22 +197,39 @@ export default function TeacherDashboard() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-col items-end gap-3">
                     <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${item.status === 'scheduled' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
                       }`}>
                       {item.status === 'scheduled' ? 'Sắp diễn ra' : item.status}
                     </div>
-                    {item.meeting_url && (
-                      <a
-                        href={item.meeting_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-bold text-primary hover:underline"
+                    <div className="flex items-center gap-2">
+                      {item.meeting_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 text-[11px] font-bold border-primary/20 hover:bg-primary/5 text-primary gap-1.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(item.meeting_url, '_blank');
+                          }}
+                        >
+                          <Video className="size-3.5" />
+                          VÀO LỚP HỌC
+                        </Button>
+                      )}
+                      <Link
+                        href={`/teacher/sessions/${item.id}/attendance`}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Vào lớp học
-                      </a>
-                    )}
+                        <Button
+                          size="sm"
+                          className="h-8 px-3 text-[11px] font-bold bg-emerald-500 hover:bg-emerald-600 text-white gap-1.5"
+                        >
+                          <CheckCircle2 className="size-3.5" />
+                          ĐIỂM DANH
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))

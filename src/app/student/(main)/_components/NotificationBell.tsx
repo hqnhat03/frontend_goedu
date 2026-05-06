@@ -1,5 +1,6 @@
 'use client';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -13,7 +14,6 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Bell } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -146,7 +146,7 @@ export function NotificationBell() {
                   {!notification.read_at && (
                     <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-600" />
                   )}
-                  
+
                   <Avatar className="h-10 w-10 rounded-xl shrink-0">
                     <AvatarImage src={notification.data.sender_image} alt={notification.data.sender_name} />
                     <AvatarFallback className="bg-slate-100 text-[10px] font-bold text-slate-400">
@@ -171,7 +171,7 @@ export function NotificationBell() {
                         )}
                       </div>
                     </div>
-                    
+
                     <span className={cn(
                       "text-[13px] leading-snug line-clamp-1",
                       !notification.read_at ? "font-bold text-slate-900" : "font-medium text-slate-600"
@@ -186,8 +186,8 @@ export function NotificationBell() {
         </ScrollArea>
         <Separator className="opacity-50" />
         <div className="p-2">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="w-full text-xs font-bold text-slate-400 hover:text-blue-600 hover:bg-blue-50 h-10 rounded-lg transition-colors"
             onClick={() => router.push('/student/notifications')}
           >

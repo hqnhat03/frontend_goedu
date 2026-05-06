@@ -19,7 +19,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
 import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns"
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, ExternalLink, LayoutList, Plus, Table as TableIcon, Trash2, Video, X } from "lucide-react"
+import { Calendar as CalendarIcon, CheckCircle2, ChevronLeft, ChevronRight, Clock, LayoutList, Plus, Table as TableIcon, Trash2, Video, X } from "lucide-react"
+import Link from "next/link"
 import * as React from "react"
 import { toast } from "sonner"
 
@@ -278,10 +279,11 @@ export default function SchedulePage() {
                     </Badge>
 
                     <AlertDialog>
-                      <AlertDialogTrigger>
+                      <AlertDialogTrigger render={
                         <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10 hover:text-destructive">
                           <Trash2 className="size-4" />
                         </Button>
+                      }>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
@@ -304,28 +306,29 @@ export default function SchedulePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 pt-2">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/20">
-                    <div className="p-2 rounded-md bg-background shadow-sm text-primary">
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  {item.meeting_url ? (
+                    <Button
+                      variant="outline"
+                      className="flex-1 min-w-[140px] border-primary/20 hover:bg-primary/5 text-primary font-bold gap-2"
+                      onClick={() => window.open(item.meeting_url, '_blank')}
+                    >
                       <Video className="size-4" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Lớp học trực tuyến</span>
-                      {item.meeting_url ? (
-                        <a
-                          href={item.meeting_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-bold text-primary hover:underline flex items-center gap-1"
-                        >
-                          Vào lớp học
-                          <ExternalLink className="size-3" />
-                        </a>
-                      ) : (
-                        <span className="text-sm font-bold text-muted-foreground/40 italic">Chưa có link</span>
-                      )}
-                    </div>
-                  </div>
+                      VÀO LỚP HỌC
+                    </Button>
+                  ) : (
+                    <Button variant="outline" disabled className="flex-1 min-w-[140px] opacity-50 font-bold gap-2">
+                      <Video className="size-4" />
+                      CHƯA CÓ LINK
+                    </Button>
+                  )}
+
+                  <Link href={`/teacher/sessions/${item.id}/attendance`} className="flex-1 min-w-[140px]">
+                    <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-2">
+                      <CheckCircle2 className="size-4" />
+                      ĐIỂM DANH
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

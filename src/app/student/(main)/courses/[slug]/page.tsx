@@ -28,7 +28,6 @@ import {
   ChevronLeft,
   Clock,
   GraduationCap,
-  Star,
   Tag,
   Users
 } from "lucide-react"
@@ -526,7 +525,6 @@ export default function CourseDetailPage() {
                   )}
                 >
                   {formatCurrency(course.price)}
-                  {!isFree && <span className="text-lg font-medium text-muted-foreground ml-1.5">/ tháng</span>}
                 </div>
               </div>
 
@@ -572,17 +570,6 @@ export default function CourseDetailPage() {
                     <Users className="size-4" /> Học viên
                   </span>
                   <span className="font-medium">{course.enrolled_students_count}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground flex items-center gap-2">
-                    <Star className="size-4" /> Trạng thái
-                  </span>
-                  <Badge 
-                    variant={course.is_full ? "destructive" : "default"} 
-                    className="text-xs"
-                  >
-                    {course.is_full ? "Lớp đã đầy" : "Đang mở"}
-                  </Badge>
                 </div>
               </div>
             </div>

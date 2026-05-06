@@ -1,14 +1,8 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { useAuthStore } from "@/store/auth-store"
-import api from "@/lib/axios"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AdminSidebar } from "@/components/admin-sidebar"
-import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Award, ChevronDown, LogOut, User } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import api from "@/lib/axios"
+import { useAuthStore } from "@/store/auth-store"
+import { ChevronDown, LogOut, User } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import * as React from "react"
 
 export default function AdminLayout({
   children,
@@ -50,18 +50,18 @@ export default function AdminLayout({
       try {
         const response = await api.get('/auth/me');
         if (response.data.success) {
-            const userData = response.data.data;
-            // Map data backend sang User interface của frontend
-            const userRole = userData.roles?.[0] || 'admin'; // Lấy role đầu tiên
-            
-            useAuthStore.getState().setUser({
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
-                role: userRole,
-                avatar: userData.avatar,
-                permissions: userData.permissions
-            });
+          const userData = response.data.data;
+          // Map data backend sang User interface của frontend
+          const userRole = userData.roles?.[0] || 'admin'; // Lấy role đầu tiên
+
+          useAuthStore.getState().setUser({
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            role: userRole,
+            avatar: userData.avatar,
+            permissions: userData.permissions
+          });
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -123,10 +123,7 @@ export default function AdminLayout({
                       <span className="font-medium">Thông tin cá nhân</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer py-2 px-3 focus:bg-primary/5 focus:text-primary transition-colors">
-                    <Award className="mr-3 h-4 w-4" />
-                    <span className="font-medium">Chứng chỉ</span>
-                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator className="opacity-50" />
                   <DropdownMenuItem
                     className="cursor-pointer py-2 px-3 text-destructive focus:bg-destructive/5 focus:text-destructive transition-colors"

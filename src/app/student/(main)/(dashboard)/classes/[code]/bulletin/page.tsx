@@ -91,7 +91,6 @@ export default function BulletinPage({ params }: { params: Promise<{ code: strin
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 mb-2">
-        <div className="h-10 w-1 rounded-full bg-blue-600" />
         <div>
           <h2 className="text-xl font-bold text-slate-900">Bảng tin lớp học</h2>
           <p className="text-xs text-slate-500 font-medium">Cập nhật những thông báo mới nhất từ giáo viên</p>
@@ -101,7 +100,7 @@ export default function BulletinPage({ params }: { params: Promise<{ code: strin
       <div className="space-y-3">
         {announcements.map((announcement) => (
           <Card key={announcement.id} className="gap-0 group border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden rounded-xl bg-white">
-            <CardHeader className="p-4 pb-2 border-b border-slate-50/50">
+            <CardHeader className="border-b border-slate-50/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
@@ -123,7 +122,7 @@ export default function BulletinPage({ params }: { params: Promise<{ code: strin
               </div>
             </CardHeader>
             <CardContent>
-              <h3 className="text-lg font-bold text-slate-900 mb-3 leading-tight">
+              <h3 className="text-lg font-bold text-slate-900 mb-2 leading-tight">
                 {announcement.title}
               </h3>
               <div
