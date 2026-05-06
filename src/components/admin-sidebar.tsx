@@ -70,7 +70,7 @@ const navItems = [
     title: "Quản lý đăng ký",
     url: "/course-registrations",
     icon: GraduationCap, // Or another suitable icon
-    permission: "course_registation_list",
+    permission: "course_registration_list",
   },
   {
     title: "Phân quyền màn hình",

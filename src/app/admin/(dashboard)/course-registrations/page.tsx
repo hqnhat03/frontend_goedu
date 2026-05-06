@@ -90,7 +90,7 @@ export default function CourseRegistrationsPage() {
 
     // Kiểm tra quyền truy cập trang
     React.useEffect(() => {
-        if (!hasPermission("course_registation_list")) {
+        if (!hasPermission("course_registration_list")) {
             toast.error("Bạn không có quyền truy cập trang này")
             router.push("/admin")
         }
@@ -121,7 +121,7 @@ export default function CourseRegistrationsPage() {
 
     const fetchRegistrations = React.useCallback(async () => {
         // We check permission inside but don't depend on the function reference
-        if (!hasPermission("course_registation_list")) return
+        if (!hasPermission("course_registration_list")) return
 
         setIsLoading(true)
         try {
@@ -150,7 +150,7 @@ export default function CourseRegistrationsPage() {
         fetchRegistrations()
     }, [fetchRegistrations])
 
-    if (!hasPermission("course_registation_list")) return null
+    if (!hasPermission("course_registration_list")) return null
 
     const handleUpdateStatus = async () => {
         if (!editingRegistration || !selectedStatus) return
@@ -326,7 +326,7 @@ export default function CourseRegistrationsPage() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            {hasPermission("course_registation_edit") && (
+                                            {hasPermission("course_registration_edit") && (
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

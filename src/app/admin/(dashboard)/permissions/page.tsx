@@ -71,7 +71,7 @@ const GROUP_CONFIG: Record<string, { label: string; icon: React.ComponentType }>
   guardian: { label: 'Người giám hộ', icon: UserCircle },
   permission: { label: 'Phân quyền', icon: Key },
   student_in_course: { label: 'HS trong khóa', icon: UserCheck },
-  course_registation: { label: 'Đăng ký khóa học', icon: GraduationCap },
+  course_registration: { label: 'Đăng ký khóa học', icon: GraduationCap },
 };
 
 const ACTION_LABELS: Record<string, string> = {
