@@ -21,9 +21,9 @@ const nextConfig = {
         ],
     },
     allowedDevOrigins: [
-        'goedu.demo.vn',
-        'teacher-goedu.demo.vn',
-        'student-goedu.demo.vn',
+        'myapp.test',
+        'teacher.myapp.test',
+        'student.myapp.test',
     ],
 };
 

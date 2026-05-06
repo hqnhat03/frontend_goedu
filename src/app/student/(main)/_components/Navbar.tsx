@@ -24,6 +24,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { NotificationBell } from './NotificationBell';
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -85,59 +86,62 @@ export function Navbar() {
         </nav>
 
         {/* Desktop Auth */}
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
           {!mounted ? (
             <div className="w-20" /> // Placeholder to avoid layout shift
           ) : user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger render={
-                <Button variant="outline" className="h-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar || ""} alt={user.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                      {user.name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden md:flex flex-col items-start pr-1 text-left">
-                    <span className="text-sm font-bold leading-none">{user.name}</span>
-                  </div>
-                  <ChevronDown className="size-3 text-muted-foreground mr-1" />
-                </Button>
-              } />
-              <DropdownMenuContent className="w-64 mt-1 shadow-xl border-slate-100" align="end">
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1 p-2">
-                      <p className="text-sm font-semibold leading-none">{user.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator className="opacity-50" />
-                <DropdownMenuItem className="cursor-pointer py-2 px-3 focus:bg-primary/5 focus:text-primary transition-colors">
-                  <Link href="/profile" className="flex items-center">
-                    <User className="mr-3 h-4 w-4" />
-                    <span className="font-medium">Thông tin cá nhân</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer py-2 px-3 focus:bg-primary/5 focus:text-primary transition-colors">
-                  <Link href="/dashboard" className="flex items-center">
-                    <LayoutDashboard className="mr-3 h-4 w-4" />
-                    <span className="font-medium">Bảng điều khiển</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="opacity-50" />
-                <DropdownMenuItem
-                  className="cursor-pointer py-2 px-3 text-destructive focus:bg-destructive/5 focus:text-destructive transition-colors"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-3 h-4 w-4" />
-                  <span className="font-medium">Đăng xuất</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
             <>
+              <NotificationBell />
+              <DropdownMenu>
+                <DropdownMenuTrigger render={
+                  <Button variant="outline" className="h-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.avatar || ""} alt={user.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                        {user.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden md:flex flex-col items-start pr-1 text-left">
+                      <span className="text-sm font-bold leading-none">{user.name}</span>
+                    </div>
+                    <ChevronDown className="size-3 text-muted-foreground mr-1" />
+                  </Button>
+                } />
+                <DropdownMenuContent className="w-64 mt-1 shadow-xl border-slate-100" align="end">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1 p-2">
+                        <p className="text-sm font-semibold leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator className="opacity-50" />
+                  <DropdownMenuItem className="cursor-pointer py-2 px-3 focus:bg-primary/5 focus:text-primary transition-colors">
+                    <Link href="/profile" className="flex items-center">
+                      <User className="mr-3 h-4 w-4" />
+                      <span className="font-medium">Thông tin cá nhân</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer py-2 px-3 focus:bg-primary/5 focus:text-primary transition-colors">
+                    <Link href="/dashboard" className="flex items-center">
+                      <LayoutDashboard className="mr-3 h-4 w-4" />
+                      <span className="font-medium">Bảng điều khiển</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="opacity-50" />
+                  <DropdownMenuItem
+                    className="cursor-pointer py-2 px-3 text-destructive focus:bg-destructive/5 focus:text-destructive transition-colors"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-3 h-4 w-4" />
+                    <span className="font-medium">Đăng xuất</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <div className="flex items-center gap-4">
               <Link href="/login">
                 <Button variant="ghost" className="font-bold text-slate-600 hover:text-slate-900 px-6">Đăng nhập</Button>
               </Link>
@@ -146,17 +150,20 @@ export function Navbar() {
                   Đăng ký
                 </Button>
               </Link>
-            </>
+            </div>
           )}
         </div>
 
-        {/* Mobile Toggle */}
-        <button
-          className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 md:hidden transition-colors"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile Actions */}
+        <div className="flex items-center gap-2 md:hidden">
+          {mounted && user && <NotificationBell />}
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
 
       </div>
 

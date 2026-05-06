@@ -7,7 +7,8 @@ import {
   ClipboardList,
   Info,
   LayoutDashboard,
-  Newspaper
+  Newspaper,
+  Bell
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, usePathname } from "next/navigation"
@@ -37,6 +38,11 @@ const navItems = [
     title: "Lịch học",
     url: "/schedule",
     icon: Calendar,
+  },
+  {
+    title: "Thông báo",
+    url: "/notifications",
+    icon: Bell,
   },
 ]
 

@@ -3,7 +3,6 @@
 import {
   BookOpen,
   Eye,
-  Pencil,
   Search
 } from "lucide-react"
 import Link from "next/link"
@@ -186,15 +185,6 @@ export default function ClassesPage() {
                               </Link>
                             } />
                             <TooltipContent>Xem chi tiết</TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger render={
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-orange-600 hover:bg-orange-50">
-                                <Pencil className="size-4" />
-                              </Button>
-                            } />
-                            <TooltipContent>Chỉnh sửa</TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
                       </div>

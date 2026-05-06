@@ -59,7 +59,7 @@ interface Classroom {
   class_code: string
   start_day: string
   end_day: string
-  status: string
+  is_full: boolean
   teachers: Teacher[]
   schedules: Schedule[]
 }
@@ -68,7 +68,6 @@ interface Subject {
   id: number
   name: string
   category: string
-  status: string
 }
 
 interface CourseDetail {
@@ -76,7 +75,7 @@ interface CourseDetail {
   name: string
   slug: string
   description: string
-  status: string
+  is_full: boolean
   target_student: string
   price: string
   full_price?: string
@@ -174,10 +173,10 @@ function ClassroomCard({ room }: { room: Classroom }) {
         </div>
         <div className="flex items-center gap-3">
           <Badge
-            variant={room.status === "published" ? "default" : "secondary"}
+            variant={room.is_full ? "destructive" : "default"}
             className="capitalize text-xs"
           >
-            {room.status === "published" ? "Đang mở" : room.status}
+            {room.is_full ? "Lớp đã đầy" : "Đang mở"}
           </Badge>
           <ChevronDown
             className={cn("size-5 text-muted-foreground transition-transform duration-200", {
@@ -535,8 +534,9 @@ export default function CourseDetailPage() {
                 size="lg"
                 className="w-full font-semibold text-base"
                 onClick={() => setShowRegDialog(true)}
+                disabled={course.is_full}
               >
-                Đăng ký ngay
+                {course.is_full ? "Lớp đã đầy" : "Đăng ký ngay"}
               </Button>
 
               <Separator />
@@ -577,8 +577,11 @@ export default function CourseDetailPage() {
                   <span className="text-muted-foreground flex items-center gap-2">
                     <Star className="size-4" /> Trạng thái
                   </span>
-                  <Badge variant={course.status === "published" ? "default" : "secondary"} className="text-xs">
-                    {course.status === "published" ? "Đang mở" : course.status}
+                  <Badge 
+                    variant={course.is_full ? "destructive" : "default"} 
+                    className="text-xs"
+                  >
+                    {course.is_full ? "Lớp đã đầy" : "Đang mở"}
                   </Badge>
                 </div>
               </div>
@@ -670,9 +673,9 @@ export default function CourseDetailPage() {
               <Button
                 type="submit"
                 className="w-full h-12 rounded-xl font-bold text-base shadow-lg shadow-primary/20 transition-all hover:shadow-xl active:scale-95"
-                disabled={isRegistering}
+                disabled={isRegistering || course.is_full}
               >
-                {isRegistering ? "Đang xử lý..." : "Đăng ký học"}
+                {isRegistering ? "Đang xử lý..." : (course.is_full ? "Lớp đã đầy" : "Đăng ký học")}
               </Button>
             </div>
           </form>
