@@ -186,7 +186,7 @@ export default function TeacherAnnouncementsPage({
             <div className="grid gap-6">
                 {loading ? (
                     [1, 2, 3].map((i) => (
-                        <Card key={i} className="border-none shadow-sm bg-background/40 backdrop-blur-md rounded-xl overflow-hidden">
+                        <Card key={i} className="border-none shadow-sm bg-background/40 backdrop-blur-md rounded-lg overflow-hidden">
                             <CardHeader className="p-6 pb-2">
                                 <div className="flex items-center gap-4">
                                     <Skeleton className="h-12 w-12 rounded-full" />
@@ -207,7 +207,7 @@ export default function TeacherAnnouncementsPage({
                         </Card>
                     ))
                 ) : announcements.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24 px-4 text-center bg-muted/20 rounded-2xl border-2 border-dashed border-border/50 backdrop-blur-sm">
+                    <div className="flex flex-col items-center justify-center py-24 px-4 text-center bg-muted/20 rounded-xl border-2 border-dashed border-border/50 backdrop-blur-sm">
                         <div className="h-24 w-24 rounded-full bg-background flex items-center justify-center mb-8 shadow-xl border border-border/40">
                             <Megaphone className="h-10 w-10 text-primary animate-pulse" />
                         </div>
@@ -227,7 +227,7 @@ export default function TeacherAnnouncementsPage({
                     announcements.map((announcement) => (
                         <Card
                             key={announcement.id}
-                            className={`group border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-xl bg-background/60 backdrop-blur-md overflow-hidden relative ${announcement.is_pinned ? 'ring-2 ring-primary/20' : ''
+                            className={`group border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-lg bg-background/60 backdrop-blur-md overflow-hidden relative ${announcement.is_pinned ? 'ring-2 ring-primary/20' : ''
                                 }`}
                         >
                             {announcement.is_pinned && (
@@ -331,7 +331,7 @@ export default function TeacherAnnouncementsPage({
             />
 
             <AlertDialog open={!!announcementToDelete} onOpenChange={() => setAnnouncementToDelete(null)}>
-                <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+                <AlertDialogContent className="rounded-xl border-none shadow-2xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-2xl font-black">Xác nhận xóa?</AlertDialogTitle>
                         <AlertDialogDescription className="font-medium text-muted-foreground">

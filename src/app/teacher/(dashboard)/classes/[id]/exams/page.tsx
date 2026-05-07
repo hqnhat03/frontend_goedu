@@ -117,14 +117,14 @@ export default function ClassExamsPage() {
             {/* Main Content Table */}
             {loading ? (
                 <div className="space-y-4">
-                    <Skeleton className="h-[200px] w-full rounded-2xl" />
-                    <Skeleton className="h-[400px] w-full rounded-2xl" />
+                    <Skeleton className="h-[200px] w-full rounded-xl" />
+                    <Skeleton className="h-[400px] w-full rounded-xl" />
                 </div>
             ) : data?.exams.length === 0 ? (
-                <div className="bg-background/60 backdrop-blur-xl border border-border/40 rounded-2xl p-16 flex flex-col items-center justify-center min-h-[450px] text-center space-y-6 shadow-sm">
+                <div className="bg-background/60 backdrop-blur-xl border border-border/40 rounded-xl p-16 flex flex-col items-center justify-center min-h-[450px] text-center space-y-6 shadow-sm">
                     <div className="relative">
                         <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
-                        <div className="relative p-10 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/10 shadow-inner">
+                        <div className="relative p-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/10 shadow-inner">
                             <ClipboardList className="size-20" />
                         </div>
                     </div>
@@ -136,7 +136,7 @@ export default function ClassExamsPage() {
                     </div>
                 </div>
             ) : (
-                <div className="bg-background/60 backdrop-blur-xl border border-border/40 rounded-xl overflow-hidden shadow-sm transition-all hover:shadow-md">
+                <div className="bg-background/60 backdrop-blur-xl border border-border/40 rounded-lg overflow-hidden shadow-sm transition-all hover:shadow-md">
                     <Table>
                         <TableHeader className="bg-muted/40 h-12">
                             <TableRow className="hover:bg-transparent border-border/20">

@@ -123,7 +123,7 @@ export default function TeacherProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-8 px-4 md:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 rounded-xl bg-primary/10 text-primary uppercase">
+        <div className="p-2.5 rounded-lg bg-primary/10 text-primary uppercase">
           <User className="size-6" />
         </div>
         <div>
@@ -161,7 +161,7 @@ export default function TeacherProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="mt-4">
-            <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div className="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
               <div className="flex items-center gap-3 text-sm text-slate-600">
                 <Mail className="h-4 w-4 text-slate-400" />
                 <span className="font-medium truncate" title={displayEmail}>{displayEmail}</span>
@@ -185,7 +185,7 @@ export default function TeacherProfilePage() {
             </div>
 
             <Button
-              className="w-full mt-6 font-bold rounded-xl"
+              className="w-full mt-6 font-bold rounded-lg"
               variant="outline"
               onClick={handleAvatarClick}
               disabled={isUploading}
@@ -229,7 +229,7 @@ export default function TeacherProfilePage() {
           <Link href="/profile/edit" className="block">
             <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
               <CardHeader className="flex flex-row items-center gap-4 py-5">
-                <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                <div className="p-3 rounded-lg bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                   <User className="size-5 text-slate-500 group-hover:text-primary" />
                 </div>
                 <div className="flex-1">
@@ -246,7 +246,7 @@ export default function TeacherProfilePage() {
           <Link href="/profile/security" className="block">
             <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
               <CardHeader className="flex flex-row items-center gap-4 py-5">
-                <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                <div className="p-3 rounded-lg bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                   <Shield className="size-5 text-slate-500 group-hover:text-primary" />
                 </div>
                 <div className="flex-1">

@@ -131,7 +131,7 @@ export default function ExamsPage() {
         </div>
       </div>
 
-      <div className="bg-background/60 backdrop-blur-sm border border-border/40 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-background/60 backdrop-blur-sm border border-border/40 rounded-lg overflow-hidden shadow-sm">
         {exams.length > 0 ? (
           <Table>
             <TableHeader>
@@ -231,7 +231,7 @@ export default function ExamsPage() {
           </div>
         ) : (
           <div className="p-12 flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
-            <div className="p-4 rounded-2xl bg-primary/10 text-primary">
+            <div className="p-4 rounded-xl bg-primary/10 text-primary">
               <ClipboardList className="size-12" />
             </div>
             <div className="space-y-2">
@@ -262,7 +262,7 @@ export default function ExamsPage() {
       />
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+        <AlertDialogContent className="rounded-xl border-none shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-black text-destructive flex items-center gap-2">
               <Trash2 className="size-6" />

@@ -113,9 +113,9 @@ export function AnnouncementForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-5xl rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-5xl rounded-xl border-none shadow-2xl p-0 overflow-hidden">
         <div className="bg-primary/5 p-8 pb-8 flex items-center gap-4 border-b border-primary/10">
-          <div className="h-14 w-14 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="h-14 w-14 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
             <Megaphone className="h-7 w-7 text-primary-foreground" />
           </div>
           <div>
@@ -130,7 +130,7 @@ export function AnnouncementForm({
           </div>
         </div>
 
-        <div className="bg-background rounded-2xl p-6 shadow-xl">
+        <div className="bg-background rounded-xl p-6 shadow-xl">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Field>
               <FieldLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">
@@ -169,7 +169,7 @@ export function AnnouncementForm({
               <FieldError errors={[{ message: form.formState.errors.content?.message }]} className="font-bold text-[11px]" />
             </Field>
 
-            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/20">
+            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/20">
               <div className="space-y-0.5">
                 <FieldLabel className="text-sm font-black">Ghim thông báo</FieldLabel>
                 <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">

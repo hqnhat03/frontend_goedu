@@ -140,7 +140,7 @@ export default function SchedulePage() {
 
   const renderWeekView = () => {
     return (
-      <div className="w-full overflow-x-auto border border-border/40 rounded-xl shadow-sm bg-background/50">
+      <div className="w-full overflow-x-auto border border-border/40 rounded-lg shadow-sm bg-background/50">
         <div className="min-w-[800px]">
           <div className="grid grid-cols-[80px_repeat(7,1fr)] bg-muted/40 border-b border-border/40">
             <div className="p-3 text-[10px] font-black uppercase text-center text-muted-foreground flex items-center justify-center border-r border-border/40">
@@ -259,7 +259,7 @@ export default function SchedulePage() {
       <div className="space-y-4 max-w-3xl mx-auto py-2">
         {schedules.length > 0 ? (
           schedules.sort((a, b) => a.start_time.localeCompare(b.start_time)).map((item) => (
-            <div key={item.id} className="flex flex-col sm:flex-row items-stretch gap-0 sm:gap-4 rounded-xl border border-border/40 bg-background/50 hover:border-primary/40 transition-all shadow-sm overflow-hidden group">
+            <div key={item.id} className="flex flex-col sm:flex-row items-stretch gap-0 sm:gap-4 rounded-lg border border-border/40 bg-background/50 hover:border-primary/40 transition-all shadow-sm overflow-hidden group">
               <div className="flex flex-row sm:flex-col items-center justify-center sm:min-w-[120px] p-4 bg-muted/20 sm:border-r border-border/20 gap-3 sm:gap-1">
                 <span className="text-lg font-bold text-primary">{item.start_time.slice(0, 5)}</span>
                 <div className="hidden sm:block w-8 h-[2px] bg-primary/20 my-1 rounded-full" />
@@ -334,7 +334,7 @@ export default function SchedulePage() {
             </div>
           ))
         ) : (
-          <div className="py-24 flex flex-col items-center justify-center border border-dashed rounded-2xl border-border/60 bg-muted/5">
+          <div className="py-24 flex flex-col items-center justify-center border border-dashed rounded-xl border-border/60 bg-muted/5">
             <div className="p-4 rounded-full bg-muted/50 mb-4 animate-pulse">
               <CalendarIcon className="size-10 text-muted-foreground/40" />
             </div>
@@ -367,7 +367,7 @@ export default function SchedulePage() {
           </CardContent>
         </Card>
 
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/10 shadow-sm relative overflow-hidden group">
+        <div className="p-5 rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/10 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Plus className="size-12 rotate-45" />
           </div>
@@ -397,7 +397,7 @@ export default function SchedulePage() {
                 {viewMode === "week" ? "Toàn bộ lịch dạy trong tuần" : `Lịch trình ngày ${date ? format(date, "dd/MM/yyyy") : ""}`}
               </CardDescription>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2 bg-muted/30 p-1.5 rounded-xl border border-border/20 shadow-inner">
+            <div className="flex flex-wrap items-center justify-center gap-2 bg-muted/30 p-1.5 rounded-lg border border-border/20 shadow-inner">
               <div className="flex items-center gap-1 pr-2 border-r border-border/20 mr-1">
                 <Button
                   variant="ghost"
@@ -447,7 +447,7 @@ export default function SchedulePage() {
           <CardContent className="flex-1 p-0 sm:p-6 overflow-hidden">
             {loading ? (
               <div className="space-y-6 p-4">
-                <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-0 border rounded-xl overflow-hidden">
+                <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-0 border rounded-lg overflow-hidden">
                   <div className="h-10 bg-muted/40 border-b" />
                   {Array.from({ length: 7 }).map((_, i) => <div key={i} className="h-10 bg-muted/40 border-b border-l" />)}
                   {Array.from({ length: 80 }).map((_, i) => <Skeleton key={i} className="h-10 w-full rounded-none border-b border-l bg-muted/20" />)}

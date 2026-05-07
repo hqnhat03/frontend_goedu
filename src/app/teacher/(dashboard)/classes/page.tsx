@@ -90,7 +90,7 @@ export default function ClassesPage() {
         </div>
       </div>
 
-      <div className="bg-background/40 p-4 rounded-2xl border border-border/40 backdrop-blur-sm">
+      <div className="bg-background/40 p-4 rounded-xl border border-border/40 backdrop-blur-sm">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <input
@@ -98,7 +98,7 @@ export default function ClassesPage() {
             placeholder="Tìm theo mã lớp, tên khóa học..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/40 bg-background/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium placeholder:text-muted-foreground/50"
+            className="w-full h-11 pl-10 pr-4 rounded-lg border border-border/40 bg-background/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium placeholder:text-muted-foreground/50"
           />
         </div>
       </div>

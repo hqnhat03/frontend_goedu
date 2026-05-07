@@ -31,13 +31,14 @@ export function CourseCard({ course }: { course: Course }) {
   const content = (
     <Card className="p-0 flex flex-col sm:flex-row overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg group bg-card border-border">
       {/* image header */}
-      <div className="relative w-full sm:w-[160px] shrink-0 aspect-[3/4] sm:aspect-auto overflow-hidden bg-muted">
+      <div className="relative w-full sm:w-[180px] shrink-0 aspect-[3/4] overflow-hidden bg-muted border-r border-border/50">
         <Image
           src={course.image_url || 'https://placehold.co/300x400.png?text=No+Image'}
           alt={course.name}
-          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-          width={160}
-          height={215}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          fill
+          sizes="(max-width: 640px) 100vw, 180px"
+          priority
         />
         <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
           {course.is_published && <Badge variant="secondary" className="bg-white/90 text-[10px] h-5 px-1.5 text-black hover:bg-white shadow-sm">Đã xuất bản</Badge>}

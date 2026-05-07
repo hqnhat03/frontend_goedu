@@ -4,64 +4,42 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import api from '@/lib/axios';
 import {
   ArrowRight,
   Award,
   DollarSign,
-  Laptop, ShieldCheck,
+  Laptop,
+  Loader2,
+  ShieldCheck,
   Star,
   Users
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+interface Teacher {
+  id: number;
+  name: string;
+  avatar: string | null;
+}
+
+interface PopularCourse {
+  id: number;
+  name: string;
+  slug: string;
+  image_url: string;
+  price: string;
+  level: string;
+  subject: string;
+  student_count: number;
+  teachers: Teacher[];
+}
 
 // --- MOCK DATA ---
 
-const COURSES = [
-  {
-    id: 1,
-    title: 'Thiết kế Web Toàn diện: từ Figma đến Webflow',
-    instructor: 'Jane Doe',
-    rating: 4.8,
-    reviews: 1240,
-    price: '$49.99',
-    badge: 'Bán chạy nhất',
-    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=600&auto=format&fit=crop',
-    category: 'Thiết kế'
-  },
-  {
-    id: 2,
-    title: 'Lớp học Lập trình Fullstack React & Next.js',
-    instructor: 'John Smith',
-    rating: 4.9,
-    reviews: 3120,
-    price: '$79.99',
-    badge: 'Phổ biến',
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=600&auto=format&fit=crop',
-    category: 'Phát triển'
-  },
-  {
-    id: 3,
-    title: 'Chiến lược Tiếp thị Kỹ thuật số & SEO',
-    instructor: 'Sarah Lee',
-    rating: 4.7,
-    reviews: 840,
-    price: 'Miễn phí',
-    badge: 'Mới',
-    image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=600&auto=format&fit=crop',
-    category: 'Tiếp thị'
-  },
-  {
-    id: 4,
-    title: 'Khóa huấn luyện Khoa học Dữ liệu 2024',
-    instructor: 'Michael Chen',
-    rating: 4.8,
-    reviews: 2150,
-    price: '$99.99',
-    badge: 'Hot',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop',
-    category: 'Khoa học Dữ liệu'
-  }
-];
+// const COURSES = [...] (Removed mock data)
 
 const TESTIMONIALS = [
   {
@@ -123,9 +101,9 @@ function HeroSection() {
 
             <div className="mt-10 flex items-center justify-center gap-4 text-sm text-slate-500 lg:justify-start">
               <div className="flex -space-x-3">
-                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Student" width={10} height={10} />
-                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" alt="Student" width={10} height={10} />
-                <Image className="h-10 w-10 rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Student" width={10} height={10} />
+                <Image className="rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Student" width={40} height={40} />
+                <Image className="rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" alt="Student" width={40} height={40} />
+                <Image className="rounded-full border-2 border-slate-50" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" alt="Student" width={40} height={40} />
               </div>
               <p>Được tin tưởng với mức đánh giá <span className="font-semibold text-slate-900">4.9/5</span></p>
             </div>
@@ -133,13 +111,14 @@ function HeroSection() {
 
           {/* Right Image */}
           <div className="relative z-10 hidden lg:block">
-            <div className="relative rounded-3xl bg-white p-2 shadow-2xl">
+            <div className="relative rounded-3xl bg-white p-2 shadow-2xl h-[516px]">
               <Image
                 src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop"
                 alt="Students learning"
-                className="rounded-2xl object-cover shadow-inner h-[500px] w-full"
-                width={1000}
-                height={500}
+                className="rounded-2xl object-cover shadow-inner"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
               />
 
               {/* Floating Element */}
@@ -214,6 +193,32 @@ function FeaturesSection() {
 }
 
 function CoursesSection() {
+  const [courses, setCourses] = useState<PopularCourse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get('/student/courses/popular');
+        if (response.data.success) {
+          setCourses(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch popular courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const formatPrice = (price: string) => {
+    const p = parseFloat(price);
+    if (p === 0) return 'Miễn phí';
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
+  };
+
   return (
     <section className="bg-slate-50 py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -227,46 +232,69 @@ function CoursesSection() {
           </Button>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {COURSES.map((course) => (
-            <Card key={course.id} className="group flex cursor-pointer flex-col overflow-hidden border-slate-100 bg-white transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={course.image}
-                  alt={course.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <Badge className="absolute left-4 top-4 bg-white text-slate-900 hover:bg-slate-50 shadow-sm font-semibold">
-                  {course.badge}
-                </Badge>
-                <div className="absolute inset-0 bg-slate-900/10 transition-opacity group-hover:opacity-0" />
-              </div>
-
-              <CardContent className="flex flex-1 flex-col p-6">
-                <div className="mb-3 flex items-center justify-between text-sm text-slate-500">
-                  <span className="font-medium text-blue-600">{course.category}</span>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    <span className="font-semibold text-slate-700">{course.rating}</span>
-                    <span>({course.reviews})</span>
+        {loading ? (
+          <div className="flex h-64 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          </div>
+        ) : (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {courses.map((course) => (
+              <Link key={course.id} href={`/courses/${course.slug}`}>
+                <Card className="group flex h-full cursor-pointer flex-col overflow-hidden border-slate-100 bg-white transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={course.image_url}
+                      alt={course.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <Badge className="absolute left-4 top-4 bg-white text-slate-900 hover:bg-slate-50 shadow-sm font-semibold">
+                      {course.level}
+                    </Badge>
+                    <div className="absolute inset-0 bg-slate-900/10 transition-opacity group-hover:opacity-0" />
                   </div>
-                </div>
 
-                <h3 className="mb-2 line-clamp-2 text-lg font-bold leading-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                  {course.title}
-                </h3>
+                  <CardContent className="flex flex-1 flex-col p-6">
+                    <div className="mb-3 flex items-center justify-between text-sm text-slate-500">
+                      <span className="font-medium text-blue-600">{course.subject}</span>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4 text-slate-400" />
+                        <span className="font-semibold text-slate-700">{course.student_count}</span>
+                        <span>học viên</span>
+                      </div>
+                    </div>
 
-                <p className="mb-6 text-sm text-slate-600">{course.instructor}</p>
+                    <h3 className="mb-2 line-clamp-2 text-lg font-bold leading-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                      {course.name}
+                    </h3>
 
-                <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
-                  <span className="text-xl font-bold text-slate-900">{course.price}</span>
-                  <p className="text-sm font-medium text-blue-600 group-hover:underline">Khám phá</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                    <div className="mb-6 flex items-center gap-2">
+                      <div className="flex -space-x-2">
+                        {course.teachers.slice(0, 3).map((teacher) => (
+                          <Avatar key={teacher.id} className="h-6 w-6 border-2 border-white">
+                            <AvatarImage src={teacher.avatar || ''} alt={teacher.name} />
+                            <AvatarFallback className="text-[10px]">{teacher.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                        ))}
+                      </div>
+                      <p className="text-sm text-slate-600 truncate">
+                        {course.teachers.length > 0
+                          ? course.teachers.map(t => t.name).join(', ')
+                          : 'Giảng viên hệ thống'
+                        }
+                      </p>
+                    </div>
+
+                    <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
+                      <span className="text-xl font-bold text-slate-900">{formatPrice(course.price)}</span>
+                      <p className="text-sm font-medium text-blue-600 group-hover:underline">Khám phá</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="mt-12 text-center md:hidden">
           <Button variant="outline" className="w-full border-slate-200 text-slate-700">

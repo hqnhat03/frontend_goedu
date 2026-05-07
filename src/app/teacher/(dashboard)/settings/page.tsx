@@ -36,7 +36,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 rounded-xl bg-primary/10 text-primary uppercase">
+        <div className="p-2.5 rounded-lg bg-primary/10 text-primary uppercase">
           <SettingsIcon className="size-6" />
         </div>
         <div>
@@ -49,7 +49,7 @@ export default function SettingsPage() {
         {settingsSections.map((section, i) => (
           <Card key={i} className="border-none shadow-sm bg-background/60 backdrop-blur-sm hover:bg-background/80 transition-all cursor-pointer group">
             <CardHeader className="flex flex-row items-center gap-4 py-4">
-              <div className="p-3 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+              <div className="p-3 rounded-lg bg-muted group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                 <section.icon className="size-5" />
               </div>
               <div className="flex-1">
@@ -65,7 +65,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="flex justify-end pt-4">
-        <Button className="h-10 rounded-xl px-8 shadow-lg shadow-primary/20 font-bold">
+        <Button className="h-10 rounded-lg px-8 shadow-lg shadow-primary/20 font-bold">
           Lưu tất cả thay đổi
         </Button>
       </div>

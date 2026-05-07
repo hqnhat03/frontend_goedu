@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface User {
   id: number;
@@ -18,52 +19,38 @@ interface AuthState {
   logout: () => void;
 }
 
-// Helper để lấy cookie client-side
-const getCookie = (name: string) => {
-  if (typeof window === 'undefined') return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-  return null;
-};
-
-export const useAuthStore = create<AuthState>((set) => ({
-  user: (() => {
-    const userData = getCookie('user_info');
-    if (userData) {
-      try {
-        return JSON.parse(decodeURIComponent(userData));
-      } catch {
-        return null;
-      }
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      setAuth: (user, token) => {
+        set({ user, token });
+        // Vẫn lưu token vào cookie để middleware hoặc SSR có thể đọc nếu cần
+        if (typeof window !== 'undefined') {
+          document.cookie = `access_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+        }
+      },
+      setUser: (user) => {
+        set({ user });
+      },
+      setToken: (token) => {
+        set({ token });
+        if (typeof window !== 'undefined') {
+          document.cookie = `access_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+        }
+      },
+      logout: () => {
+        set({ user: null, token: null });
+        if (typeof window !== 'undefined') {
+          document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          localStorage.removeItem('auth-storage'); // Xóa sạch local storage khi logout
+        }
+      },
+    }),
+    {
+      name: 'auth-storage', // Tên key trong local storage
+      storage: createJSONStorage(() => localStorage),
     }
-    return null;
-  })(),
-  token: getCookie('access_token'),
-  setAuth: (user, token) => {
-    set({ user, token });
-    if (typeof window !== 'undefined') {
-      document.cookie = `access_token=${token}; path=/; max-age=86400`;
-      document.cookie = `user_info=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=86400`;
-    }
-  },
-  setUser: (user) => {
-    set({ user });
-    if (typeof window !== 'undefined') {
-      document.cookie = `user_info=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=86400`;
-    }
-  },
-  setToken: (token) => {
-    set({ token });
-    if (typeof window !== 'undefined') {
-      document.cookie = `access_token=${token}; path=/; max-age=86400`;
-    }
-  },
-  logout: () => {
-    set({ user: null, token: null });
-    if (typeof window !== 'undefined') {
-      document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie = "user_info=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    }
-  },
-}));
+  )
+);

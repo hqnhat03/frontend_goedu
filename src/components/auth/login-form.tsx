@@ -81,15 +81,6 @@ export function LoginForm({ role }: LoginFormProps) {
 
         if (result.data) {
           useAuthStore.getState().setAuth(result.data.user, result.data.access_token);
-
-          // Lưu vào localStorage để hỗ trợ các components cũ
-          localStorage.setItem("access_token", result.data.access_token);
-          localStorage.setItem("user_info", JSON.stringify(result.data.user));
-
-          // Lưu vào cookie thay vì localStorage để đồng bộ với Middleware và tránh flick
-          const maxAge = 604800; // 7 days
-          document.cookie = `access_token=${result.data.access_token}; path=/; max-age=${maxAge}; samesite=lax`;
-          document.cookie = `user_info=${encodeURIComponent(JSON.stringify(result.data.user))}; path=/; max-age=${maxAge}; samesite=lax`;
         }
 
         // Sử dụng window.location.href thay vì router.push để đảm bảo 

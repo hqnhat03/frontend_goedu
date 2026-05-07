@@ -7,7 +7,8 @@ import {
   ClipboardList,
   GraduationCap,
   Layers,
-  LayoutDashboard
+  LayoutDashboard,
+  Star
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -75,13 +76,18 @@ export function TeacherSidebar() {
       url: `/classes/${classId}/exams`,
       icon: ClipboardList,
     },
+    {
+      title: "Đánh giá",
+      url: `/classes/${classId}/evaluations`,
+      icon: Star,
+    },
   ] : []
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <SidebarHeader className="flex items-center py-6 px-4 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center transition-all duration-300">
         <Link href="/" className="flex items-center gap-3 font-bold text-xl group-data-[collapsible=icon]:gap-0">
-          <div className="size-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0 transition-all hover:scale-105 active:scale-95 group-hover:rotate-3">
+          <div className="size-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0 transition-all hover:scale-105 active:scale-95 group-hover:rotate-3">
             <GraduationCap className="size-6" />
           </div>
           <span className={`flex flex-col leading-tight whitespace-nowrap overflow-hidden transition-all duration-300 ${isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"}`}>

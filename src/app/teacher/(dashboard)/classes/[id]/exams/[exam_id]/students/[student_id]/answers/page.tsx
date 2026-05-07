@@ -431,7 +431,7 @@ export default function StudentAnswersPage() {
                           <div
                             key={option}
                             className={cn(
-                              "flex items-center justify-between p-3 rounded-xl border-2 transition-all",
+                              "flex items-center justify-between p-3 rounded-lg border-2 transition-all",
                               isStudentChoice && isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" :
                                 isStudentChoice && !isCorrectAnswer ? "bg-rose-50 border-rose-500 dark:bg-rose-950/20" :
                                   isCorrectAnswer ? "bg-emerald-50 border-emerald-500 dark:bg-emerald-950/20" :
@@ -467,7 +467,7 @@ export default function StudentAnswersPage() {
                   {/* Essay Answer */}
                   {isEssay && (
                     <div className="space-y-4">
-                      <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                      <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-3 opacity-5">
                           <MessageSquare className="h-10 w-10" />
                         </div>
@@ -488,7 +488,7 @@ export default function StudentAnswersPage() {
                       </div>
                       <Textarea
                         placeholder="Nhập nhận xét cho câu trả lời này..."
-                        className="min-h-[80px] bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 focus:ring-indigo-500 rounded-xl transition-all"
+                        className="min-h-[80px] bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 focus:ring-indigo-500 rounded-lg transition-all"
                         value={grades[detail.question_id]?.comment || ""}
                         disabled={data.status === "completed" && !isEditing}
                         onChange={(e) => handleUpdateGrade(detail.question_id, "comment", e.target.value)}

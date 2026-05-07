@@ -173,6 +173,9 @@ export default function ClassDetailPage() {
               {classDetail.course_name}
             </p>
           </div>
+
+          <div className="flex flex-wrap gap-3">
+          </div>
         </div>
       </div>
 
@@ -181,9 +184,9 @@ export default function ClassDetailPage() {
         <div className="lg:col-span-2 space-y-8">
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Card className="rounded-2xl border-none shadow-sm bg-gradient-to-br from-blue-500/10 to-transparent overflow-hidden group py-0">
+            <Card className="rounded-xl border-none shadow-sm bg-gradient-to-br from-blue-500/10 to-transparent overflow-hidden group py-0">
               <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-3.5 rounded-2xl bg-blue-500/20 text-blue-600 dark:text-blue-400 scale-100 group-hover:scale-110 transition-transform">
+                <div className="p-3.5 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-400 scale-100 group-hover:scale-110 transition-transform">
                   <Users className="size-6" />
                 </div>
                 <div>
@@ -193,9 +196,9 @@ export default function ClassDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-sm bg-gradient-to-br from-purple-500/10 to-transparent overflow-hidden group py-0">
+            <Card className="rounded-xl border-none shadow-sm bg-gradient-to-br from-purple-500/10 to-transparent overflow-hidden group py-0">
               <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-3.5 rounded-2xl bg-purple-500/20 text-purple-600 dark:text-purple-400 scale-100 group-hover:scale-110 transition-transform">
+                <div className="p-3.5 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400 scale-100 group-hover:scale-110 transition-transform">
                   <CalendarDays className="size-6" />
                 </div>
                 <div>
@@ -209,10 +212,10 @@ export default function ClassDetailPage() {
           </div>
 
           {/* Schedule Section */}
-          <Card className="rounded-2xl border-border/40 shadow-sm overflow-hidden bg-background/60 backdrop-blur-xl py-0">
+          <Card className="rounded-xl border-border/40 shadow-sm overflow-hidden bg-background/60 backdrop-blur-xl py-0">
             <CardHeader className="border-b border-border/40 bg-muted/20 pb-4 px-6 pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
                   <Clock className="size-5" />
                 </div>
                 <div>
@@ -254,11 +257,11 @@ export default function ClassDetailPage() {
           </Card>
 
           {/* Students List Section */}
-          <Card className="rounded-2xl border-border/40 shadow-sm overflow-hidden bg-background/60 backdrop-blur-xl py-0">
+          <Card className="rounded-xl border-border/40 shadow-sm overflow-hidden bg-background/60 backdrop-blur-xl py-0">
             <CardHeader className="border-b border-border/40 bg-muted/20 pb-4 px-6 pt-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600">
+                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600">
                     <Users className="size-5" />
                   </div>
                   <div>
@@ -270,7 +273,7 @@ export default function ClassDetailPage() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <Input
                     placeholder="Tìm kiếm học sinh..."
-                    className="pl-9 bg-background/50 border-border/40 rounded-xl focus-visible:ring-primary/20"
+                    className="pl-9 bg-background/50 border-border/40 rounded-lg focus-visible:ring-primary/20"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -348,7 +351,7 @@ export default function ClassDetailPage() {
         {/* Sidebar Info Area */}
         <div className="space-y-8">
           {/* Teacher Info */}
-          <Card className="rounded-2xl border-border/40 shadow-sm overflow-hidden bg-background/60 backdrop-blur-xl py-0">
+          <Card className="rounded-xl border-border/40 shadow-sm overflow-hidden bg-background/60 backdrop-blur-xl py-0">
             <CardHeader className="border-b border-border/40 bg-muted/20 px-6 pt-6 pb-4">
               <CardTitle className="text-lg font-bold flex items-center gap-2">
                 <User className="size-5 text-primary" />
@@ -357,7 +360,7 @@ export default function ClassDetailPage() {
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               {classDetail.teachers.map((teacher) => (
-                <div key={teacher.id} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-muted/50 transition-all border border-transparent hover:border-border/40 group">
+                <div key={teacher.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-border/40 group">
                   <Avatar className="size-14 border-2 border-primary/10 group-hover:border-primary/30 transition-all">
                     <AvatarImage src={teacher.avatar} alt={teacher.name} />
                     <AvatarFallback className="bg-primary/5 text-primary font-bold">
@@ -391,20 +394,20 @@ function ClassDetailSkeleton() {
             <Skeleton className="h-12 w-64" />
             <Skeleton className="h-6 w-96" />
           </div>
-          <Skeleton className="h-12 w-40 rounded-xl" />
+          <Skeleton className="h-12 w-40 rounded-lg" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Skeleton className="h-28 rounded-2xl" />
-            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-28 rounded-xl" />
+            <Skeleton className="h-28 rounded-xl" />
           </div>
-          <Skeleton className="h-[400px] rounded-2xl" />
+          <Skeleton className="h-[400px] rounded-xl" />
         </div>
         <div className="space-y-8">
-          <Skeleton className="h-48 rounded-2xl" />
+          <Skeleton className="h-48 rounded-xl" />
         </div>
       </div>
     </div>

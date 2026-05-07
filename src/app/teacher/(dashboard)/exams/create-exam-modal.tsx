@@ -29,12 +29,15 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { AxiosError } from "axios"
 import { Calendar, Loader2 } from "lucide-react"
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Resolver } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
 const examSchema = z.object({
-  class_id: z.coerce.number().min(1, "Vui lòng chọn lớp học"),
+  class_id: z.preprocess(
+    (val) => (val === undefined || val === null || val === "" ? undefined : Number(val)),
+    z.number({ error: "Vui lòng chọn lớp học" }).min(1, "Vui lòng chọn lớp học")
+  ),
   name: z.string().min(1, "Vui lòng nhập tên bài kiểm tra"),
   duration_minutes: z.coerce.number().positive("Thời gian phải lớn hơn 0"),
   status: z.enum(["draft", "published", "archived"]),
@@ -62,10 +65,9 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
   const [isLoadingClasses, setIsLoadingClasses] = React.useState(false)
 
   const form = useForm<ExamFormValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(examSchema as any),
+    resolver: zodResolver(examSchema) as unknown as Resolver<ExamFormValues>,
     defaultValues: {
-      class_id: 0,
+      class_id: undefined as unknown as number,
       name: "",
       duration_minutes: 60,
       status: "draft",
@@ -80,7 +82,7 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
       const fetchClasses = async () => {
         setIsLoadingClasses(true)
         try {
-          const response = await api.get("/teacher/classes/")
+          const response = await api.get("/teacher/classes?status=published")
           if (response.data?.success) {
             setClasses(response.data.data)
           }
@@ -123,7 +125,7 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
         })
       } else {
         form.reset({
-          class_id: 0,
+          class_id: undefined as unknown as number,
           name: "",
           duration_minutes: 60,
           status: "draft",
@@ -166,7 +168,7 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 overflow-hidden rounded-xl">
+      <DialogContent className="sm:max-w-2xl p-0 overflow-hidden rounded-lg">
         <DialogHeader className="px-6 py-4 border-b bg-muted/30">
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="size-5 text-primary" />
@@ -181,11 +183,11 @@ export function CreateExamModal({ onSuccess, open, onOpenChange, initialData }: 
               <FieldContent>
                 <Select
                   onValueChange={(value) => value && form.setValue("class_id", parseInt(value))}
-                  value={form.watch("class_id")?.toString()}
+                  value={form.watch("class_id")?.toString() || ""}
                   disabled={isSubmitting || isLoadingClasses || !!initialData}
                 >
                   <SelectTrigger className="w-full rounded-lg">
-                    <SelectValue placeholder={isLoadingClasses ? "Đang tải lớp học..." : "Chọn lớp học"}>
+                    <SelectValue placeholder={isLoadingClasses ? "Đang tải lớp học..." : "Chọn lớp"}>
                       {classes.find(cls => cls.id === form.watch("class_id"))?.class_code}
                     </SelectValue>
                   </SelectTrigger>

@@ -3,11 +3,10 @@
 import {
   BookOpen,
   Calendar,
+  CheckCircle2,
   Clock,
-  TrendingUp,
   Users,
-  Video,
-  CheckCircle2
+  Video
 } from "lucide-react"
 import * as React from "react"
 
@@ -103,14 +102,6 @@ export default function TeacherDashboard() {
       color: "text-orange-600",
       bg: "bg-orange-100/50",
     },
-    {
-      title: "Tỷ lệ chuyên cần",
-      value: stats ? `${stats.attendance_rate}%` : "0%",
-      description: "Trung bình tháng này",
-      icon: TrendingUp,
-      color: "text-emerald-600",
-      bg: "bg-emerald-100/50",
-    },
   ]
 
   return (
@@ -128,7 +119,7 @@ export default function TeacherDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat, i) => (
           <Card key={i} className="border-none shadow-sm bg-background/60 backdrop-blur-sm transition-all hover:shadow-md hover:-translate-y-1 relative overflow-hidden group">
             <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full ${stat.bg} opacity-20 blur-2xl group-hover:scale-150 transition-transform duration-500`} />
@@ -173,7 +164,7 @@ export default function TeacherDashboard() {
           <CardContent className="space-y-4 pt-6">
             {scheduleLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-border/20 bg-muted/5">
+                <div key={i} className="flex items-center justify-between p-4 rounded-lg border border-border/20 bg-muted/5">
                   <div className="space-y-2 w-full">
                     <Skeleton className="h-4 w-3/4" />
                     <div className="flex gap-4">
@@ -185,7 +176,7 @@ export default function TeacherDashboard() {
               ))
             ) : dailySchedule.length > 0 ? (
               dailySchedule.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-4 rounded-xl border border-border/20 bg-muted/5 hover:bg-muted/10 transition-all cursor-pointer group">
+                <div key={item.id} className="flex items-center justify-between p-4 rounded-lg border border-border/20 bg-muted/5 hover:bg-muted/10 transition-all cursor-pointer group">
                   <div className="space-y-1">
                     <p className="font-bold text-sm group-hover:text-primary transition-colors">Lớp {item.class_code}</p>
                     <div className="flex items-center gap-4 text-[11px] font-medium text-muted-foreground">
@@ -234,7 +225,7 @@ export default function TeacherDashboard() {
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/5 rounded-xl border border-dashed border-border/40">
+              <div className="flex flex-col items-center justify-center py-8 text-center bg-muted/5 rounded-lg border border-dashed border-border/40">
                 <Calendar className="size-8 text-muted-foreground/30 mb-2" />
                 <p className="text-sm font-medium text-muted-foreground">Không có lịch dạy cho ngày hôm nay</p>
               </div>
@@ -258,12 +249,12 @@ export default function TeacherDashboard() {
             <CardDescription className="text-xs font-medium uppercase tracking-widest text-muted-foreground/60">Thông tin quan trọng từ hệ thống</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
-            <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100 dark:bg-blue-900/10 dark:border-blue-900/20 group hover:border-blue-400/30 transition-colors cursor-pointer">
+            <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-100 dark:bg-blue-900/10 dark:border-blue-900/20 group hover:border-blue-400/30 transition-colors cursor-pointer">
               <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Hệ thống</p>
               <p className="text-sm font-bold mb-1 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">Cập nhật giáo trình Toán 12</p>
               <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">Hệ thống vừa cập nhật các bài giảng và bài tập trắc nghiệm mới cho chương trình Toán 12 Tập 2...</p>
             </div>
-            <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/20 group hover:border-emerald-400/30 transition-colors cursor-pointer">
+            <div className="p-4 rounded-lg bg-emerald-50/50 border border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/20 group hover:border-emerald-400/30 transition-colors cursor-pointer">
               <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Tin nhắn</p>
               <p className="text-sm font-bold mb-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">Phụ huynh em Nguyễn Văn B</p>
               <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">&quot;Chào thầy, gia đình muốn xin phép cho em B nghỉ học ngày mai vì lý do sức khỏe...&quot;</p>

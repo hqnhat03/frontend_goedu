@@ -316,14 +316,14 @@ export default function ClassLecturesPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-64 rounded-xl" />
+            <Skeleton key={i} className="h-64 rounded-lg" />
           ))}
         </div>
       ) : lectures.length === 0 ? (
-        <div className="bg-background/60 backdrop-blur-xl border border-border/40 rounded-2xl p-16 flex flex-col items-center justify-center min-h-[500px] text-center space-y-6 shadow-sm">
+        <div className="bg-background/60 backdrop-blur-xl border border-border/40 rounded-xl p-16 flex flex-col items-center justify-center min-h-[500px] text-center space-y-6 shadow-sm">
           <div className="relative">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
-            <div className="relative p-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/10 shadow-inner">
+            <div className="relative p-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/10 shadow-inner">
               <BookOpen className="size-16" />
             </div>
           </div>
@@ -449,7 +449,7 @@ export default function ClassLecturesPage() {
                   <FieldContent>
                     <Input
                       placeholder="VD: Giới thiệu về React"
-                      className="rounded-xl h-11"
+                      className="rounded-lg h-11"
                       {...form.register("name")}
                     />
                     <FieldError errors={[form.formState.errors.name]} />
@@ -463,7 +463,7 @@ export default function ClassLecturesPage() {
                       <Input
                         type="number"
                         min="1"
-                        className="rounded-xl h-11"
+                        className="rounded-lg h-11"
                         {...form.register("lecture_number")}
                       />
                       <FieldError errors={[form.formState.errors.lecture_number]} />
@@ -476,7 +476,7 @@ export default function ClassLecturesPage() {
                       <Input
                         type="number"
                         min="1"
-                        className="rounded-xl h-11"
+                        className="rounded-lg h-11"
                         {...form.register("duration_time")}
                       />
                       <FieldError errors={[form.formState.errors.duration_time]} />
@@ -492,7 +492,7 @@ export default function ClassLecturesPage() {
                     <PlayCircle className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
                       placeholder="https://youtube.com/..."
-                      className="pl-9 rounded-xl h-11"
+                      className="pl-9 rounded-lg h-11"
                       {...form.register("video_url")}
                     />
                   </div>
@@ -507,7 +507,7 @@ export default function ClassLecturesPage() {
                     <FileText className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
                       placeholder="https://drive.google.com/..."
-                      className="pl-9 rounded-xl h-11"
+                      className="pl-9 rounded-lg h-11"
                       {...form.register("document_url")}
                     />
                   </div>
@@ -602,7 +602,7 @@ export default function ClassLecturesPage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 flex gap-3">
+                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 flex gap-3">
                   <Info className="size-5 text-amber-500 shrink-0 mt-0.5" />
                   <p className="text-xs text-amber-600 font-medium leading-relaxed">
                     Lưu ý: Hệ thống sẽ tự động gán các bài giảng này vào lớp học hiện tại. Các link video và tài liệu phải là link hợp lệ.
@@ -659,7 +659,7 @@ export default function ClassLecturesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="rounded-xl font-bold mt-2"
+                        className="rounded-lg font-bold mt-2"
                         onClick={() => document.getElementById('csv-upload')?.click()}
                       >
                         Duyệt file
@@ -727,7 +727,7 @@ export default function ClassLecturesPage() {
 
               <div className="p-8 space-y-8">
                 {/* Video Player Section */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black shadow-2xl group border-4 border-muted/50">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black shadow-2xl group border-4 border-muted/50">
                   {selectedLecture.video_url.includes('youtube.com') || selectedLecture.video_url.includes('youtu.be') ? (
                     <iframe
                       src={selectedLecture.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
@@ -760,7 +760,7 @@ export default function ClassLecturesPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {selectedLecture.document_url && (
-                      <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-between group/doc hover:bg-emerald-500/10 transition-all">
+                      <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-between group/doc hover:bg-emerald-500/10 transition-all">
                         <div className="flex items-center gap-3">
                           <div className="p-2 rounded-lg bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
                             <FileUp className="size-4" />
@@ -778,7 +778,7 @@ export default function ClassLecturesPage() {
                       </div>
                     )}
 
-                    <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex items-center justify-between">
+                    <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/10 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-500/20">
                           <PlayCircle className="size-4" />
@@ -833,7 +833,7 @@ export default function ClassLecturesPage() {
                   <FieldContent>
                     <Input
                       placeholder="VD: Giới thiệu về React"
-                      className="rounded-xl h-11"
+                      className="rounded-lg h-11"
                       {...form.register("name")}
                     />
                     <FieldError errors={[form.formState.errors.name]} />
@@ -847,7 +847,7 @@ export default function ClassLecturesPage() {
                       <Input
                         type="number"
                         min="1"
-                        className="rounded-xl h-11"
+                        className="rounded-lg h-11"
                         {...form.register("lecture_number")}
                       />
                       <FieldError errors={[form.formState.errors.lecture_number]} />
@@ -860,7 +860,7 @@ export default function ClassLecturesPage() {
                       <Input
                         type="number"
                         min="1"
-                        className="rounded-xl h-11"
+                        className="rounded-lg h-11"
                         {...form.register("duration_time")}
                       />
                       <FieldError errors={[form.formState.errors.duration_time]} />
@@ -876,7 +876,7 @@ export default function ClassLecturesPage() {
                     <PlayCircle className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
                       placeholder="https://youtube.com/..."
-                      className="pl-9 rounded-xl h-11"
+                      className="pl-9 rounded-lg h-11"
                       {...form.register("video_url")}
                     />
                   </div>
@@ -891,7 +891,7 @@ export default function ClassLecturesPage() {
                     <FileText className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
                       placeholder="https://drive.google.com/..."
-                      className="pl-9 rounded-xl h-11"
+                      className="pl-9 rounded-lg h-11"
                       {...form.register("document_url")}
                     />
                   </div>

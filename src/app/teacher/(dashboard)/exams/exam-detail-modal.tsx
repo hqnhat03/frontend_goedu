@@ -16,7 +16,7 @@ import {
   HelpCircle,
   Info
 } from "lucide-react"
-import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface Exam {
   id: number
@@ -40,12 +40,13 @@ interface ExamDetailModalProps {
 }
 
 export function ExamDetailModal({ exam, open, onOpenChange }: ExamDetailModalProps) {
+  const router = useRouter()
 
   if (!exam) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-2xl">
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-xl">
         <DialogHeader className="px-6 py-4 border-b bg-muted/30">
           <DialogTitle className="flex items-center gap-2">
             <Info className="size-5 text-primary" />
@@ -121,9 +122,7 @@ export function ExamDetailModal({ exam, open, onOpenChange }: ExamDetailModalPro
           <Button
             className="w-full sm:flex-1 rounded-lg font-bold shadow-lg shadow-primary/20"
             onClick={() => {
-              // Giả định path quản lý câu hỏi
-              // router.push(`/teacher/exams/${exam.id}/questions`)
-              toast.info("Chức năng cập nhật câu hỏi đang được phát triển")
+              router.push(`/teacher/exams/${exam.id}/questions`)
               onOpenChange(false)
             }}
           >

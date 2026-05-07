@@ -108,7 +108,7 @@ export default function EditTeacherProfilePage() {
     <div className="max-w-3xl mx-auto space-y-6 py-8 px-4 md:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-4 mb-6">
         <Link href="/profile">
-          <Button variant="outline" size="icon" className="rounded-xl h-10 w-10 shrink-0">
+          <Button variant="outline" size="icon" className="rounded-lg h-10 w-10 shrink-0">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
@@ -142,7 +142,7 @@ export default function EditTeacherProfilePage() {
                     onChange={handleChange}
                     placeholder="Nhập họ và tên"
                     required
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -152,7 +152,7 @@ export default function EditTeacherProfilePage() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Nhập số điện thoại"
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function EditTeacherProfilePage() {
                     type="date"
                     value={formData.date_of_birth}
                     onChange={handleChange}
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -175,7 +175,7 @@ export default function EditTeacherProfilePage() {
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="Nhập địa chỉ của bạn"
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function EditTeacherProfilePage() {
                     value={formData.nationality}
                     onChange={handleChange}
                     placeholder="Ví dụ: Việt Nam, Hoa Kỳ..."
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -213,7 +213,7 @@ export default function EditTeacherProfilePage() {
                     value={formData.expertise}
                     onChange={handleChange}
                     placeholder="Ví dụ: Tiếng Anh, Toán..."
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function EditTeacherProfilePage() {
                     value={formData.experience}
                     onChange={handleChange}
                     placeholder="Ví dụ: 5 năm, 10 năm..."
-                    className="h-11 rounded-xl"
+                    className="h-11 rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
@@ -236,7 +236,7 @@ export default function EditTeacherProfilePage() {
                       type="button"
                       variant={formData.target_student === 'student' ? 'default' : 'outline'}
                       onClick={() => setFormData(prev => ({ ...prev, target_student: 'student' }))}
-                      className="flex-1 h-11 rounded-xl"
+                      className="flex-1 h-11 rounded-lg"
                     >
                       Học sinh
                     </Button>
@@ -244,7 +244,7 @@ export default function EditTeacherProfilePage() {
                       type="button"
                       variant={formData.target_student === 'employee' ? 'default' : 'outline'}
                       onClick={() => setFormData(prev => ({ ...prev, target_student: 'employee' }))}
-                      className="flex-1 h-11 rounded-xl"
+                      className="flex-1 h-11 rounded-lg"
                     >
                       Người đi làm
                     </Button>
@@ -252,7 +252,7 @@ export default function EditTeacherProfilePage() {
                       type="button"
                       variant={formData.target_student === 'all' ? 'default' : 'outline'}
                       onClick={() => setFormData(prev => ({ ...prev, target_student: 'all' }))}
-                      className="flex-1 h-11 rounded-xl"
+                      className="flex-1 h-11 rounded-lg"
                     >
                       Tất cả
                     </Button>
@@ -267,20 +267,20 @@ export default function EditTeacherProfilePage() {
                   value={formData.bio}
                   onChange={handleChange}
                   placeholder="Giới thiệu ngắn gọn về bản thân, phương pháp giảng dạy..."
-                  className="min-h-[120px] rounded-xl resize-y"
+                  className="min-h-[120px] rounded-lg resize-y"
                 />
               </div>
 
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t mt-8">
                 <Link href="/profile">
-                  <Button type="button" variant="outline" className="w-full sm:w-auto h-11 px-6 rounded-xl">
+                  <Button type="button" variant="outline" className="w-full sm:w-auto h-11 px-6 rounded-lg">
                     Hủy bỏ
                   </Button>
                 </Link>
                 <Button
                   type="submit"
                   disabled={updateLoading}
-                  className="w-full sm:w-auto h-11 px-8 rounded-xl font-bold shadow-lg shadow-primary/20"
+                  className="w-full sm:w-auto h-11 px-8 rounded-lg font-bold shadow-lg shadow-primary/20"
                 >
                   {updateLoading ? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />

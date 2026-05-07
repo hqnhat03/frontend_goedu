@@ -277,7 +277,7 @@ export default function ExamStudentsPage() {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div className="rounded-lg border border-slate-100 dark:border-slate-800 overflow-hidden">
                         <Table>
                             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
                                 <TableRow>

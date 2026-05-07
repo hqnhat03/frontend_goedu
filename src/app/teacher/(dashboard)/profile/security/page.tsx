@@ -60,7 +60,7 @@ export default function SecurityTeacherPage() {
     <div className="max-w-3xl mx-auto space-y-6 py-8 px-4 md:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-4 mb-6">
         <Link href="/profile">
-          <Button variant="outline" size="icon" className="rounded-xl h-10 w-10 shrink-0">
+          <Button variant="outline" size="icon" className="rounded-lg h-10 w-10 shrink-0">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
@@ -92,7 +92,7 @@ export default function SecurityTeacherPage() {
                     onChange={handleChange}
                     placeholder="Nhập mật khẩu hiện tại"
                     required
-                    className="h-11 rounded-xl pl-10"
+                    className="h-11 rounded-lg pl-10"
                   />
                   <KeyRound className="h-4 w-4 text-slate-400 absolute left-3.5 top-3.5" />
                 </div>
@@ -109,7 +109,7 @@ export default function SecurityTeacherPage() {
                     placeholder="Nhập mật khẩu mới"
                     required
                     minLength={6}
-                    className="h-11 rounded-xl pl-10"
+                    className="h-11 rounded-lg pl-10"
                   />
                   <Shield className="h-4 w-4 text-slate-400 absolute left-3.5 top-3.5" />
                 </div>
@@ -126,7 +126,7 @@ export default function SecurityTeacherPage() {
                     placeholder="Nhập lại mật khẩu mới"
                     required
                     minLength={6}
-                    className="h-11 rounded-xl pl-10"
+                    className="h-11 rounded-lg pl-10"
                   />
                   <Shield className="h-4 w-4 text-slate-400 absolute left-3.5 top-3.5" />
                 </div>
@@ -135,14 +135,14 @@ export default function SecurityTeacherPage() {
 
             <div className="flex flex-col-reverse sm:flex-row justify-start gap-3 pt-6 border-t mt-8">
               <Link href="/profile">
-                <Button type="button" variant="outline" className="w-full sm:w-auto h-11 px-6 rounded-xl">
+                <Button type="button" variant="outline" className="w-full sm:w-auto h-11 px-6 rounded-lg">
                   Hủy bỏ
                 </Button>
               </Link>
               <Button
                 type="submit"
                 disabled={updateLoading}
-                className="w-full sm:w-auto h-11 px-8 rounded-xl font-bold shadow-lg shadow-rose-500/20 bg-rose-600 hover:bg-rose-700 text-white"
+                className="w-full sm:w-auto h-11 px-8 rounded-lg font-bold shadow-lg shadow-rose-500/20 bg-rose-600 hover:bg-rose-700 text-white"
               >
                 {updateLoading ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />

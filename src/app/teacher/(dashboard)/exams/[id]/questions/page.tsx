@@ -184,8 +184,10 @@ export default function ExamQuestionsPage() {
   // ------------------------------
 
   const handleSaveQuestion = (q: Question) => {
-    const stripped = q.question.replace(/<[^>]*>/g, "").trim()
-    if (!stripped) {
+    const hasImage = q.question.includes("<img")
+    const hasText = q.question.replace(/<[^>]*>/g, "").trim().length > 0
+    
+    if (!hasImage && !hasText) {
       toast.error(`Câu hỏi đang để trống`)
       return
     }
@@ -247,8 +249,10 @@ export default function ExamQuestionsPage() {
 
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i]
-      const stripped = q.question.replace(/<[^>]*>/g, "").trim()
-      if (!stripped) {
+      const hasImage = q.question.includes("<img")
+      const hasText = q.question.replace(/<[^>]*>/g, "").trim().length > 0
+
+      if (!hasImage && !hasText) {
         toast.error(`Câu hỏi số ${i + 1} đang để trống`)
         return
       }
@@ -314,7 +318,7 @@ export default function ExamQuestionsPage() {
           <Button
             variant="outline"
             onClick={addQuestion}
-            className="rounded-xl font-bold border-2 border-primary/20 hover:border-primary/40"
+            className="rounded-lg font-bold border-2 border-primary/20 hover:border-primary/40"
           >
             <Plus className="size-4 mr-2" />
             Thêm câu hỏi
@@ -322,7 +326,7 @@ export default function ExamQuestionsPage() {
           <Button
             onClick={onSave}
             disabled={isSaving}
-            className="rounded-xl font-black px-8 shadow-lg shadow-primary/20 bg-primary hover:scale-105 transition-transform"
+            className="rounded-lg font-black px-8 shadow-lg shadow-primary/20 bg-primary hover:scale-105 transition-transform"
           >
             {isSaving ? (
               "Đang lưu..."
@@ -339,8 +343,8 @@ export default function ExamQuestionsPage() {
       {/* Question list */}
       <div className="space-y-8 pb-24">
         {questions.length === 0 ? (
-          <div className="text-center py-20 border-2 border-dashed rounded-2xl space-y-4 bg-muted/30">
-            <div className="mx-auto size-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+          <div className="text-center py-20 border-2 border-dashed rounded-xl space-y-4 bg-muted/30">
+            <div className="mx-auto size-20 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
               <HelpCircle className="size-10" />
             </div>
             <div className="space-y-1">
@@ -349,7 +353,7 @@ export default function ExamQuestionsPage() {
                 Bắt đầu bằng cách thêm câu hỏi đầu tiên cho bài kiểm tra này.
               </p>
             </div>
-            <Button onClick={addQuestion} size="lg" className="rounded-2xl font-bold shadow-xl shadow-primary/10">
+            <Button onClick={addQuestion} size="lg" className="rounded-xl font-bold shadow-xl shadow-primary/10">
               <Plus className="size-5 mr-2" />
               Thêm câu hỏi đầu tiên
             </Button>
@@ -370,7 +374,7 @@ export default function ExamQuestionsPage() {
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`group overflow-hidden border rounded-xl hover:border-primary/30 transition-all shadow-sm bg-card cursor-pointer ${isDragged ? 'opacity-40 scale-[0.98] border-dashed border-primary ring-2 ring-primary/20' : ''
+                  className={`group overflow-hidden border rounded-lg hover:border-primary/30 transition-all shadow-sm bg-card cursor-pointer ${isDragged ? 'opacity-40 scale-[0.98] border-dashed border-primary ring-2 ring-primary/20' : ''
                     } ${isDragOver && !isDragged ? 'border-primary border-t-4 border-t-primary scale-[1.01] shadow-lg' : ''}`}
                   onClick={() => toggleEdit(q.id, true)}
                 >
@@ -383,7 +387,7 @@ export default function ExamQuestionsPage() {
                     </div>
                     <div className="flex-1 space-y-3 pr-10">
                       <div
-                        className="text-sm font-medium text-foreground [&>p]:m-0 [&>p]:leading-relaxed [&>img]:max-h-[150px] [&>img]:rounded-xl [&>img]:mt-2 [&>img]:shadow-sm whitespace-normal break-words"
+                        className="text-sm font-medium text-foreground [&>p]:m-0 [&>p]:leading-relaxed [&>img]:max-h-[150px] [&>img]:rounded-lg [&>img]:mt-2 [&>img]:shadow-sm whitespace-normal break-words"
                         dangerouslySetInnerHTML={{ __html: q.question }}
                       />
                       {q.type === "multiple_choice" ? (
@@ -450,13 +454,13 @@ export default function ExamQuestionsPage() {
                 onDragEnter={(e) => handleDragEnter(e, index)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, index)}
-                className={`group overflow-hidden border-2 rounded-2xl hover:border-primary/50 transition-all duration-300 shadow-xl shadow-black/5 hover:shadow-primary/10 bg-card/50 backdrop-blur-sm ${isDragOver ? 'border-primary border-t-4 border-t-primary scale-[1.01] shadow-lg' : ''
+                className={`group overflow-hidden border-2 rounded-xl hover:border-primary/50 transition-all duration-300 shadow-xl shadow-black/5 hover:shadow-primary/10 bg-card/50 backdrop-blur-sm ${isDragOver ? 'border-primary border-t-4 border-t-primary scale-[1.01] shadow-lg' : ''
                   }`}
               >
                 {/* Card header */}
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between p-3 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="bg-primary text-primary-foreground size-8 rounded-xl flex items-center justify-center font-black text-sm shadow-md">
+                    <div className="bg-primary text-primary-foreground size-8 rounded-lg flex items-center justify-center font-black text-sm shadow-md">
                       {q.order_number || index + 1}
                     </div>
                     <div className="flex items-center gap-3">
@@ -476,7 +480,7 @@ export default function ExamQuestionsPage() {
                         <SelectTrigger className="w-[140px] h-6 rounded-md font-bold text-[10px] border-none bg-primary/10 text-primary uppercase p-0 px-2 shadow-none hover:bg-primary/20">
                           <SelectValue placeholder="Loại" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-none shadow-2xl">
+                        <SelectContent className="rounded-lg border-none shadow-2xl">
                           <SelectItem value="multiple_choice" className="font-bold">
                             Trắc nghiệm
                           </SelectItem>
@@ -516,7 +520,7 @@ export default function ExamQuestionsPage() {
                 <CardContent className="p-4 space-y-4">
                   {/* Quill editor */}
                   <div className="space-y-1">
-                    <div className="border rounded-xl overflow-hidden focus-within:border-primary transition-colors bg-background shadow-inner">
+                    <div className="border rounded-lg overflow-hidden focus-within:border-primary transition-colors bg-background shadow-inner">
                       <QuillEditor
                         value={q.question}
                         onChange={(html) => updateQuestion(q.id, { question: html })}
@@ -537,7 +541,7 @@ export default function ExamQuestionsPage() {
                         {["A", "B", "C", "D"].map((label, idx) => (
                           <div
                             key={label}
-                            className={`flex items-center gap-2 p-2 px-3 rounded-xl border transition-all duration-300 ${q.correct_answer === q.options?.[idx] && q.options?.[idx] !== ""
+                            className={`flex items-center gap-2 p-2 px-3 rounded-lg border transition-all duration-300 ${q.correct_answer === q.options?.[idx] && q.options?.[idx] !== ""
                               ? "border-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm"
                               : "border-border/60 bg-muted/10 hover:border-primary/20"
                               }`}
@@ -574,7 +578,7 @@ export default function ExamQuestionsPage() {
 
                   {/* Essay note */}
                   {q.type === "essay" && (
-                    <div className="p-6 rounded-xl bg-blue-50/50 border-2 border-blue-100 border-dashed flex items-start gap-5">
+                    <div className="p-6 rounded-lg bg-blue-50/50 border-2 border-blue-100 border-dashed flex items-start gap-5">
                       <div className="p-3 rounded-lg bg-blue-100 text-blue-600 shadow-sm">
                         <AlertCircle className="size-6" />
                       </div>

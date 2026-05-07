@@ -194,7 +194,7 @@ export default function AttendancePage() {
           <Button
             onClick={saveAttendance}
             disabled={saving}
-            className="bg-primary text-primary-foreground font-bold px-8 h-12 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all gap-2"
+            className="bg-primary text-primary-foreground font-bold px-8 h-12 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all gap-2"
           >
             {saving ? (
               <div className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -210,7 +210,7 @@ export default function AttendancePage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-none bg-blue-500/10 shadow-none">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-xl bg-blue-500/20 text-blue-600"><Users className="size-5" /></div>
+            <div className="p-2.5 rounded-lg bg-blue-500/20 text-blue-600"><Users className="size-5" /></div>
             <div>
               <p className="text-[10px] font-black uppercase text-blue-600/70">Tổng số</p>
               <p className="text-xl font-black">{stats.total}</p>
@@ -219,7 +219,7 @@ export default function AttendancePage() {
         </Card>
         <Card className="border-none bg-emerald-500/10 shadow-none">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-600"><UserCheck className="size-5" /></div>
+            <div className="p-2.5 rounded-lg bg-emerald-500/20 text-emerald-600"><UserCheck className="size-5" /></div>
             <div>
               <p className="text-[10px] font-black uppercase text-emerald-600/70">Hiện diện</p>
               <p className="text-xl font-black">{stats.present}</p>
@@ -228,7 +228,7 @@ export default function AttendancePage() {
         </Card>
         <Card className="border-none bg-orange-500/10 shadow-none">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-xl bg-orange-500/20 text-orange-600"><History className="size-5" /></div>
+            <div className="p-2.5 rounded-lg bg-orange-500/20 text-orange-600"><History className="size-5" /></div>
             <div>
               <p className="text-[10px] font-black uppercase text-orange-600/70">Đi muộn</p>
               <p className="text-xl font-black">{stats.late}</p>
@@ -237,7 +237,7 @@ export default function AttendancePage() {
         </Card>
         <Card className="border-none bg-rose-500/10 shadow-none">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-xl bg-rose-500/20 text-rose-600"><UserX className="size-5" /></div>
+            <div className="p-2.5 rounded-lg bg-rose-500/20 text-rose-600"><UserX className="size-5" /></div>
             <div>
               <p className="text-[10px] font-black uppercase text-rose-600/70">Vắng mặt</p>
               <p className="text-xl font-black">{stats.absent}</p>
@@ -258,7 +258,7 @@ export default function AttendancePage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm học sinh..."
-                className="pl-9 bg-background/50 border-border/40 rounded-xl"
+                className="pl-9 bg-background/50 border-border/40 rounded-lg"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -304,7 +304,7 @@ export default function AttendancePage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-center gap-1.5 p-1 bg-muted/20 rounded-xl w-fit mx-auto border border-border/10">
+                        <div className="flex items-center justify-center gap-1.5 p-1 bg-muted/20 rounded-lg w-fit mx-auto border border-border/10">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -378,9 +378,9 @@ function AttendanceSkeleton() {
       <div className="h-8 w-48 bg-muted rounded-lg" />
       <div className="h-32 bg-muted rounded-3xl" />
       <div className="grid grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-muted rounded-xl" />)}
+        {[1, 2, 3, 4].map(i => <div key={i} className="h-20 bg-muted rounded-lg" />)}
       </div>
-      <div className="h-[400px] bg-muted rounded-2xl" />
+      <div className="h-[400px] bg-muted rounded-xl" />
     </div>
   )
 }
