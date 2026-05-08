@@ -1,6 +1,10 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
   Edit,
   Eye,
   Filter,
@@ -9,7 +13,6 @@ import {
   Trash2
 } from "lucide-react"
 import * as React from "react"
-import { cn } from "@/lib/utils"
 
 import { Can } from "@/components/auth/can"
 import {
@@ -83,6 +86,14 @@ export default function TeachersPage() {
   const debouncedSearch = useDebounce(search, 300)
   const debouncedExpertise = useDebounce(expertise, 300)
 
+  // Pagination and Sorting State
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  const [sortBy, setSortBy] = React.useState("created_at")
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc")
+  const [totalItems, setTotalItems] = React.useState(0)
+  const [lastPage, setLastPage] = React.useState(1)
+
   // Drawer state
   const [drawerMode, setDrawerMode] = React.useState<"create" | "edit" | "view" | undefined>()
   const [selectedTeacher, setSelectedTeacher] = React.useState<Teacher | null>(null)
@@ -129,14 +140,22 @@ export default function TeachersPage() {
       if (status !== "all") params.append("status", status)
       if (debouncedExpertise) params.append("expertise", debouncedExpertise)
 
+      params.append("page", currentPage.toString())
+      params.append("limit", pageSize.toString())
+      params.append("sort_by", sortBy)
+      params.append("sort_order", sortOrder)
+
       const response = await api.get(`/admin/teachers?${params.toString()}`)
       const result = response.data
-      if (Array.isArray(result)) {
-        setTeachers(result)
-      } else if (result.data && Array.isArray(result.data)) {
+
+      if (result.data && Array.isArray(result.data)) {
         setTeachers(result.data)
-      } else if (result.teachers && Array.isArray(result.teachers)) {
-        setTeachers(result.teachers)
+        setTotalItems(result.meta?.total || result.total || 0)
+        setLastPage(result.meta?.last_page || result.last_page || 1)
+      } else if (Array.isArray(result)) {
+        setTeachers(result)
+        setTotalItems(result.length)
+        setLastPage(1)
       }
     } catch (err) {
       console.error(err)
@@ -144,7 +163,7 @@ export default function TeachersPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [debouncedSearch, status, debouncedExpertise])
+  }, [debouncedSearch, status, debouncedExpertise, currentPage, pageSize, sortBy, sortOrder])
 
   React.useEffect(() => {
     fetchTeachers()
@@ -153,6 +172,25 @@ export default function TeachersPage() {
   const openDrawer = (mode: "create" | "edit" | "view", teacher: Teacher | null = null) => {
     setSelectedTeacher(teacher)
     setDrawerMode(mode)
+  }
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(field)
+      setSortOrder("asc")
+    }
+    setCurrentPage(1)
+  }
+
+  const SortIcon = ({ field }: { field: string }) => {
+    if (sortBy !== field) return <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+    return sortOrder === "asc" ? (
+      <ChevronUp className="ml-2 h-4 w-4 text-primary" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4 text-primary" />
+    )
   }
 
   return (
@@ -237,12 +275,60 @@ export default function TeachersPage() {
           <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead className="w-[80px]">Avatar</TableHead>
-              <TableHead>Họ tên</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Số điện thoại</TableHead>
-              <TableHead>Chuyên môn</TableHead>
-              <TableHead>Đối tượng</TableHead>
-              <TableHead>Trạng thái</TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center">
+                  Họ tên
+                  <SortIcon field="name" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("email")}
+              >
+                <div className="flex items-center">
+                  Email
+                  <SortIcon field="email" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("phone")}
+              >
+                <div className="flex items-center">
+                  Số điện thoại
+                  <SortIcon field="phone" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("expertise")}
+              >
+                <div className="flex items-center">
+                  Chuyên môn
+                  <SortIcon field="expertise" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("target_student")}
+              >
+                <div className="flex items-center">
+                  Đối tượng
+                  <SortIcon field="target_student" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("status")}
+              >
+                <div className="flex items-center">
+                  Trạng thái
+                  <SortIcon field="status" />
+                </div>
+              </TableHead>
               <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
@@ -361,14 +447,82 @@ export default function TeachersPage() {
         </Table>
       </div>
 
-      {/* Pagination Placeholder */}
-      <div className="flex items-center justify-between px-2">
-        <p className="text-sm text-muted-foreground font-medium">
-          Hiển thị {teachers.length === 0 ? 0 : 1} đến {teachers.length} trong tổng số {teachers.length} giáo viên
-        </p>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" disabled className="h-8 px-4">Trước</Button>
-          <Button variant="outline" size="sm" disabled className="h-8 px-4">Sau</Button>
+      {/* Pagination Section */}
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4 text-sm text-muted-foreground border-t bg-muted/5 rounded-b-xl">
+        <div className="flex items-center gap-4">
+          <p>
+            Hiển thị <strong>{teachers.length}</strong> / <strong>{totalItems}</strong> giáo viên
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="whitespace-nowrap">Số hàng:</span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(val) => {
+                setPageSize(parseInt(val || "10"))
+                setCurrentPage(1)
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px] bg-background">
+                <SelectValue placeholder={pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1 || isLoading}
+            className="bg-background h-8"
+          >
+            Trước
+          </Button>
+
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
+              let pageNum = i + 1;
+              if (lastPage > 5 && currentPage > 3) {
+                pageNum = currentPage - 2 + i;
+                if (pageNum + (4 - i) > lastPage) pageNum = lastPage - (4 - i);
+              }
+              if (pageNum <= 0) return null;
+              if (pageNum > lastPage) return null;
+
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "ghost"}
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8 text-xs font-medium",
+                    currentPage === pageNum && "shadow-md shadow-primary/20"
+                  )}
+                  onClick={() => setCurrentPage(pageNum)}
+                  disabled={isLoading}
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(lastPage, prev + 1))}
+            disabled={currentPage === lastPage || isLoading}
+            className="bg-background h-8"
+          >
+            Sau
+          </Button>
         </div>
       </div>
 

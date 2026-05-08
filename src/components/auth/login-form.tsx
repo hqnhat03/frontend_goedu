@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, GraduationCap, Lock, LogIn, Mail, MoveLeft, User } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Lock, LogIn, Mail, MoveLeft, User, Users } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React from "react";
@@ -35,7 +35,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-type UserRole = "student" | "teacher";
+type UserRole = "student" | "teacher" | "guardian";
 
 interface LoginFormProps {
   role: UserRole;
@@ -153,11 +153,11 @@ export function LoginForm({ role }: LoginFormProps) {
           </div>
 
           <Tabs value={role} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 h-12 p-1">
+            <TabsList className="grid w-full grid-cols-3 mb-8 h-12 p-1">
               <TabsTrigger value="student">
                 <Link
                   href={`${APP_LINKS.student}/login?email=${encodeURIComponent(currentEmail)}`}
-                  className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs sm:text-sm"
                 >
                   <User className="size-4" />
                   Học viên
@@ -166,10 +166,19 @@ export function LoginForm({ role }: LoginFormProps) {
               <TabsTrigger value="teacher">
                 <Link
                   href={`${APP_LINKS.teacher}/login?email=${encodeURIComponent(currentEmail)}`}
-                  className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs sm:text-sm"
                 >
                   <GraduationCap className="size-4" />
                   Giảng viên
+                </Link>
+              </TabsTrigger>
+              <TabsTrigger value="guardian">
+                <Link
+                  href={`${APP_LINKS.guardian}/login?email=${encodeURIComponent(currentEmail)}`}
+                  className="flex items-center gap-2 cursor-pointer h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs sm:text-sm"
+                >
+                  <Users className="size-4" />
+                  Phụ huynh
                 </Link>
               </TabsTrigger>
             </TabsList>

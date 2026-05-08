@@ -3,7 +3,11 @@
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
   Edit,
   Eye,
   Plus,
@@ -17,7 +21,6 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 
 import {
   AlertDialog,
@@ -66,9 +69,16 @@ export default function GuardiansPage() {
   }, [hasPermission, router])
 
   // State for filtering
-
   const [search, setSearch] = React.useState("")
   const [status, setStatus] = React.useState<string>("all")
+
+  // Pagination and Sorting State
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  const [sortBy, setSortBy] = React.useState("created_at")
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc")
+  const [totalItems, setTotalItems] = React.useState(0)
+  const [lastPage, setLastPage] = React.useState(1)
 
   // State for data
   const [guardians, setGuardians] = React.useState<Guardian[]>([])
@@ -97,17 +107,22 @@ export default function GuardiansPage() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await api.get(`/admin/guardians`, {
-        params: {
-          search: debouncedSearch || undefined,
-          status: status !== "all" ? status : undefined,
-        }
-      })
+      const params = new URLSearchParams()
+      if (debouncedSearch) params.append("search", debouncedSearch)
+      if (status !== "all") params.append("status", status)
 
+      params.append("page", currentPage.toString())
+      params.append("limit", pageSize.toString())
+      params.append("sort_by", sortBy)
+      params.append("sort_order", sortOrder)
+
+      const response = await api.get(`/admin/guardians?${params.toString()}`)
       const result = response.data
 
-      if (result.success && Array.isArray(result.data)) {
+      if (result.success) {
         setGuardians(result.data)
+        setTotalItems(result.meta?.total || result.total || 0)
+        setLastPage(result.meta?.last_page || result.last_page || 1)
       } else {
         throw new Error(result.message || "Lỗi khi lấy dữ liệu")
       }
@@ -118,11 +133,30 @@ export default function GuardiansPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [debouncedSearch, status])
+  }, [debouncedSearch, status, currentPage, pageSize, sortBy, sortOrder])
 
   React.useEffect(() => {
     fetchGuardians()
   }, [fetchGuardians])
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(field)
+      setSortOrder("asc")
+    }
+    setCurrentPage(1)
+  }
+
+  const SortIcon = ({ field }: { field: string }) => {
+    if (sortBy !== field) return <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+    return sortOrder === "asc" ? (
+      <ChevronUp className="ml-2 h-4 w-4 text-primary" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4 text-primary" />
+    )
+  }
 
   const handleDeleteClick = (guardian: Guardian) => {
     setGuardianToDelete(guardian)
@@ -156,6 +190,7 @@ export default function GuardiansPage() {
   const resetFilters = () => {
     setSearch("")
     setStatus("all")
+    setCurrentPage(1)
   }
 
   const openDrawer = (mode: "create" | "edit" | "view", guardian: Guardian | null = null) => {
@@ -204,6 +239,7 @@ export default function GuardiansPage() {
               onValueChange={(val) => {
                 const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
                 setStatus(key || "all");
+                setCurrentPage(1);
               }}
             >
               <SelectTrigger className="bg-background border-muted-foreground/20">
@@ -238,17 +274,49 @@ export default function GuardiansPage() {
           <TableHeader className="bg-muted/50">
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-[120px] font-semibold">Ảnh đại diện</TableHead>
-              <TableHead className="font-semibold">Họ và tên</TableHead>
-              <TableHead className="font-semibold">Email</TableHead>
-              <TableHead className="font-semibold">Số điện thoại</TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center">
+                  Họ và tên
+                  <SortIcon field="name" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("email")}
+              >
+                <div className="flex items-center">
+                  Email
+                  <SortIcon field="email" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("phone")}
+              >
+                <div className="flex items-center">
+                  Số điện thoại
+                  <SortIcon field="phone" />
+                </div>
+              </TableHead>
               <TableHead className="font-semibold">Học sinh</TableHead>
-              <TableHead className="font-semibold">Trạng thái</TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:bg-muted/80 transition-colors"
+                onClick={() => handleSort("status")}
+              >
+                <div className="flex items-center">
+                  Trạng thái
+                  <SortIcon field="status" />
+                </div>
+              </TableHead>
               <TableHead className="text-right font-semibold">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={cn(isLoading && guardians.length > 0 && "opacity-50 transition-opacity duration-300")}>
             {isLoading && guardians.length === 0 ? (
-              Array.from({ length: 5 }).map((_, i) => (
+              Array.from({ length: pageSize }).map((_, i) => (
                 <TableRow key={i}>
                   <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-32" /></TableCell>
@@ -363,15 +431,82 @@ export default function GuardiansPage() {
         </Table>
       </div>
 
-      {/* Pagination Placeholder */}
-      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4">
-        <p className="text-sm text-muted-foreground">
-          Hiển thị <strong>{guardians.length}</strong> phụ huynh
-        </p>
+      {/* Pagination Section */}
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4 text-sm text-muted-foreground border-t bg-muted/5 rounded-b-xl">
+        <div className="flex items-center gap-4">
+          <p>
+            Hiển thị <strong>{guardians.length}</strong> / <strong>{totalItems}</strong> phụ huynh
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="whitespace-nowrap">Số hàng:</span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(val) => {
+                setPageSize(parseInt(val || "10"))
+                setCurrentPage(1)
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px] bg-background">
+                <SelectValue placeholder={pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="shadow-sm" disabled>Trước</Button>
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-medium">1</div>
-          <Button variant="outline" size="sm" className="shadow-sm" disabled>Sau</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1 || isLoading}
+            className="bg-background h-8"
+          >
+            Trước
+          </Button>
+
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
+              let pageNum = i + 1;
+              if (lastPage > 5 && currentPage > 3) {
+                pageNum = currentPage - 2 + i;
+                if (pageNum + (4 - i) > lastPage) pageNum = lastPage - (4 - i);
+              }
+              if (pageNum <= 0) return null;
+              if (pageNum > lastPage) return null;
+
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "ghost"}
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8 text-xs font-medium",
+                    currentPage === pageNum && "shadow-md shadow-primary/20"
+                  )}
+                  onClick={() => setCurrentPage(pageNum)}
+                  disabled={isLoading}
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(lastPage, prev + 1))}
+            disabled={currentPage === lastPage || isLoading}
+            className="bg-background h-8"
+          >
+            Sau
+          </Button>
         </div>
       </div>
 

@@ -24,6 +24,7 @@ const nextConfig = {
         'myapp.test',
         'teacher.myapp.test',
         'student.myapp.test',
+        'guardian.myapp.test',
     ],
 };
 

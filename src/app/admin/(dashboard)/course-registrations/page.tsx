@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils"
 import { AxiosError } from "axios"
 import {
     CheckCircle2,
+    ChevronDown,
+    ChevronUp,
+    ChevronsUpDown,
     Clock,
     Edit2,
     Mail,
@@ -59,12 +62,6 @@ interface CourseRegistration {
     course_name: string
 }
 
-interface Meta {
-    total: number
-    per_page: number
-    current_page: number
-    last_page: number
-}
 
 const statusConfig = {
     pending: {
@@ -98,11 +95,17 @@ export default function CourseRegistrationsPage() {
     }, [router]) // Remove hasPermission to avoid loop
 
     const [registrations, setRegistrations] = React.useState<CourseRegistration[]>([])
-    const [meta, setMeta] = React.useState<Meta | null>(null)
     const [isLoading, setIsLoading] = React.useState(true)
     const [search, setSearch] = React.useState("")
     const [statusFilter, setStatusFilter] = React.useState<string>("all")
+
+    // Pagination and Sorting State
     const [currentPage, setCurrentPage] = React.useState(1)
+    const [pageSize, setPageSize] = React.useState(10)
+    const [sortBy, setSortBy] = React.useState("created_at")
+    const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc")
+    const [totalItems, setTotalItems] = React.useState(0)
+    const [lastPage, setLastPage] = React.useState(1)
 
     const debouncedSearch = useDebounce(search, 500)
 
@@ -128,14 +131,20 @@ export default function CourseRegistrationsPage() {
             const response = await api.get("/admin/course-registrations", {
                 params: {
                     page: currentPage,
+                    per_page: pageSize,
                     search: debouncedSearch,
                     status: statusFilter !== "all" ? statusFilter : undefined,
+                    sort_by: sortBy,
+                    sort_order: sortOrder,
                 },
             })
 
-            const { data, meta } = response.data
-            setRegistrations(data || [])
-            setMeta(meta || null)
+            const result = response.data
+            if (result.success) {
+                setRegistrations(result.data || [])
+                setTotalItems(result.meta?.total || 0)
+                setLastPage(result.meta?.last_page || 1)
+            }
         } catch (error) {
             if (error instanceof AxiosError) {
                 toast.error(error.response?.data?.message || "Không thể tải danh sách đăng ký")
@@ -144,7 +153,26 @@ export default function CourseRegistrationsPage() {
             setIsLoading(false)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentPage, debouncedSearch, statusFilter]) // Remove hasPermission
+    }, [currentPage, pageSize, debouncedSearch, statusFilter, sortBy, sortOrder]) // Remove hasPermission
+
+    const handleSort = (field: string) => {
+        if (sortBy === field) {
+            setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+        } else {
+            setSortBy(field)
+            setSortOrder("asc")
+        }
+        setCurrentPage(1)
+    }
+
+    const SortIcon = ({ field }: { field: string }) => {
+        if (sortBy !== field) return <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+        return sortOrder === "asc" ? (
+            <ChevronUp className="ml-2 h-4 w-4 text-primary" />
+        ) : (
+            <ChevronDown className="ml-2 h-4 w-4 text-primary" />
+        )
+    }
 
     React.useEffect(() => {
         fetchRegistrations()
@@ -186,6 +214,8 @@ export default function CourseRegistrationsPage() {
         setSearch("")
         setStatusFilter("all")
         setCurrentPage(1)
+        setSortBy("created_at")
+        setSortOrder("desc")
     }
 
     return (
@@ -253,11 +283,51 @@ export default function CourseRegistrationsPage() {
                 <Table className="relative">
                     <TableHeader className="bg-muted/50 backdrop-blur-md">
                         <TableRow className="hover:bg-transparent border-muted/20">
-                            <TableHead className="font-bold">Khóa học</TableHead>
-                            <TableHead className="font-bold">Khách hàng</TableHead>
-                            <TableHead className="font-bold">Email</TableHead>
-                            <TableHead className="font-bold">Số điện thoại</TableHead>
-                            <TableHead className="font-bold text-center">Trạng thái</TableHead>
+                            <TableHead
+                                className="font-bold cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => handleSort("course_id")}
+                            >
+                                <div className="flex items-center">
+                                    Khóa học
+                                    <SortIcon field="course_id" />
+                                </div>
+                            </TableHead>
+                            <TableHead
+                                className="font-bold cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => handleSort("name")}
+                            >
+                                <div className="flex items-center">
+                                    Khách hàng
+                                    <SortIcon field="name" />
+                                </div>
+                            </TableHead>
+                            <TableHead
+                                className="font-bold cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => handleSort("email")}
+                            >
+                                <div className="flex items-center">
+                                    Email
+                                    <SortIcon field="email" />
+                                </div>
+                            </TableHead>
+                            <TableHead
+                                className="font-bold cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => handleSort("phone")}
+                            >
+                                <div className="flex items-center">
+                                    Số điện thoại
+                                    <SortIcon field="phone" />
+                                </div>
+                            </TableHead>
+                            <TableHead
+                                className="font-bold text-center cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => handleSort("status")}
+                            >
+                                <div className="flex items-center justify-center">
+                                    Trạng thái
+                                    <SortIcon field="status" />
+                                </div>
+                            </TableHead>
                             <TableHead className="text-right font-bold">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -347,27 +417,76 @@ export default function CourseRegistrationsPage() {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between px-2 mt-6 text-sm text-muted-foreground">
-                <p>
-                    Hiển thị <strong>{registrations.length}</strong> {meta ? `trên ${meta.total}` : ""} kết quả
-                </p>
+            <div className="flex flex-col sm:flex-row items-center justify-between px-2 mt-6 gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4">
+                    <p>
+                        Hiển thị <strong>{registrations.length}</strong> / <strong>{totalItems}</strong> đăng ký
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <span className="whitespace-nowrap">Số hàng:</span>
+                        <Select
+                            value={pageSize.toString()}
+                            onValueChange={(val) => {
+                                setPageSize(parseInt(val || "10"))
+                                setCurrentPage(1)
+                            }}
+                        >
+                            <SelectTrigger className="h-8 w-[70px] bg-background">
+                                <SelectValue placeholder={pageSize} />
+                            </SelectTrigger>
+                            <SelectContent side="top">
+                                <SelectItem value="5">5</SelectItem>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="20">20</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
                 <div className="flex items-center gap-2">
                     <Button
                         variant="ghost"
                         size="sm"
-                        disabled={!meta || currentPage === 1 || isLoading}
-                        onClick={() => setCurrentPage(prev => prev - 1)}
+                        disabled={currentPage === 1 || isLoading}
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     >
                         Trước
                     </Button>
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary text-xs font-bold shadow-sm shadow-primary/10">
-                        {currentPage}
+
+                    <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
+                            let pageNum = i + 1;
+                            if (lastPage > 5 && currentPage > 3) {
+                                pageNum = currentPage - 2 + i;
+                                if (pageNum + (4 - i) > lastPage) pageNum = lastPage - (4 - i);
+                            }
+                            if (pageNum <= 0) return null;
+                            if (pageNum > lastPage) return null;
+
+                            return (
+                                <Button
+                                    key={pageNum}
+                                    variant={currentPage === pageNum ? "default" : "ghost"}
+                                    size="icon"
+                                    className={cn(
+                                        "h-8 w-8 text-xs font-bold",
+                                        currentPage === pageNum && "bg-primary/10 text-primary hover:bg-primary/20 shadow-sm"
+                                    )}
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    disabled={isLoading}
+                                >
+                                    {pageNum}
+                                </Button>
+                            );
+                        })}
                     </div>
+
                     <Button
                         variant="ghost"
                         size="sm"
-                        disabled={!meta || currentPage === meta.last_page || isLoading}
-                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        disabled={currentPage === lastPage || isLoading}
+                        onClick={() => setCurrentPage(prev => Math.min(lastPage, prev + 1))}
                     >
                         Sau
                     </Button>

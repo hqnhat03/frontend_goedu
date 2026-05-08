@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import api from "@/lib/axios"
 import { useAuthStore } from "@/store/auth-store"
 import { ChevronDown, LogOut, User } from "lucide-react"
 import Link from "next/link"
@@ -44,31 +43,6 @@ export default function AdminLayout({
       router.replace('/login')
       return;
     }
-
-    // Fetch user profile to get permissions
-    const fetchProfile = async () => {
-      try {
-        const response = await api.get('/auth/me');
-        if (response.data.success) {
-          const userData = response.data.data;
-          // Map data backend sang User interface của frontend
-          const userRole = userData.roles?.[0] || 'admin'; // Lấy role đầu tiên
-
-          useAuthStore.getState().setUser({
-            id: userData.id,
-            name: userData.name,
-            email: userData.email,
-            role: userRole,
-            avatar: userData.avatar,
-            permissions: userData.permissions
-          });
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-      }
-    };
-
-    fetchProfile();
   }, [router])
 
   // Tránh render nội dung khi chưa mounted hoặc không có token

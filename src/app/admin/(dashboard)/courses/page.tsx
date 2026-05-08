@@ -1,8 +1,12 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import { Course, useCourseStore } from "@/store/course-store"
 import {
   BookOpen,
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
   Edit,
   Eye,
   GraduationCap,
@@ -16,7 +20,6 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
-import { cn } from "@/lib/utils"
 
 import { Can } from "@/components/auth/can"
 import {
@@ -82,6 +85,15 @@ export default function CoursesPage() {
   const [subject, setSubject] = React.useState<string>("all")
   const [level, setLevel] = React.useState<string>("all")
   const [items, setItems] = React.useState<Course[]>([])
+
+  // Pagination and Sorting State
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  const [sortBy, setSortBy] = React.useState("created_at")
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc")
+  const [totalItems, setTotalItems] = React.useState(0)
+  const [lastPage, setLastPage] = React.useState(1)
+
   const [subjectsFilter, setSubjectsFilter] = React.useState<{ id: number | string, name: string }[]>([])
   const [levelsFilter, setLevelsFilter] = React.useState<{ id: number | string, name: string }[]>([])
 
@@ -161,12 +173,18 @@ export default function CoursesPage() {
         target_student: targetStudent === "all" ? "" : targetStudent,
         subject: subject === "all" ? "" : subject,
         level: level === "all" ? "" : level,
+        page: currentPage.toString(),
+        limit: pageSize.toString(),
+        sort_by: sortBy,
+        sort_order: sortOrder,
       })
 
       const response = await api.get(`/admin/courses?${queryParams}`)
       const result = response.data
       if (response.status === 200) {
         setItems(result.data || [])
+        setTotalItems(result.meta?.total || 0)
+        setLastPage(result.meta?.last_page || 1)
       }
     } catch (error) {
       console.error("Failed to fetch courses:", error)
@@ -175,7 +193,7 @@ export default function CoursesPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [search, status, targetStudent, subject, level])
+  }, [search, status, targetStudent, subject, level, currentPage, pageSize, sortBy, sortOrder])
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -213,6 +231,26 @@ export default function CoursesPage() {
     setTargetStudent("all")
     setSubject("all")
     setLevel("all")
+    setCurrentPage(1)
+  }
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(field)
+      setSortOrder("asc")
+    }
+    setCurrentPage(1)
+  }
+
+  const SortIcon = ({ field }: { field: string }) => {
+    if (sortBy !== field) return <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+    return sortOrder === "asc" ? (
+      <ChevronUp className="ml-2 h-4 w-4 text-primary" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4 text-primary" />
+    )
   }
 
   return (
@@ -358,11 +396,51 @@ export default function CoursesPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold py-4">Tên khóa học</TableHead>
-                <TableHead className="font-semibold py-4">Môn học</TableHead>
-                <TableHead className="font-semibold py-4">Trình độ</TableHead>
-                <TableHead className="font-semibold py-4">Đối tượng</TableHead>
-                <TableHead className="font-semibold py-4">Trạng thái</TableHead>
+                <TableHead
+                  className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleSort("name")}
+                >
+                  <div className="flex items-center">
+                    Tên khóa học
+                    <SortIcon field="name" />
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleSort("subject_name")}
+                >
+                  <div className="flex items-center">
+                    Môn học
+                    <SortIcon field="subject_name" />
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleSort("level_name")}
+                >
+                  <div className="flex items-center">
+                    Trình độ
+                    <SortIcon field="level_name" />
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleSort("target_student")}
+                >
+                  <div className="flex items-center">
+                    Đối tượng
+                    <SortIcon field="target_student" />
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleSort("status")}
+                >
+                  <div className="flex items-center">
+                    Trạng thái
+                    <SortIcon field="status" />
+                  </div>
+                </TableHead>
                 <TableHead className="text-right font-semibold py-4">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
@@ -541,14 +619,78 @@ export default function CoursesPage() {
       </AlertDialog>
 
       {/* Footer Info */}
-      <div className="flex items-center justify-between px-2 text-sm text-muted-foreground">
-        <p>
-          Hiển thị <strong>{items.length}</strong> khóa học
-        </p>
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4 text-sm text-muted-foreground border-t bg-muted/10">
+        <div className="flex items-center gap-4">
+          <p>
+            Hiển thị <strong>{items.length}</strong> / <strong>{totalItems}</strong> khóa học
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="whitespace-nowrap">Số hàng:</span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(val) => {
+                setPageSize(parseInt(val || "10"))
+                setCurrentPage(1)
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px] bg-background">
+                <SelectValue placeholder={pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" disabled>Trước</Button>
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary text-xs font-bold shadow-sm shadow-primary/10">1</div>
-          <Button variant="ghost" size="sm" disabled>Sau</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1 || isLoading}
+            className="bg-background h-8"
+          >
+            Trước
+          </Button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
+              let pageNum = i + 1;
+              if (lastPage > 5 && currentPage > 3) {
+                pageNum = currentPage - 3 + i + 1;
+                if (pageNum > lastPage) pageNum = lastPage - (4 - i);
+              }
+              if (pageNum <= 0) return null;
+              if (pageNum > lastPage) return null;
+
+              return (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "ghost"}
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8 text-xs font-medium",
+                    currentPage === pageNum && "shadow-md shadow-primary/20"
+                  )}
+                  onClick={() => setCurrentPage(pageNum)}
+                  disabled={isLoading}
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(lastPage, prev + 1))}
+            disabled={currentPage === lastPage || isLoading}
+            className="bg-background h-8"
+          >
+            Sau
+          </Button>
         </div>
       </div>
     </div>

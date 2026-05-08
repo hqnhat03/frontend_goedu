@@ -4,6 +4,10 @@ import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
 import api from "@/lib/axios"
 import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Calendar,
   Edit,
   Eye,
   Plus,
@@ -61,6 +65,7 @@ interface Student {
   phone: string
   status: "active" | "inactive"
   avatar: string
+  created_at: string
 }
 
 interface PaginationMeta {
@@ -87,6 +92,8 @@ export default function StudentsPage() {
   const [search, setSearch] = React.useState("")
   const [status, setStatus] = React.useState<string>("all")
   const [studentType, setStudentType] = React.useState<string>("all")
+  const [sortBy, setSortBy] = React.useState<string>("created_at")
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc")
 
   // State for data
   const [students, setStudents] = React.useState<Student[]>([])
@@ -128,6 +135,8 @@ export default function StudentsPage() {
       if (debouncedSearch) params.append("q", debouncedSearch)
       if (status !== "all") params.append("status", status)
       if (studentType !== "all") params.append("student_type", studentType)
+      if (sortBy) params.append("sort_by", sortBy)
+      if (sortOrder) params.append("sort_order", sortOrder)
 
       const response = await api.get(`/admin/students?${params.toString()}`)
       const result = response.data
@@ -147,7 +156,26 @@ export default function StudentsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [debouncedSearch, status, studentType, page])
+  }, [debouncedSearch, status, studentType, page, sortBy, sortOrder])
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(column)
+      setSortOrder("desc")
+    }
+    setPage(1)
+  }
+
+  const getSortIcon = (column: string) => {
+    if (sortBy !== column) return <ArrowUpDown className="ml-2 h-4 w-4" />
+    return sortOrder === "asc" ? (
+      <ArrowUp className="ml-2 h-4 w-4 text-primary" />
+    ) : (
+      <ArrowDown className="ml-2 h-4 w-4 text-primary" />
+    )
+  }
 
   React.useEffect(() => {
     setPage(1)
@@ -292,11 +320,54 @@ export default function StudentsPage() {
           <TableHeader className="bg-muted/50">
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-[120px] font-semibold">Ảnh đại diện</TableHead>
-              <TableHead className="font-semibold">Họ và tên</TableHead>
-              <TableHead className="font-semibold">Loại</TableHead>
-              <TableHead className="font-semibold">Email</TableHead>
-              <TableHead className="font-semibold">Số điện thoại</TableHead>
-              <TableHead className="font-semibold">Trạng thái</TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center">
+                  Họ và tên {getSortIcon("name")}
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("student_type")}
+              >
+                <div className="flex items-center">
+                  Loại {getSortIcon("student_type")}
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("email")}
+              >
+                <div className="flex items-center">
+                  Email {getSortIcon("email")}
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("phone")}
+              >
+                <div className="flex items-center">
+                  Số điện thoại {getSortIcon("phone")}
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("status")}
+              >
+                <div className="flex items-center">
+                  Trạng thái {getSortIcon("status")}
+                </div>
+              </TableHead>
+              <TableHead
+                className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleSort("created_at")}
+              >
+                <div className="flex items-center">
+                  Ngày tạo {getSortIcon("created_at")}
+                </div>
+              </TableHead>
               <TableHead className="text-right font-semibold">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
@@ -358,6 +429,12 @@ export default function StudentsPage() {
                         Bị khóa
                       </Badge>
                     )}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {student.created_at ? new Date(student.created_at).toLocaleDateString("vi-VN") : "N/A"}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">

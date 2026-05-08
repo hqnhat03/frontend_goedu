@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
   const adminDomain = baseDomain;
   const teacherDomain = `teacher.${baseDomain}`;
   const studentDomain = `student.${baseDomain}`;
+  const guardianDomain = `guardian.${baseDomain}`;
 
   // Extract the main part of the hostname (removing port if present)
   const currentHost = hostname.split(':')[0];
@@ -55,6 +56,13 @@ export function middleware(request: NextRequest) {
       url.pathname = newPathname;
       return NextResponse.redirect(url);
     }
+
+    // Redirect root to dashboard
+    if (pathname === '/') {
+      url.pathname = '/dashboard';
+      return NextResponse.redirect(url);
+    }
+
     return handleProtectedDomain('/admin');
   }
 
@@ -76,6 +84,23 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
     return handleProtectedDomain('/student', ['/', '/courses']);
+  }
+
+  if (currentHost === guardianDomain) {
+    // Nếu truy cập domain guardian mà có prefix /guardian thì redirect bỏ prefix đó đi
+    if (pathname === '/guardian' || pathname.startsWith('/guardian/')) {
+      const newPathname = pathname.replace(/^\/guardian/, '') || '/';
+      url.pathname = newPathname;
+      return NextResponse.redirect(url);
+    }
+
+    // Redirect root to dashboard
+    if (pathname === '/') {
+      url.pathname = '/dashboard';
+      return NextResponse.redirect(url);
+    }
+
+    return handleProtectedDomain('/guardian');
   }
 
   // Fallback or default behavior
