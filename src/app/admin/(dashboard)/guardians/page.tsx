@@ -223,8 +223,8 @@ export default function GuardiansPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/40 backdrop-blur-sm">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-center">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row flex-wrap items-center gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên, email, số điện thoại..."
@@ -233,7 +233,6 @@ export default function GuardiansPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-
             <Select
               value={statusLabels[status]}
               onValueChange={(val) => {
@@ -254,16 +253,14 @@ export default function GuardiansPage() {
                 <SelectItem value="Bị khóa">Bị khóa</SelectItem>
               </SelectContent>
             </Select>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 bg-background hover:bg-muted transition-colors"
-                onClick={resetFilters}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
-              </Button>
-            </div>
+            <div className="flex-1"></div>
+            <Button
+              variant="outline"
+              className="w-full md:w-fit bg-background hover:bg-muted transition-colors"
+              onClick={resetFilters}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -469,20 +466,24 @@ export default function GuardiansPage() {
           >
             Trước
           </Button>
-
           <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
-              let pageNum = i + 1;
-              if (lastPage > 5 && currentPage > 3) {
-                pageNum = currentPage - 2 + i;
-                if (pageNum + (4 - i) > lastPage) pageNum = lastPage - (4 - i);
-              }
-              if (pageNum <= 0) return null;
-              if (pageNum > lastPage) return null;
+            {(() => {
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+              const end = Math.min(lastPage, start + maxVisible - 1);
 
-              return (
+              if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+              }
+
+              const pages = [];
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map((pageNum) => (
                 <Button
-                  key={pageNum}
+                  key={`page-${pageNum}`}
                   variant={currentPage === pageNum ? "default" : "ghost"}
                   size="icon"
                   className={cn(
@@ -494,8 +495,8 @@ export default function GuardiansPage() {
                 >
                   {pageNum}
                 </Button>
-              );
-            })}
+              ));
+            })()}
           </div>
 
           <Button

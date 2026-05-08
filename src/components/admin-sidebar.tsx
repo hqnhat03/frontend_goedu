@@ -2,10 +2,13 @@
 
 import { usePermission } from "@/hooks/use-permission"
 import {
+  ArrowLeft,
   BookOpen,
   ChevronRight,
   GraduationCap,
   LayoutDashboard,
+  LayoutGrid,
+  ListOrdered,
   Settings,
   ShieldCheck,
   UserCheck,
@@ -105,6 +108,67 @@ export function AdminSidebar() {
   const pathname = usePathname()
   const { hasPermission } = usePermission()
 
+  const courseMatch = pathname.match(/^\/courses\/(\d+)/);
+  const courseId = courseMatch ? courseMatch[1] : null;
+
+  const classMatch = pathname.match(/^\/classes\/(\d+)/);
+  const classId = classMatch ? classMatch[1] : null;
+
+  let displayItems = navItems;
+  let contextLabel = "Dashboard";
+
+  if (courseId) {
+    contextLabel = "Khóa học";
+    displayItems = [
+      {
+        title: "Quay lại",
+        url: "/courses",
+        icon: ArrowLeft,
+        permission: "course_list",
+      },
+      {
+        title: "Chi tiết khóa học",
+        url: `/courses/${courseId}`,
+        icon: BookOpen,
+        permission: "course_detail",
+      },
+      {
+        title: "Danh sách học sinh",
+        url: `/courses/${courseId}/students`,
+        icon: Users,
+        permission: "student_in_course_list",
+      },
+      {
+        title: "Danh sách lớp",
+        url: `/courses/${courseId}/classes`,
+        icon: LayoutGrid,
+        permission: "class_list",
+      },
+    ];
+  } else if (classId) {
+    contextLabel = "Lớp học";
+    displayItems = [
+      {
+        title: "Quay lại",
+        url: "/courses",
+        icon: ArrowLeft,
+        permission: "course_list",
+      },
+      {
+        title: "Chi tiết lớp học",
+        url: `/classes/${classId}`,
+        icon: LayoutGrid,
+        permission: "class_detail",
+      },
+      {
+        title: "Quản lý bài giảng",
+        url: `/classes/${classId}/lecture`,
+        icon: ListOrdered,
+        permission: "lecture_list",
+      },
+    ];
+  }
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex items-center py-2 px-5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center transition-all duration-300">
@@ -114,14 +178,16 @@ export function AdminSidebar() {
           </div>
           <span className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden whitespace-nowrap overflow-hidden">
             <span className="text-lg">GoEdu</span>
-            <span className="text-xs text-muted-foreground font-medium">Dashboard</span>
+            <span className="text-xs text-muted-foreground font-medium">
+              {contextLabel}
+            </span>
           </span>
         </Link>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
+      <SidebarContent className="group-data-[collapsible=icon]:px-0">
+        <SidebarGroup className="group-data-[collapsible=icon]:p-0">
           <SidebarMenu>
-            {navItems.map((item) => {
+            {displayItems.map((item) => {
               // Nếu mục này yêu cầu permission mà user không có thì ẩn
               if (item.permission && !hasPermission(item.permission)) return null;
 
@@ -135,10 +201,10 @@ export function AdminSidebar() {
                 if (visibleSubItems.length === 0) return null;
 
                 return (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                     <SidebarMenuButton
                       tooltip={item.title}
-                      className="hover:bg-accent hover:text-accent-foreground"
+                      className="hover:bg-accent hover:text-accent-foreground group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
                     >
                       <item.icon />
                       <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
@@ -161,12 +227,12 @@ export function AdminSidebar() {
               }
 
               return (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                   <SidebarMenuButton
                     render={<Link href={item.url!} />}
                     isActive={pathname === item.url}
                     tooltip={item.title}
-                    className="hover:bg-accent hover:text-accent-foreground"
+                    className="hover:bg-accent hover:text-accent-foreground group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
                   >
                     <item.icon />
                     <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>

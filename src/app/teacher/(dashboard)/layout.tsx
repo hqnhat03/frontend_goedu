@@ -1,7 +1,7 @@
 "use client"
 
-import { TeacherHeader } from "@/components/teacher-header"
-import { TeacherSidebar } from "@/components/teacher-sidebar"
+import { TeacherHeader } from "@/app/teacher/(dashboard)/_components/teacher-header"
+import { TeacherSidebar } from "@/app/teacher/(dashboard)/_components/teacher-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 import * as React from "react"

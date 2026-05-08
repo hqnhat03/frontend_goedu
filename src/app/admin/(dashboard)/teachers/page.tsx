@@ -9,6 +9,7 @@ import {
   Eye,
   Filter,
   Plus,
+  RefreshCw,
   Search,
   Trash2
 } from "lucide-react"
@@ -216,8 +217,8 @@ export default function TeachersPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/40">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row items-center justify-end gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm kiếm theo tên, email..."
@@ -226,27 +227,24 @@ export default function TeachersPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <Select
+              value={statusLabels[status]}
+              onValueChange={(val) => {
+                const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
+                setStatus(key || "all");
+              }}
+            >
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
+                <SelectItem value="Bị khóa">Bị khóa</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <div>
-              <Select
-                value={statusLabels[status]}
-                onValueChange={(val) => {
-                  const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
-                  setStatus(key || "all");
-                }}
-              >
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Trạng thái" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
-                  <SelectItem value="Đang hoạt động">Đang hoạt động</SelectItem>
-                  <SelectItem value="Bị khóa">Bị khóa</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="relative">
+            <div className="relative w-full md:w-64">
               <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Chuyên môn..."
@@ -256,15 +254,16 @@ export default function TeachersPage() {
               />
             </div>
 
-            <div className="flex items-end">
-              <Button variant="outline" className="w-full" onClick={() => {
-                setSearch("")
-                setStatus("all")
-                setExpertise("")
-              }}>
-                Làm mới bộ lọc
-              </Button>
-            </div>
+
+            <div className='flex-1'></div>
+
+            <Button variant="outline" className="w-full md:w-fit" onClick={() => {
+              setSearch("")
+              setStatus("all")
+              setExpertise("")
+            }}>
+              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -485,20 +484,24 @@ export default function TeachersPage() {
           >
             Trước
           </Button>
-
           <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
-              let pageNum = i + 1;
-              if (lastPage > 5 && currentPage > 3) {
-                pageNum = currentPage - 2 + i;
-                if (pageNum + (4 - i) > lastPage) pageNum = lastPage - (4 - i);
-              }
-              if (pageNum <= 0) return null;
-              if (pageNum > lastPage) return null;
+            {(() => {
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+              const end = Math.min(lastPage, start + maxVisible - 1);
 
-              return (
+              if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+              }
+
+              const pages = [];
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map((pageNum) => (
                 <Button
-                  key={pageNum}
+                  key={`page-${pageNum}`}
                   variant={currentPage === pageNum ? "default" : "ghost"}
                   size="icon"
                   className={cn(
@@ -510,8 +513,8 @@ export default function TeachersPage() {
                 >
                   {pageNum}
                 </Button>
-              );
-            })}
+              ));
+            })()}
           </div>
 
           <Button

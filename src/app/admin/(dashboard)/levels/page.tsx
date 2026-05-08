@@ -53,6 +53,13 @@ const statusConfig = {
   archived: { label: "Lưu trữ", color: "bg-rose-500/10 text-rose-600 border-rose-200" },
 }
 
+const statusLabels: Record<string, string> = {
+  all: "Tất cả trạng thái",
+  draft: "Bản nháp",
+  published: "Đã xuất bản",
+  archived: "Lưu trữ",
+}
+
 export default function LevelsPage() {
   const router = useRouter()
   const { hasPermission } = usePermission()
@@ -191,8 +198,8 @@ export default function LevelsPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/30 backdrop-blur-md">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 items-center">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row flex-wrap items-center justify-start gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên trình độ..."
@@ -202,45 +209,62 @@ export default function LevelsPage() {
               />
             </div>
 
-            <Select value={status} onValueChange={(val) => setStatus(val ?? "all")}>
-              <SelectTrigger className="bg-background border-muted-foreground/20">
-                <div className="flex items-center gap-2">
-                  <Settings2 className="h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Trạng thái" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                <SelectItem value="draft">Bản nháp</SelectItem>
-                <SelectItem value="published">Đã xuất bản</SelectItem>
-                <SelectItem value="archived">Lưu trữ</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="w-full md:w-48">
+              <Select 
+                value={statusLabels[status]} 
+                onValueChange={(val) => {
+                  const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
+                  setStatus(key || "all");
+                }}
+              >
+                <SelectTrigger className="bg-background border-muted-foreground/20">
+                  <div className="flex items-center gap-2">
+                    <Settings2 className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Trạng thái" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                  <SelectItem value="Bản nháp">Bản nháp</SelectItem>
+                  <SelectItem value="Đã xuất bản">Đã xuất bản</SelectItem>
+                  <SelectItem value="Lưu trữ">Lưu trữ</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={educationLevel} onValueChange={(val) => setEducationLevel(val ?? "all")}>
-              <SelectTrigger className="bg-background border-muted-foreground/20">
-                <div className="flex items-center gap-2">
-                  <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Cấp học" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả cấp học</SelectItem>
-                {educationLevels.map((edu: string) => (
-                  <SelectItem key={edu} value={edu}>
-                    {edu}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="w-full md:w-48">
+              <Select 
+                value={educationLevel === "all" ? "Tất cả cấp học" : educationLevel} 
+                onValueChange={(val) => {
+                  setEducationLevel(!val || val === "Tất cả cấp học" ? "all" : val);
+                }}
+              >
+                <SelectTrigger className="bg-background border-muted-foreground/20">
+                  <div className="flex items-center gap-2">
+                    <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Cấp học" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Tất cả cấp học">Tất cả cấp học</SelectItem>
+                  {educationLevels.map((edu: string) => (
+                    <SelectItem key={edu} value={edu}>
+                      {edu}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex-1"></div>
 
             <Button
-              variant="outline"
-              className="w-full bg-background hover:bg-muted transition-colors border-dashed"
-              onClick={resetFilters}
-            >
-              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới bộ lọc
-            </Button>
+                variant="outline"
+                className="w-full md:w-fit bg-background hover:bg-muted transition-colors border-dashed"
+                onClick={resetFilters}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
+              </Button>
           </div>
         </CardContent>
       </Card>

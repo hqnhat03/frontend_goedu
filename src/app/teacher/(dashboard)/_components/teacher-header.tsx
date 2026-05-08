@@ -26,9 +26,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useAuthStore } from "@/store/auth-store"
 
 const pageTitles: Record<string, string> = {
-  "/": "Tổng quan",
+  "/dashboard": "Tổng quan",
   "/schedule": "Lịch giảng dạy",
   "/classes": "Quản lý lớp học",
+  "/exams": "Quản lý bài kiểm tra",
+  "/profile": "Thông tin cá nhân",
   "/settings": "Cài đặt tài khoản",
 }
 

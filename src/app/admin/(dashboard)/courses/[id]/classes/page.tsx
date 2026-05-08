@@ -157,7 +157,7 @@ export default function CourseClassesPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/30 backdrop-blur-md">
         <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-end">
             <div className="relative w-full sm:w-[350px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -170,10 +170,10 @@ export default function CourseClassesPage() {
 
             <Button
               variant="outline"
-              className="w-full sm:w-auto bg-background hover:bg-muted transition-colors border-dashed"
+              className="w-full sm:w-auto sm:ml-auto bg-background hover:bg-muted transition-colors border-dashed"
               onClick={fetchClasses}
             >
-              <RefreshCw className="mr-2 h-4 w-4" /> Tải lại dữ liệu
+              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
             </Button>
           </div>
         </CardContent>
@@ -266,7 +266,7 @@ export default function CourseClassesPage() {
                         <StatusBadge status={mappedStatus} className="shadow-none" />
                       </TableCell>
                       <TableCell className="text-right py-4">
-                        <Link href={`/courses/${params.id}/classes/${item.id}`}>
+                        <Link href={`/classes/${item.id}`}>
                           <Button
                             variant="ghost"
                             size="sm"

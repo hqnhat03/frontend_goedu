@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Clock,
   Clock3,
-  Copy,
   ExternalLink,
   GraduationCap,
   Mail,
@@ -29,14 +28,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-
 import { Skeleton } from "@/components/ui/skeleton"
 
 
@@ -57,32 +48,46 @@ const getStatusConfig = (status: string) => {
     case "published":
       return {
         label: "Đã xuất bản",
-        color: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-        icon: <CheckCircle2 className="w-3.5 h-3.5 mr-1" />,
+        color: "bg-emerald-500/15 text-emerald-700 border-emerald-200/50 dark:bg-emerald-500/20 dark:text-emerald-400",
+        icon: <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />,
         tooltip: "Lớp học đã được công khai và có thể bắt đầu",
       }
     case "draft":
       return {
         label: "Bản nháp",
-        color: "bg-slate-500/10 text-slate-600 border-slate-200",
-        icon: <Clock3 className="w-3.5 h-3.5 mr-1" />,
+        color: "bg-amber-500/15 text-amber-700 border-amber-200/50 dark:bg-amber-500/20 dark:text-amber-400",
+        icon: <Clock3 className="w-3.5 h-3.5 mr-1.5" />,
         tooltip: "Lớp học đang trong quá trình chuẩn bị",
       }
     case "archived":
       return {
         label: "Lưu trữ",
-        color: "bg-rose-500/10 text-rose-600 border-rose-200",
-        icon: <Archive className="w-3.5 h-3.5 mr-1" />,
+        color: "bg-slate-500/15 text-slate-700 border-slate-200/50 dark:bg-slate-500/20 dark:text-slate-400",
+        icon: <Archive className="w-3.5 h-3.5 mr-1.5" />,
         tooltip: "Lớp học đã kết thúc hoặc bị tạm dừng",
       }
     default:
       return {
         label: status || "N/A",
-        color: "bg-primary/10 text-primary border-primary/20",
+        color: "bg-primary/15 text-primary border-primary/20",
         icon: null,
         tooltip: "Trạng thái không xác định",
       }
   }
+}
+
+const getDayConfig = (day: number | string) => {
+  const dayNum = Number(day);
+  const configs: Record<number, { color: string, bg: string }> = {
+    1: { color: "text-blue-600", bg: "bg-blue-500/10" },
+    2: { color: "text-purple-600", bg: "bg-purple-500/10" },
+    3: { color: "text-amber-600", bg: "bg-amber-500/10" },
+    4: { color: "text-rose-600", bg: "bg-rose-500/10" },
+    5: { color: "text-emerald-600", bg: "bg-emerald-500/10" },
+    6: { color: "text-indigo-600", bg: "bg-indigo-500/10" },
+    0: { color: "text-red-600", bg: "bg-red-500/10" },
+  };
+  return configs[dayNum] || { color: "text-slate-600", bg: "bg-slate-500/10" };
 }
 
 interface ScheduleItem {
@@ -128,7 +133,7 @@ export default function ClassDetailPage() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await api.get(`/admin/classes/${params.classId}`)
+      const response = await api.get(`/admin/classes/${params.id}`)
       const result = response.data
       if (response.status === 200 && result.success) {
         setData(result.data)
@@ -144,13 +149,13 @@ export default function ClassDetailPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [params.classId])
+  }, [params.id])
 
   React.useEffect(() => {
-    if (params.classId) {
+    if (params.id) {
       fetchClassDetail()
     }
-  }, [fetchClassDetail, params.classId])
+  }, [fetchClassDetail, params.id])
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A"
@@ -172,16 +177,10 @@ export default function ClassDetailPage() {
     return timeString.split(":").slice(0, 2).join(":")
   }
 
-  const handleCopyLink = () => {
-    if (data?.meeting_url) {
-      navigator.clipboard.writeText(data.meeting_url)
-      toast.success("Đã sao chép link học tập")
-    }
-  }
 
   const handleBack = () => {
-    if (params.id) {
-      router.push(`/admin/courses/${params.id}/classes`)
+    if (data?.course_id) {
+      router.push(`/courses/${data.course_id}/classes`)
     } else {
       router.back()
     }
@@ -221,34 +220,17 @@ export default function ClassDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold tracking-tight text-primary">
               {data.class_code}
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="outline" className={`cursor-default ${statusConfig.color} px-2 py-0.5 border`}>
-                      {statusConfig.icon}
-                      {statusConfig.label}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{statusConfig.tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <span className="text-sm text-muted-foreground">• ID: {data.id}</span>
-            </div>
+
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-dashed" onClick={handleCopyLink} disabled={!data.meeting_url}>
-            <Copy className="mr-2 h-4 w-4" /> Copy link học
-          </Button>
+
           <Can permission="class_edit">
-            <Link href={`/courses/${params.id}/classes/${params.classId}/edit`}>
-              <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+            <Link href={`/classes/${params.id}/edit`}>
+              <Button className="bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95">
                 <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
               </Button>
             </Link>
@@ -269,58 +251,49 @@ export default function ClassDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Calendar className="size-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Ngày bắt đầu</p>
-                      <p className="font-semibold">{formatDate(data.start_day)}</p>
-                    </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Calendar className="size-4 text-primary/70" />
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Ngày bắt đầu</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Calendar className="size-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Ngày kết thúc</p>
-                      <p className="font-semibold">{formatDate(data.end_day)}</p>
-                    </div>
-                  </div>
+                  <p className="text-sm font-semibold">{formatDate(data.start_day)}</p>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Users className="size-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Số lượng tối đa</p>
-                      <p className="font-semibold">{data.max_student} học viên</p>
-                    </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Calendar className="size-4 text-primary/70" />
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Ngày kết thúc</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Video className="size-5" />
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className="text-sm text-muted-foreground">Link học trực tuyến</p>
-                      {data.meeting_url ? (
-                        <a
-                          href={data.meeting_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-semibold text-primary hover:underline flex items-center gap-1 group/link truncate"
-                        >
-                          {data.meeting_url}
-                          <ExternalLink className="size-3 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
-                        </a>
-                      ) : (
-                        <p className="text-muted-foreground italic">Chưa có link</p>
-                      )}
-                    </div>
+                  <p className="text-sm font-semibold">{formatDate(data.end_day)}</p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Users className="size-4 text-primary/70" />
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Số lượng tối đa</span>
                   </div>
+                  <p className="text-sm font-semibold">{data.max_student} học viên</p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 overflow-hidden">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Video className="size-4 text-primary/70" />
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Link học tập</span>
+                  </div>
+                  {data.meeting_url ? (
+                    <a
+                      href={data.meeting_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-semibold text-primary hover:underline flex items-center gap-1 group/link truncate"
+                    >
+                      Mở link
+                      <ExternalLink className="size-3 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+                    </a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">Chưa có</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -337,7 +310,7 @@ export default function ClassDetailPage() {
             </CardHeader>
             <CardContent>
               {data.class_schedules?.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {data.class_schedules
                     .slice()
                     .sort((a: ScheduleItem, b: ScheduleItem) => {
@@ -347,25 +320,25 @@ export default function ClassDetailPage() {
                     })
                     .map((schedule: ScheduleItem, idx: number) => {
                       const dayLabel = dayMap[schedule.day_of_week as number] || String(schedule.day_of_week)
+                      const dayConfig = getDayConfig(schedule.day_of_week)
                       return (
                         <div
                           key={schedule.id || idx}
-                          className="flex items-center justify-between p-4 rounded-xl border bg-background/50 hover:bg-background transition-colors group/item"
+                          className="flex flex-col gap-3 p-4 rounded-xl border bg-background/40 hover:bg-background hover:shadow-md transition-all group/item"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="size-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 font-bold text-sm">
+                            <div className={`size-12 rounded-2xl ${dayConfig.bg} ${dayConfig.color} flex items-center justify-center font-black text-lg shadow-sm border border-current/10`}>
                               {dayLabel.replace("Thứ ", "T").replace("Chủ nhật", "CN")}
                             </div>
                             <div>
-                              <p className="font-semibold">{dayLabel}</p>
-                              <p className="text-xs text-muted-foreground">Cố định hàng tuần</p>
+                              <p className="font-bold text-base leading-tight">{dayLabel}</p>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Hàng tuần</p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <Badge variant="secondary" className="font-mono text-xs">
-                              {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
-                            </Badge>
-                          </div>
+                          <Badge variant="secondary" className="w-full justify-center py-1.5 font-mono text-sm bg-muted/50 text-foreground/80 border-none">
+                            <Clock3 className="size-3.5 mr-2 opacity-60" />
+                            {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
+                          </Badge>
                         </div>
                       )
                     })}
@@ -395,23 +368,31 @@ export default function ClassDetailPage() {
             </CardHeader>
             <CardContent>
               {data.students?.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   {data.students.map((student: StudentItem) => (
                     <div
                       key={student.id}
-                      className="inline-flex items-center gap-2 p-1.5 pr-3 rounded-lg border bg-background/50 hover:border-blue-200 transition-all hover:shadow-sm group/student"
+                      className="flex items-center gap-2 p-2 rounded-xl border bg-background/40 hover:border-blue-300 hover:bg-background transition-all hover:shadow-sm group/student"
                     >
-                      <Avatar className="size-8 border">
+                      <Avatar className="size-8 border-2 border-background shadow-sm">
                         <AvatarImage src={student.avatar} alt={student.name} />
                         <AvatarFallback className="bg-blue-50 text-blue-600 font-bold text-[10px]">
                           {student.name?.substring(0, 2).toUpperCase() || "ST"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium text-foreground whitespace-nowrap group-hover/student:text-blue-600 transition-colors">
-                        {student.name || "N/A"}
-                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-foreground truncate group-hover/student:text-blue-600 transition-colors">
+                          {student.name || "N/A"}
+                        </p>
+                        <p className="text-[9px] text-muted-foreground uppercase tracking-tighter">Học viên</p>
+                      </div>
                     </div>
                   ))}
+                  {data.students.length > 20 && (
+                    <div className="flex items-center justify-center p-2 rounded-xl border border-dashed text-muted-foreground hover:text-primary hover:border-primary transition-all cursor-pointer text-xs font-bold uppercase tracking-tight">
+                      +{data.students.length - 20} học viên khác
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="py-12 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl space-y-2">
@@ -434,76 +415,89 @@ export default function ClassDetailPage() {
                 Giáo viên phụ trách
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               {data.teachers?.length > 0 ? (
-                data.teachers.map((teacher: TeacherItem) => (
-                  <div
-                    key={teacher.id}
-                    className="flex items-center gap-4 p-3 rounded-xl border bg-background/50 hover:border-emerald-200 transition-all hover:shadow-md"
-                  >
-                    <Avatar className="size-12 border-2 border-emerald-100">
-                      <AvatarImage src={teacher.avatar} alt={teacher.name} />
-                      <AvatarFallback className="bg-emerald-50 text-emerald-600 font-bold">
-                        {teacher.name?.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-foreground truncate">{teacher.name}</p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Mail className="size-3" />
-                        {teacher.email || "teacher@goedu.vn"}
-                      </p>
+                <div className="space-y-3">
+                  {data.teachers.map((teacher: TeacherItem) => (
+                    <div
+                      key={teacher.id}
+                      className="flex items-center gap-3 p-2.5 rounded-xl border bg-background/50 hover:border-emerald-200 transition-all hover:shadow-sm"
+                    >
+                      <Avatar className="size-10 border-2 border-emerald-100 shadow-sm">
+                        <AvatarImage src={teacher.avatar} alt={teacher.name} />
+                        <AvatarFallback className="bg-emerald-50 text-emerald-600 font-bold text-xs">
+                          {teacher.name?.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-foreground truncate leading-tight">{teacher.name}</p>
+                        <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Mail className="size-2.5" />
+                          {teacher.email || "teacher@goedu.vn"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
-                <div className="py-6 text-center text-muted-foreground italic border-2 border-dashed rounded-xl">
+                <div className="py-6 text-center text-muted-foreground italic border-2 border-dashed rounded-xl text-sm">
                   Chưa phân công giáo viên
                 </div>
               )}
-
-
             </CardContent>
           </Card>
 
           {/* Quick Actions / Stats */}
-          <Card className="border-none shadow-xl bg-primary text-primary-foreground overflow-hidden group">
-            <CardHeader>
-              <CardTitle className="text-lg">Tóm tắt</CardTitle>
+          <Card className="border-none shadow-xl bg-card/60 backdrop-blur-sm overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary transition-all group-hover:w-2" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-bold text-primary flex items-center gap-2">
+                <div className="size-6 rounded-md bg-primary/10 flex items-center justify-center">
+                  <CheckCircle2 className="size-4" />
+                </div>
+                Tóm tắt lớp học
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-primary-foreground/70 text-sm">Tỷ lệ lấp đầy</p>
-                  <h3 className="text-3xl font-bold">
-                    {Math.round(((data.students?.length || 0) / (data.max_student || 1)) * 100)}%
-                  </h3>
+            <CardContent className="space-y-5">
+              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Tỷ lệ lấp đầy</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-primary">
+                        {Math.round(((data.students?.length || 0) / (data.max_student || 1)) * 100)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <Users className="size-5" />
+                  </div>
                 </div>
-                <Users className="size-10 opacity-20" />
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+                    <span>{data.students?.length || 0} học viên</span>
+                    <span>Tối đa {data.max_student}</span>
+                  </div>
+                  <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-1000 shadow-[0_0_8px_rgba(var(--primary),0.4)]"
+                      style={{ width: `${Math.min(100, ((data.students?.length || 0) / (data.max_student || 1)) * 100)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span>{data.students?.length || 0} / {data.max_student} học viên</span>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center gap-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Trạng thái</p>
+                  <Badge className={`${statusConfig.color} border-none shadow-none text-[11px] font-bold py-0 h-5`}>
+                    {statusConfig.label}
+                  </Badge>
                 </div>
-                <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-white transition-all duration-1000"
-                    style={{ width: `${Math.min(100, ((data.students?.length || 0) / (data.max_student || 1)) * 100)}%` }}
-                  />
-                </div>
-              </div>
-
-              <Separator className="bg-white/10" />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 p-3 rounded-lg text-center">
-                  <p className="text-[10px] text-primary-foreground/70 uppercase font-bold tracking-wider">Trạng thái</p>
-                  <p className="font-semibold capitalize text-sm">{data.status}</p>
-                </div>
-                <div className="bg-white/10 p-3 rounded-lg text-center">
-                  <p className="text-[10px] text-primary-foreground/70 uppercase font-bold tracking-wider">Lịch học</p>
-                  <p className="font-semibold text-sm">{data.class_schedules?.length || 0} buổi/tuần</p>
+                <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center gap-1 text-center">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Lịch học</p>
+                  <p className="font-bold text-sm text-foreground">{data.class_schedules?.length || 0} buổi/tuần</p>
                 </div>
               </div>
             </CardContent>

@@ -1,8 +1,8 @@
 "use client"
 
 import api from "@/lib/axios"
-import { AxiosError } from "axios"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AxiosError } from "axios"
 import { format, isBefore, parseISO, startOfDay } from "date-fns"
 import {
   AlertCircle,
@@ -41,10 +41,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
+import { CourseSelect } from "@/app/admin/(dashboard)/classes/_components/course-select"
+import { SchedulePicker } from "@/app/admin/(dashboard)/classes/_components/schedule-picker"
+import { TeacherSelect } from "@/app/admin/(dashboard)/classes/_components/teacher-select"
 import { useClassStore } from "@/store/class-store"
-import { CourseSelect } from "../../../_components/course-select"
-import { SchedulePicker } from "../../../_components/schedule-picker"
-import { TeacherSelect } from "../../../_components/teacher-select"
 
 const classSchema = z.object({
   class_code: z.string().min(1, "Vui lòng nhập mã lớp"),
@@ -54,10 +54,10 @@ const classSchema = z.object({
   end_day: z.date({
     error: "Vui lòng chọn ngày kết thúc",
   }),
-  max_student: z.coerce.number().min(1, "Sĩ số phải lớn hơn 0"),
+  max_student: z.number().min(1, "Sĩ số phải lớn hơn 0"),
   meeting_url: z.string().url("Link phải là một URL hợp lệ").or(z.literal("")).optional(),
   status: z.enum(["published", "draft", "archived"]),
-  course_id: z.coerce.number({
+  course_id: z.number({
     error: "Vui lòng chọn khóa học",
   }).min(1, "Vui lòng chọn khóa học"),
   class_teachers: z.array(z.object({
@@ -124,14 +124,13 @@ interface ClassFormProps {
 export function ClassForm({ initialData }: ClassFormProps) {
   const params = useParams()
   const router = useRouter()
-  const classId = params.classId as string
+  const classId = params.id as string
 
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [showConfirm, setShowConfirm] = React.useState(false)
 
   const form = useForm<FormValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(classSchema as any),
+    resolver: zodResolver(classSchema),
     defaultValues: {
       class_code: initialData.class_code || "",
       start_day: initialData.start_day ? parseISO(initialData.start_day) : undefined,
@@ -186,7 +185,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
       }
 
       toast.success("Cập nhật lớp học thành công!")
-      router.push(`/admin/courses/${params.id}/classes/${classId}`)
+      router.push(`/classes/${classId}`)
       router.refresh()
     } catch (err: unknown) {
       console.error(err)
@@ -300,7 +299,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
                     type="number"
                     placeholder="VD: 25"
                     className="bg-background/50 focus-visible:ring-primary/20"
-                    {...form.register("max_student")}
+                    {...form.register("max_student", { valueAsNumber: true })}
                   />
                 </FieldContent>
                 <FieldError errors={[{ message: errors.max_student?.message }]} />

@@ -62,6 +62,13 @@ const statusConfig = {
   archived: { label: "Lưu trữ", color: "bg-rose-500/10 text-rose-600 border-rose-200" },
 }
 
+const statusLabels: Record<string, string> = {
+  all: "Tất cả trạng thái",
+  draft: "Bản nháp",
+  published: "Đã xuất bản",
+  archived: "Lưu trữ",
+}
+
 export default function SubjectsPage() {
   const router = useRouter()
   const { hasPermission } = usePermission()
@@ -181,8 +188,8 @@ export default function SubjectsPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/30 backdrop-blur-md">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 items-center">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row flex-wrap items-center justify-start gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên môn học..."
@@ -191,8 +198,13 @@ export default function SubjectsPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-
-            <Select value={status} onValueChange={(val) => setStatus(val ?? "all")}>
+            <Select 
+              value={statusLabels[status]} 
+              onValueChange={(val) => {
+                const key = Object.keys(statusLabels).find(k => statusLabels[k] === val);
+                setStatus(key || "all");
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <Settings2 className="h-4 w-4 text-muted-foreground" />
@@ -200,14 +212,24 @@ export default function SubjectsPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                <SelectItem value="draft">Bản nháp</SelectItem>
-                <SelectItem value="published">Đã xuất bản</SelectItem>
-                <SelectItem value="archived">Lưu trữ</SelectItem>
+                <SelectItem value="Tất cả trạng thái">Tất cả trạng thái</SelectItem>
+                <SelectItem value="Bản nháp">Bản nháp</SelectItem>
+                <SelectItem value="Đã xuất bản">Đã xuất bản</SelectItem>
+                <SelectItem value="Lưu trữ">Lưu trữ</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={category} onValueChange={(val) => setCategory(val ?? "all")}>
+            <Select 
+              value={category === "all" ? "Tất cả danh mục" : categories.find(c => c.slug === category)?.name || "Tất cả danh mục"} 
+              onValueChange={(val) => {
+                if (val === "Tất cả danh mục") {
+                  setCategory("all");
+                } else {
+                  const cat = categories.find(c => c.name === val);
+                  setCategory(cat?.slug || "all");
+                }
+              }}
+            >
               <SelectTrigger className="bg-background border-muted-foreground/20">
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4 text-muted-foreground" />
@@ -215,7 +237,7 @@ export default function SubjectsPage() {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả danh mục</SelectItem>
+                <SelectItem value="Tất cả danh mục">Tất cả danh mục</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.slug} value={cat.name}>
                     {cat.name}
@@ -224,12 +246,14 @@ export default function SubjectsPage() {
               </SelectContent>
             </Select>
 
+            <div className="flex-1"></div>
+
             <Button
               variant="outline"
-              className="w-full bg-background hover:bg-muted transition-colors border-dashed"
+              className="w-full md:w-fit bg-background hover:bg-muted transition-colors border-dashed"
               onClick={resetFilters}
             >
-              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới bộ lọc
+              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
             </Button>
           </div>
         </CardContent>

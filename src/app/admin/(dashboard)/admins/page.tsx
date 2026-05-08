@@ -223,8 +223,8 @@ export default function AdminsPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/30 backdrop-blur-md">
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="relative flex-1 w-full">
+          <div className="flex flex-col md:flex-row items-center justify-end gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên, email hoặc SĐT..."
@@ -234,7 +234,7 @@ export default function AdminsPage() {
               />
             </div>
 
-            <div className="w-full md:w-64">
+            <div className="w-full md:w-48">
               <Select
                 value={statusLabel[status]}
                 onValueChange={(val) => {
@@ -255,20 +255,21 @@ export default function AdminsPage() {
                 </SelectContent>
               </Select>
             </div>
-
-            <Button
-              variant="outline"
-              className="w-full md:w-auto bg-background hover:bg-muted transition-colors border-dashed"
-              onClick={() => {
-                setSearch("");
-                setStatus("all");
-                setCurrentPage(1);
-                setSortBy("created_at");
-                setSortOrder("desc");
-              }}
-            >
-              <RefreshCcw className="mr-2 h-4 w-4" /> Làm mới
-            </Button>
+            <div className="flex items-end justify-end w-full md:w-fit">
+              <Button
+                variant="outline"
+                className="w-full md:w-fit bg-background hover:bg-muted transition-colors border-dashed"
+                onClick={() => {
+                  setSearch("");
+                  setStatus("all");
+                  setCurrentPage(1);
+                  setSortBy("created_at");
+                  setSortOrder("desc");
+                }}
+              >
+                <RefreshCcw className="mr-2 h-4 w-4" /> Làm mới
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -519,20 +520,24 @@ export default function AdminsPage() {
           >
             Trước
           </Button>
-
           <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
-              let pageNum = i + 1;
-              if (lastPage > 5 && currentPage > 3) {
-                pageNum = currentPage - 2 + i;
-                if (pageNum + (4 - i) > lastPage) pageNum = lastPage - (4 - i);
-              }
-              if (pageNum <= 0) return null;
-              if (pageNum > lastPage) return null;
+            {(() => {
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+              const end = Math.min(lastPage, start + maxVisible - 1);
 
-              return (
+              if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+              }
+
+              const pages = [];
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map((pageNum) => (
                 <Button
-                  key={pageNum}
+                  key={`page-${pageNum}`}
                   variant={currentPage === pageNum ? "default" : "ghost"}
                   size="icon"
                   className={cn(
@@ -544,8 +549,8 @@ export default function AdminsPage() {
                 >
                   {pageNum}
                 </Button>
-              );
-            })}
+              ));
+            })()}
           </div>
 
           <Button

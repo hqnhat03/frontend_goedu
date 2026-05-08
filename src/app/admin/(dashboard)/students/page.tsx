@@ -3,6 +3,7 @@
 import { Can } from "@/components/auth/can"
 import { usePermission } from "@/hooks/use-permission"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 import {
   ArrowDown,
   ArrowUp,
@@ -21,7 +22,6 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import { StudentDrawer } from "./_components/StudentDrawer"
 
 import {
@@ -100,6 +100,7 @@ export default function StudentsPage() {
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [page, setPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
   const [meta, setMeta] = React.useState<PaginationMeta | null>(null)
 
   // Debounced search term
@@ -132,6 +133,7 @@ export default function StudentsPage() {
       const params = new URLSearchParams()
 
       params.append("page", page.toString())
+      params.append("limit", pageSize.toString())
       if (debouncedSearch) params.append("q", debouncedSearch)
       if (status !== "all") params.append("status", status)
       if (studentType !== "all") params.append("student_type", studentType)
@@ -156,7 +158,7 @@ export default function StudentsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [debouncedSearch, status, studentType, page, sortBy, sortOrder])
+  }, [debouncedSearch, status, studentType, page, pageSize, sortBy, sortOrder])
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -250,8 +252,8 @@ export default function StudentsPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/40 backdrop-blur-sm">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 items-center">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row flex-wrap items-center justify-end gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên, email, số điện thoại..."
@@ -260,7 +262,6 @@ export default function StudentsPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-
             <Select
               value={statusLabels[status]}
               onValueChange={(val) => {
@@ -280,7 +281,6 @@ export default function StudentsPage() {
                 <SelectItem value="Bị khóa">Bị khóa</SelectItem>
               </SelectContent>
             </Select>
-
             <Select
               value={studentTypeLabels[studentType]}
               onValueChange={(val) => {
@@ -300,16 +300,14 @@ export default function StudentsPage() {
                 <SelectItem value="Nhân viên">Nhân viên</SelectItem>
               </SelectContent>
             </Select>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 bg-background hover:bg-muted transition-colors"
-                onClick={resetFilters}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
-              </Button>
-            </div>
+            <div className="flex-1"></div>
+            <Button
+              variant="outline"
+              className="w-full md:w-fit bg-background hover:bg-muted transition-colors"
+              onClick={resetFilters}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -487,49 +485,83 @@ export default function StudentsPage() {
       </div>
 
       {/* Pagination Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4">
-        <p className="text-sm text-muted-foreground">
-          Hiển thị <strong>{students.length}</strong> trên <strong>{meta?.total || 0}</strong> học sinh
-        </p>
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4 text-sm text-muted-foreground border-t bg-muted/5 rounded-b-xl">
+        <div className="flex items-center gap-4">
+          <p>
+            Hiển thị <strong>{students.length}</strong> / <strong>{meta?.total || 0}</strong> học sinh
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="whitespace-nowrap">Số hàng:</span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(val) => {
+                setPageSize(parseInt(val || "10"))
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="h-8 w-[70px] bg-background">
+                <SelectValue placeholder={pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="shadow-sm"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => setPage(prev => Math.max(1, prev - 1))}
             disabled={page === 1 || isLoading}
+            className="bg-background h-8"
           >
             Trước
           </Button>
           <div className="flex items-center gap-1">
-            {Array.from({ length: meta?.last_page || 1 }, (_, i) => i + 1)
-              .filter((p) => {
-                // Show pages around current page
-                return p === 1 || p === meta?.last_page || Math.abs(p - page) <= 1
-              })
-              .map((p, index, array) => (
-                <React.Fragment key={p}>
-                  {index > 0 && array[index - 1] !== p - 1 && (
-                    <span className="text-muted-foreground px-1">...</span>
+            {(() => {
+              const maxVisible = 5;
+              const lastPage = meta?.last_page || 1;
+              let start = Math.max(1, page - Math.floor(maxVisible / 2));
+              const end = Math.min(lastPage, start + maxVisible - 1);
+
+              if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+              }
+
+              const pages = [];
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map((pageNum) => (
+                <Button
+                  key={`page-${pageNum}`}
+                  variant={page === pageNum ? "default" : "ghost"}
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8 text-xs font-medium",
+                    page === pageNum && "shadow-md shadow-primary/20"
                   )}
-                  <Button
-                    variant={page === p ? "default" : "outline"}
-                    size="sm"
-                    className={`h-8 w-8 p-0 ${page === p ? "shadow-md" : "shadow-sm"}`}
-                    onClick={() => setPage(p)}
-                    disabled={isLoading}
-                  >
-                    {p}
-                  </Button>
-                </React.Fragment>
-              ))}
+                  onClick={() => setPage(pageNum)}
+                  disabled={isLoading}
+                >
+                  {pageNum}
+                </Button>
+              ));
+            })()}
           </div>
+
           <Button
             variant="outline"
             size="sm"
-            className="shadow-sm"
-            onClick={() => setPage((p) => Math.min(meta?.last_page || 1, p + 1))}
-            disabled={page === meta?.last_page || isLoading}
+            onClick={() => setPage(prev => Math.min(meta?.last_page || 1, prev + 1))}
+            disabled={page === (meta?.last_page || 1) || isLoading}
+            className="bg-background h-8"
           >
             Sau
           </Button>

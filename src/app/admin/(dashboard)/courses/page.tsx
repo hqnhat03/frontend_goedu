@@ -15,8 +15,7 @@ import {
   RefreshCw,
   Search,
   Settings2,
-  Trash2,
-  Users,
+  Trash2
 } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
@@ -277,8 +276,8 @@ export default function CoursesPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/30 backdrop-blur-md">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 xl:grid-cols-6 items-center">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row flex-wrap items-center justify-end gap-4">
+            <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên khóa học..."
@@ -287,7 +286,6 @@ export default function CoursesPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-
             <Select
               value={statusLabel[status]}
               onValueChange={(val) => {
@@ -308,7 +306,6 @@ export default function CoursesPage() {
                 <SelectItem value="Lưu trữ">Lưu trữ</SelectItem>
               </SelectContent>
             </Select>
-
             <Select
               value={targetStudentLabel[targetStudent]}
               onValueChange={(val) => {
@@ -328,7 +325,6 @@ export default function CoursesPage() {
                 <SelectItem value="Nhân viên">Nhân viên</SelectItem>
               </SelectContent>
             </Select>
-
             <Select
               value={subject == "all" ? "Tất cả môn học" : subjectMapper[subject]}
               onValueChange={(val) => {
@@ -379,9 +375,10 @@ export default function CoursesPage() {
               </SelectContent>
             </Select>
 
+            <div className="flex-1"></div>
             <Button
               variant="outline"
-              className="w-full bg-background hover:bg-muted transition-colors border-dashed"
+              className="w-full md:w-fit bg-background hover:bg-muted transition-colors border-dashed"
               onClick={resetFilters}
             >
               <RefreshCw className="mr-2 h-4 w-4" /> Làm mới
@@ -535,18 +532,6 @@ export default function CoursesPage() {
                             </Button>
                           </Link>
                         </Can>
-                        <Can permission="class_list">
-                          <Link href={`/courses/${item.id}/classes`}>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-indigo-600 transition-colors"
-                              title="Quản lý lớp học"
-                            >
-                              <Users className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </Can>
                         <Can permission="course_edit">
                           <Link
                             href={`/courses/${item.id}/edit`}
@@ -656,18 +641,23 @@ export default function CoursesPage() {
             Trước
           </Button>
           <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
-              let pageNum = i + 1;
-              if (lastPage > 5 && currentPage > 3) {
-                pageNum = currentPage - 3 + i + 1;
-                if (pageNum > lastPage) pageNum = lastPage - (4 - i);
-              }
-              if (pageNum <= 0) return null;
-              if (pageNum > lastPage) return null;
+            {(() => {
+              const maxVisible = 5;
+              let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+              const end = Math.min(lastPage, start + maxVisible - 1);
 
-              return (
+              if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+              }
+
+              const pages = [];
+              for (let i = start; i <= end; i++) {
+                pages.push(i);
+              }
+
+              return pages.map((pageNum) => (
                 <Button
-                  key={pageNum}
+                  key={`page-${pageNum}`}
                   variant={currentPage === pageNum ? "default" : "ghost"}
                   size="icon"
                   className={cn(
@@ -679,8 +669,8 @@ export default function CoursesPage() {
                 >
                   {pageNum}
                 </Button>
-              );
-            })}
+              ));
+            })()}
           </div>
           <Button
             variant="outline"

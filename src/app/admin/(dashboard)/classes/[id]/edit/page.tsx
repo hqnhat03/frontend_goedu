@@ -20,7 +20,7 @@ import { ClassForm } from "./_components/class-form"
 export default function EditClassPage() {
   const params = useParams()
   const router = useRouter()
-  const classId = params.classId as string
+  const classId = params.id as string
   const { hasPermission } = usePermission()
 
   // Kiểm tra quyền

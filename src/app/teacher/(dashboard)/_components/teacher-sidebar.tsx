@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  Bell,
   BookOpen,
   Calendar,
   ClipboardList,
@@ -29,7 +30,7 @@ import {
 const navItems = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -77,6 +78,11 @@ export function TeacherSidebar() {
       icon: ClipboardList,
     },
     {
+      title: "Thông báo",
+      url: `/classes/${classId}/announcements`,
+      icon: Bell,
+    },
+    {
       title: "Đánh giá",
       url: `/classes/${classId}/evaluations`,
       icon: Star,
@@ -96,8 +102,9 @@ export function TeacherSidebar() {
           </span>
         </Link>
       </SidebarHeader>
-      <SidebarContent className="px-2">
-        <SidebarGroup>
+
+      <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0">
+        <SidebarGroup className="group-data-[collapsible=icon]:p-0">
           {isClassDetail && !isCollapsed && (
             <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 mb-2">
               Chế độ lớp học
@@ -106,11 +113,11 @@ export function TeacherSidebar() {
           <SidebarMenu className="gap-1">
             {isClassDetail ? (
               <>
-                <SidebarMenuItem>
+                <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                   <SidebarMenuButton
                     render={<Link href="/classes" />}
                     tooltip="Quay lại danh sách"
-                    className="h-11 px-3 text-muted-foreground hover:bg-accent hover:text-accent-foreground mb-2 group"
+                    className="h-11 px-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center text-muted-foreground hover:bg-accent hover:text-accent-foreground mb-2 group"
                   >
                     <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-1" />
                     <span className={`font-bold text-xs uppercase tracking-wider ${isCollapsed ? "hidden" : "block"}`}>
@@ -122,13 +129,13 @@ export function TeacherSidebar() {
                 {classSubItems.map((item) => {
                   const isActive = pathname === item.url
                   return (
-                    <SidebarMenuItem key={item.title}>
+                    <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                       <SidebarMenuButton
                         render={<Link href={item.url} />}
                         isActive={isActive}
                         tooltip={item.title}
                         className={`
-                          h-11 px-3 transition-all duration-200 flex items-center gap-3
+                          h-11 px-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center transition-all duration-200 flex items-center gap-3
                           ${isActive
                             ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary font-medium shadow-sm ring-1 ring-primary/20"
                             : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"}
@@ -150,13 +157,13 @@ export function TeacherSidebar() {
               navItems.map((item) => {
                 const isActive = pathname === item.url
                 return (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                     <SidebarMenuButton
                       render={<Link href={item.url} />}
                       isActive={isActive}
                       tooltip={item.title}
                       className={`
-                        h-11 px-3 transition-all duration-200 flex items-center gap-3
+                        h-11 px-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center transition-all duration-200 flex items-center gap-3
                         ${isActive
                           ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary font-medium shadow-sm ring-1 ring-primary/20"
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"}

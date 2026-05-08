@@ -86,19 +86,19 @@ export function StudentSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="relative border-r border-slate-200">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu className="gap-1 p-2">
+      <SidebarContent className="group-data-[collapsible=icon]:px-0">
+        <SidebarGroup className="group-data-[collapsible=icon]:p-0">
+          <SidebarMenu className="gap-1 p-2 group-data-[collapsible=icon]:p-0">
             {itemsToRender.map((item) => (
-              <SidebarMenuItem key={item.title}>
+              <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                 <SidebarMenuButton
                   isActive={pathname === item.url}
                   tooltip={item.title}
-                  className={`h-11 rounded-lg transition-all duration-200 hover:bg-slate-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold`}
+                  className={`h-11 rounded-lg transition-all duration-200 hover:bg-slate-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-semibold group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0`}
                 >
-                  <Link href={item.url} className="flex items-center gap-3 w-full">
+                  <Link href={item.url} className="flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0">
                     <item.icon className="size-5 shrink-0" />
-                    <span className="truncate text-sm">{item.title}</span>
+                    <span className="truncate text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

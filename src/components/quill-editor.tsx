@@ -13,6 +13,7 @@ interface QuillEditorProps {
   onInsertImageReady?: (insertFn: (url: string) => void) => void
   placeholder?: string
   minHeight?: number
+  showImage?: boolean
 }
 
 export function QuillEditor({
@@ -22,6 +23,7 @@ export function QuillEditor({
   onInsertImageReady,
   placeholder = "Nhập nội dung...",
   minHeight = 180,
+  showImage = true,
 }: QuillEditorProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const quillRef = React.useRef<Quill | null>(null)
@@ -46,7 +48,7 @@ export function QuillEditor({
       [{ header: [1, 2, 3, false] }],
       [{ list: "ordered" }, { list: "bullet" }],
       ["link"],
-      ["image"],
+      ...(showImage ? [["image"]] : []),
       ["clean"],
     ]
 
@@ -56,11 +58,11 @@ export function QuillEditor({
       modules: {
         toolbar: {
           container: toolbarOptions,
-          handlers: {
+          handlers: showImage ? {
             image: () => {
               onImageUpload?.()
             },
-          },
+          } : {},
         },
       },
     })

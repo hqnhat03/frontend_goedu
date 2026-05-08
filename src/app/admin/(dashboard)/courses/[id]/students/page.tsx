@@ -44,6 +44,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import {
+    Tabs,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { AssignClassModal } from "./_components/AssignClassModal"
 
@@ -227,22 +232,16 @@ export default function CourseStudentsPage() {
                 </div>
 
                 <Can permission="student_in_course_edit">
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant={filterType === "registered" ? "default" : "outline"}
-                            className={filterType === "registered" ? "shadow-md" : "bg-background"}
-                            onClick={() => setFilterType(filterType === "registered" ? "all" : "registered")}
-                        >
-                            <UserPlus className="mr-2 h-4 w-4" /> Đăng ký
-                        </Button>
-                        <Button
-                            variant={filterType === "arranged" ? "default" : "outline"}
-                            className={filterType === "arranged" ? "shadow-md" : "bg-background"}
-                            onClick={() => setFilterType(filterType === "arranged" ? "all" : "arranged")}
-                        >
-                            <UserCheck className="mr-2 h-4 w-4" /> Đã sắp xếp
-                        </Button>
-                    </div>
+                    <Tabs value={filterType} onValueChange={(v) => setFilterType(v as "registered" | "arranged")} className="w-full sm:w-auto">
+                        <TabsList className="grid w-full grid-cols-2 h-10 p-1 bg-muted/50">
+                            <TabsTrigger value="registered" className="rounded-md transition-all">
+                                <UserPlus className="mr-2 h-4 w-4" /> Đăng ký
+                            </TabsTrigger>
+                            <TabsTrigger value="arranged" className="rounded-md transition-all">
+                                <UserCheck className="mr-2 h-4 w-4" /> Đã sắp xếp
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
                 </Can>
             </div>
 
@@ -315,7 +314,7 @@ export default function CourseStudentsPage() {
                         <TableBody>
                             {isLoading ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-48 text-center">
+                                    <TableCell colSpan={7} className="h-48 text-center">
                                         <div className="flex flex-col items-center justify-center gap-3">
                                             <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent shadow-sm" />
                                             <p className="text-muted-foreground font-medium animate-pulse">Đang tải học sinh...</p>
@@ -324,7 +323,7 @@ export default function CourseStudentsPage() {
                                 </TableRow>
                             ) : filteredStudents.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-48 text-center text-muted-foreground">
+                                    <TableCell colSpan={7} className="h-48 text-center text-muted-foreground">
                                         <div className="flex flex-col items-center justify-center gap-2">
                                             <Users className="h-10 w-10 opacity-20" />
                                             <p>{search ? "Không tìm thấy học sinh nào phù hợp." : "Chưa có học sinh nào tham gia khóa học này."}</p>

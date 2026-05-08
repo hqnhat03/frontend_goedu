@@ -73,6 +73,13 @@ export function middleware(request: NextRequest) {
       url.pathname = newPathname;
       return NextResponse.redirect(url);
     }
+
+    // Redirect root to dashboard
+    if (pathname === '/') {
+      url.pathname = '/dashboard';
+      return NextResponse.redirect(url);
+    }
+
     return handleProtectedDomain('/teacher');
   }
 
