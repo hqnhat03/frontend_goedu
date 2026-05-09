@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -56,8 +56,10 @@ const mapStatus = (status: string): CommonStatus => {
 
 export default function CourseClassesPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const router = useRouter()
   const { hasPermission } = usePermission()
+  const courseName = searchParams.get("course_name") || ""
 
   // Kiểm tra quyền
   React.useEffect(() => {
@@ -133,7 +135,7 @@ export default function CourseClassesPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Danh sách lớp học
+              {courseName ? `Lớp học: ${courseName}` : "Danh sách lớp học"}
             </h1>
             <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
               <span className="font-mono bg-muted px-1.5 py-0.5 rounded-md text-xs">ID Khóa: {params.id}</span>
@@ -145,7 +147,7 @@ export default function CourseClassesPage() {
         <Can permission="class_create">
           <div className="flex items-center gap-3">
             {/* Link to create class within this course context */}
-            <Link href={`/courses/${params.id}/classes/create`}>
+            <Link href={`/admin/courses/${params.id}/classes/create?course_name=${encodeURIComponent(courseName)}`}>
               <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95 whitespace-nowrap">
                 <Plus className="mr-2 h-4 w-4" /> Thêm lớp học
               </Button>

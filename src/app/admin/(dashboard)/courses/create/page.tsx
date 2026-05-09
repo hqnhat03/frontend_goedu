@@ -20,7 +20,7 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import * as React from "react"
-import { Controller, useFieldArray, useForm } from "react-hook-form"
+import { Controller, Resolver, useFieldArray, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { v4 as uuidv4 } from "uuid"
 import * as z from "zod"
@@ -64,16 +64,20 @@ const courseSchema = z.object({
     description: z.string().min(1, "Mô tả khóa học không được để trống"),
     status: z.enum(["draft", "published", "archived"]),
     target_student: z.enum(["student", "teacher", "all"]),
-    price: z.number().min(0, "Giá bán phải lớn hơn hoặc bằng 0"),
-    lesson_count: z.number().optional(),
-    completion_time: z.number().optional(),
-    image_url: z.string().optional(),
-    level_id: z.number().min(1, "Vui lòng chọn trình độ"),
-    subject_id: z.number().min(1, "Vui lòng chọn môn học"),
+    price: z.coerce.number().min(0, "Giá bán phải lớn hơn hoặc bằng 0"),
+    lesson_count: z.coerce.number().min(1, "Số bài học không được để trống"),
+    completion_time: z.coerce.number().min(1, "Thời gian không được để trống"),
+    image_url: z.string().min(1, "Vui lòng tải lên hình ảnh khóa học"),
+    level_id: z.coerce.number({
+        error: "Vui lòng chọn trình độ",
+    }),
+    subject_id: z.coerce.number({
+        error: "Vui lòng chọn môn học",
+    }),
     course_materials: z.array(
         z.object({
             id: z.string(),
-            link_url: z.url("URL không hợp lệ").min(1, "Vui lòng nhập Link URL"),
+            link_url: z.string().url("URL không hợp lệ").min(1, "Vui lòng nhập Link URL"),
         })
     ).optional(),
 })
@@ -104,7 +108,7 @@ export default function CreateCoursePage() {
     const [openSubject, setOpenSubject] = React.useState(false)
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(courseSchema),
+        resolver: zodResolver(courseSchema) as unknown as Resolver<FormValues>,
         defaultValues: {
             name: "",
             description: "",
@@ -211,9 +215,6 @@ export default function CreateCoursePage() {
         }
     }
 
-    // Xem trước hình ảnh
-    const imageUrl = form.watch("image_url")
-
     return (
         <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto pb-10">
             {/* Header */}
@@ -248,7 +249,7 @@ export default function CreateCoursePage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
-                                <Field>
+                                <Field data-invalid={!!form.formState.errors.name}>
                                     <FieldLabel>Tên khóa học <span className="text-destructive">*</span></FieldLabel>
                                     <FieldContent>
                                         <Input
@@ -260,7 +261,7 @@ export default function CreateCoursePage() {
                                     <FieldError errors={[{ message: form.formState.errors.name?.message }]} />
                                 </Field>
 
-                                <Field>
+                                <Field data-invalid={!!form.formState.errors.description}>
                                     <FieldLabel>Mô tả <span className="text-destructive">*</span></FieldLabel>
                                     <FieldContent>
                                         <Textarea
@@ -273,7 +274,7 @@ export default function CreateCoursePage() {
                                 </Field>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Field>
+                                    <Field data-invalid={!!form.formState.errors.subject_id}>
                                         <FieldLabel>Môn học <span className="text-destructive">*</span></FieldLabel>
                                         <FieldContent>
                                             <Controller
@@ -334,7 +335,7 @@ export default function CreateCoursePage() {
                                         <FieldError errors={[{ message: form.formState.errors.subject_id?.message }]} />
                                     </Field>
 
-                                    <Field>
+                                    <Field data-invalid={!!form.formState.errors.level_id}>
                                         <FieldLabel>Trình độ <span className="text-destructive">*</span></FieldLabel>
                                         <FieldContent>
                                             <Controller
@@ -477,71 +478,82 @@ export default function CreateCoursePage() {
                                 <CardDescription>Tải lên hình ảnh đại diện cho khóa học</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    className="hidden"
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
+                                <Controller
+                                    control={form.control}
+                                    name="image_url"
+                                    render={({ field }) => (
+                                        <Field data-invalid={!!form.formState.errors.image_url}>
+                                            <FieldContent>
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleImageUpload}
+                                                />
+
+                                                <div
+                                                    className={cn(
+                                                        "relative group cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all duration-300",
+                                                        "hover:border-primary/50 hover:bg-primary/5",
+                                                        field.value ? "border-primary/20" : "border-muted-foreground/20 py-12",
+                                                        form.formState.errors.image_url && "border-destructive/50"
+                                                    )}
+                                                    onClick={() => !isUploading && fileInputRef.current?.click()}
+                                                >
+                                                    {field.value ? (
+                                                        <div className="relative aspect-[3/4] w-full max-w-[240px] mx-auto">
+                                                            <Image
+                                                                src={field.value}
+                                                                alt="Preview"
+                                                                className="w-full h-full object-cover"
+                                                                width={300}
+                                                                height={400}
+                                                            />
+                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-2">
+                                                                <Upload className="h-8 w-8" />
+                                                                <span className="text-sm font-medium">Thay đổi hình ảnh</span>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground px-6 text-center">
+                                                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
+                                                                <Upload className="h-6 w-6" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-medium text-foreground">Click để tải ảnh lên</p>
+                                                                <p className="text-xs mt-1">PNG, JPG hoặc WebP (Max 2MB)</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {isUploading && (
+                                                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10">
+                                                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                                            <span className="text-sm font-medium">Đang tải lên...</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {field.value && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 mt-2"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            field.onChange("");
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-3.5 w-3.5 mr-2" /> Xóa ảnh
+                                                    </Button>
+                                                )}
+                                            </FieldContent>
+                                            <FieldError errors={[{ message: form.formState.errors.image_url?.message }]} />
+                                        </Field>
+                                    )}
                                 />
-
-                                <div
-                                    className={cn(
-                                        "relative group cursor-pointer rounded-xl overflow-hidden border-2 border-dashed transition-all duration-300",
-                                        "hover:border-primary/50 hover:bg-primary/5",
-                                        imageUrl ? "border-primary/20" : "border-muted-foreground/20 py-12"
-                                    )}
-                                    onClick={() => !isUploading && fileInputRef.current?.click()}
-                                >
-                                    {imageUrl ? (
-                                        <div className="relative aspect-[3/4] w-full max-w-[240px] mx-auto">
-                                            {/* Dùng Image hoặc img tùy nhu cầu, ở đây giữ Image theo user edit gần nhất */}
-                                            <Image
-                                                src={imageUrl}
-                                                alt="Preview"
-                                                className="w-full h-full object-cover"
-                                                width={300}
-                                                height={400}
-                                            />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-2">
-                                                <Upload className="h-8 w-8" />
-                                                <span className="text-sm font-medium">Thay đổi hình ảnh</span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground px-6 text-center">
-                                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                                                <Upload className="h-6 w-6" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-foreground">Click để tải ảnh lên</p>
-                                                <p className="text-xs mt-1">PNG, JPG hoặc WebP (Max 2MB)</p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {isUploading && (
-                                        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10">
-                                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                            <span className="text-sm font-medium">Đang tải lên...</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {imageUrl && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            form.setValue("image_url", "");
-                                        }}
-                                    >
-                                        <Trash2 className="h-3.5 w-3.5 mr-2" /> Xóa ảnh
-                                    </Button>
-                                )}
                             </CardContent>
                         </Card>
 
@@ -554,7 +566,7 @@ export default function CreateCoursePage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
-                                <Field>
+                                <Field data-invalid={!!form.formState.errors.status}>
                                     <FieldLabel>Trạng thái <span className="text-destructive">*</span></FieldLabel>
                                     <FieldContent>
                                         <Controller
@@ -608,7 +620,7 @@ export default function CreateCoursePage() {
                                     <FieldError errors={[{ message: form.formState.errors.status?.message }]} />
                                 </Field>
 
-                                <Field>
+                                <Field data-invalid={!!form.formState.errors.target_student}>
                                     <FieldLabel>Đối tượng <span className="text-destructive">*</span></FieldLabel>
                                     <FieldContent>
                                         <Controller
@@ -650,7 +662,7 @@ export default function CreateCoursePage() {
                                 </Field>
 
                                 <div>
-                                    <Field>
+                                    <Field data-invalid={!!form.formState.errors.price}>
                                         <FieldLabel>Giá bán (VNĐ) <span className="text-destructive">*</span></FieldLabel>
                                         <FieldContent>
                                             <Controller
@@ -658,15 +670,11 @@ export default function CreateCoursePage() {
                                                 name="price"
                                                 render={({ field }) => (
                                                     <Input
-                                                        type="text"
-                                                        inputMode="numeric"
-                                                        placeholder="1,990,000"
+                                                        type="number"
+                                                        placeholder="1990000"
                                                         className="bg-background/50"
-                                                        value={field.value ? Number(field.value).toLocaleString('vi-VN') : ""}
-                                                        onChange={(e) => {
-                                                            const raw = e.target.value.replace(/\D/g, "")
-                                                            field.onChange(raw ? Number(raw) : 0)
-                                                        }}
+                                                        value={field.value}
+                                                        onChange={(e) => { field.onChange(Number(e.target.value)) }}
                                                     />
                                                 )}
                                             />
@@ -676,27 +684,41 @@ export default function CreateCoursePage() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Field>
-                                        <FieldLabel>Số bài học</FieldLabel>
+                                    <Field data-invalid={!!form.formState.errors.lesson_count}>
+                                        <FieldLabel>Số bài học <span className="text-destructive">*</span></FieldLabel>
                                         <FieldContent>
-                                            <Input
-                                                type="number"
-                                                placeholder="VD: 24"
-                                                className="bg-background/50"
-                                                {...form.register("lesson_count")}
+                                            <Controller
+                                                control={form.control}
+                                                name="lesson_count"
+                                                render={({ field }) => (
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="VD: 24"
+                                                        className="bg-background/50"
+                                                        value={field.value}
+                                                        onChange={(e) => { field.onChange(Number(e.target.value)) }}
+                                                    />
+                                                )}
                                             />
                                         </FieldContent>
                                         <FieldError errors={[{ message: form.formState.errors.lesson_count?.message }]} />
                                     </Field>
 
-                                    <Field>
-                                        <FieldLabel>Thời gian (Giờ)</FieldLabel>
+                                    <Field data-invalid={!!form.formState.errors.completion_time}>
+                                        <FieldLabel>Thời gian (Giờ) <span className="text-destructive">*</span></FieldLabel>
                                         <FieldContent>
-                                            <Input
-                                                type="number"
-                                                placeholder="VD: 60"
-                                                className="bg-background/50"
-                                                {...form.register("completion_time")}
+                                            <Controller
+                                                control={form.control}
+                                                name="completion_time"
+                                                render={({ field }) => (
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="VD: 60"
+                                                        className="bg-background/50"
+                                                        value={field.value}
+                                                        onChange={(e) => { field.onChange(Number(e.target.value)) }}
+                                                    />
+                                                )}
                                             />
                                         </FieldContent>
                                         <FieldError errors={[{ message: form.formState.errors.completion_time?.message }]} />

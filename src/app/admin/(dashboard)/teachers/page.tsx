@@ -273,7 +273,16 @@ export default function TeachersPage() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="w-[80px]">Avatar</TableHead>
+              <TableHead
+                className="w-[80px] cursor-pointer hover:bg-muted/80 transition-colors text-center"
+                onClick={() => handleSort("id")}
+              >
+                <div className="flex items-center justify-center">
+                  ID
+                  <SortIcon field="id" />
+                </div>
+              </TableHead>
+              <TableHead className="w-[120px]">Ảnh đại diện</TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-muted/80 transition-colors"
                 onClick={() => handleSort("name")}
@@ -328,13 +337,14 @@ export default function TeachersPage() {
                   <SortIcon field="status" />
                 </div>
               </TableHead>
-              <TableHead className="text-right">Thao tác</TableHead>
+              <TableHead className="text-center">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={cn(isLoading && teachers.length > 0 && "opacity-50 transition-opacity duration-300")}>
             {isLoading && teachers.length === 0 ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
+                  <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
                   <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-40" /></TableCell>
@@ -342,24 +352,27 @@ export default function TeachersPage() {
                   <TableCell><Skeleton className="h-4 w-36" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                  <TableCell className="text-center"><Skeleton className="h-8 w-32 mx-auto rounded-md" /></TableCell>
                 </TableRow>
               ))
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center text-destructive">
+                <TableCell colSpan={9} className="h-24 text-center text-destructive">
                   {error}
                 </TableCell>
               </TableRow>
             ) : teachers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                   Không tìm thấy giáo viên nào.
                 </TableCell>
               </TableRow>
             ) : (
               teachers.map((teacher) => (
                 <TableRow key={teacher.id} className="hover:bg-muted/30 transition-colors">
+                  <TableCell className="text-center">
+                    <div className="text-sm font-medium text-muted-foreground">#{teacher.id}</div>
+                  </TableCell>
                   <TableCell>
                     <Avatar className="h-10 w-10 border shadow-sm">
                       <AvatarImage src={teacher.avatar || undefined} alt={teacher.name} />
@@ -402,8 +415,8 @@ export default function TeachersPage() {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
+                  <TableCell className="text-center">
+                    <div className="flex justify-center gap-1">
                       <Can permission="teacher_detail">
                         <Button
                           variant="ghost"

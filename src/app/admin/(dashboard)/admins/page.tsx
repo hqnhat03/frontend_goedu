@@ -8,15 +8,11 @@ import {
   ChevronsUpDown,
   Edit,
   Eye,
-  Mail,
-  Phone,
   Plus,
   RefreshCcw,
   Search,
   SearchX,
   Trash2,
-  UserCheck,
-  UserX
 } from "lucide-react"
 import * as React from "react"
 
@@ -223,7 +219,7 @@ export default function AdminsPage() {
       {/* Filter Section */}
       <Card className="border-none shadow-sm bg-muted/30 backdrop-blur-md">
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row items-center justify-end gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -255,21 +251,20 @@ export default function AdminsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-end justify-end w-full md:w-fit">
-              <Button
-                variant="outline"
-                className="w-full md:w-fit bg-background hover:bg-muted transition-colors border-dashed"
-                onClick={() => {
-                  setSearch("");
-                  setStatus("all");
-                  setCurrentPage(1);
-                  setSortBy("created_at");
-                  setSortOrder("desc");
-                }}
-              >
-                <RefreshCcw className="mr-2 h-4 w-4" /> Làm mới
-              </Button>
-            </div>
+            <div className="flex-1"></div>
+            <Button
+              variant="outline"
+              className="w-full md:w-fit bg-background hover:bg-muted transition-colors border-dashed"
+              onClick={() => {
+                setSearch("");
+                setStatus("all");
+                setCurrentPage(1);
+                setSortBy("created_at");
+                setSortOrder("desc");
+              }}
+            >
+              <RefreshCcw className="mr-2 h-4 w-4" /> Làm mới
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -287,11 +282,21 @@ export default function AdminsPage() {
             <TableHeader className="bg-muted/30">
               <TableRow>
                 <TableHead
-                  className="w-[280px] cursor-pointer hover:text-primary transition-colors"
+                  className="w-[80px] cursor-pointer hover:text-primary transition-colors text-center"
+                  onClick={() => handleSort("id")}
+                >
+                  <div className="flex items-center justify-center">
+                    ID
+                    <SortIcon field="id" />
+                  </div>
+                </TableHead>
+                <TableHead className="w-[100px]">Ảnh đại diện</TableHead>
+                <TableHead
+                  className="cursor-pointer hover:text-primary transition-colors"
                   onClick={() => handleSort("name")}
                 >
                   <div className="flex items-center">
-                    Quản trị viên
+                    Họ tên
                     <SortIcon field="name" />
                   </div>
                 </TableHead>
@@ -313,7 +318,7 @@ export default function AdminsPage() {
                     <SortIcon field="phone" />
                   </div>
                 </TableHead>
-                <TableHead>Vai trò</TableHead>
+                <TableHead className="w-[150px]">Vai trò</TableHead>
                 <TableHead
                   className="cursor-pointer hover:text-primary transition-colors"
                   onClick={() => handleSort("status")}
@@ -323,24 +328,26 @@ export default function AdminsPage() {
                     <SortIcon field="status" />
                   </div>
                 </TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
+                <TableHead className="text-center">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className={cn(isLoading && admins.length > 0 && "opacity-50 transition-opacity duration-300")}>
               {isLoading && admins.length === 0 ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell><div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="space-y-2"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-24" /></div></div></TableCell>
+                    <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
+                    <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                    <TableCell className="text-center"><Skeleton className="h-8 w-32 mx-auto rounded-md" /></TableCell>
                   </TableRow>
                 ))
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-64 text-center">
+                  <TableCell colSpan={8} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center gap-4 text-destructive">
                       <SearchX className="h-12 w-12 opacity-50" />
                       <p className="font-medium">{error}</p>
@@ -350,7 +357,7 @@ export default function AdminsPage() {
                 </TableRow>
               ) : admins.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-64 text-center">
+                  <TableCell colSpan={8} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground">
                       <SearchX className="h-12 w-12 opacity-30" />
                       <div className="space-y-1">
@@ -371,34 +378,30 @@ export default function AdminsPage() {
               ) : (
                 admins.map((admin) => (
                   <TableRow key={admin.id} className="hover:bg-muted/20 transition-colors group">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10 border-2 border-background shadow-sm ring-1 ring-muted/50 group-hover:ring-primary/30 transition-all">
-                          <AvatarImage src={admin.avatar || ""} alt={admin.name} />
-                          <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                            {admin.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
-                            {admin.name}
-                          </span>
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            ID: #{admin.id}
-                          </span>
-                        </div>
-                      </div>
+                    <TableCell className="text-center">
+                      <div className="text-sm font-medium text-muted-foreground">#{admin.id}</div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer" title="Sao chép email">
-                        <Mail className="h-3.5 w-3.5 text-primary/60" />
+                      <Avatar className="h-10 w-10 border-2 border-background shadow-sm ring-1 ring-muted/50 group-hover:ring-primary/30 transition-all">
+                        <AvatarImage src={admin.avatar || ""} alt={admin.name} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                          {admin.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {admin.name}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer" title="Sao chép email">
                         {admin.email}
                       </div>
                     </TableCell>
                     <TableCell>
                       {admin.phone ? (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Phone className="h-3.5 w-3.5 text-primary/60" />
+                        <div className="text-sm text-muted-foreground">
                           {admin.phone}
                         </div>
                       ) : (
@@ -424,17 +427,17 @@ export default function AdminsPage() {
                     </TableCell>
                     <TableCell>
                       {admin.status === "active" ? (
-                        <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-200 transition-colors cursor-default">
-                          <UserCheck className="h-3 w-3 mr-1" /> Đang hoạt động
+                        <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-200/50 transition-colors cursor-default">
+                          Đang hoạt động
                         </Badge>
                       ) : (
-                        <Badge className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-rose-200 transition-colors cursor-default">
-                          <UserX className="h-3 w-3 mr-1" /> Bị khóa
+                        <Badge variant="secondary" className="bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 border-rose-200/50 transition-colors cursor-default">
+                          Bị khóa
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center">
+                      <div className="flex justify-center gap-1">
                         <Can permission="admin_detail">
                           <Button
                             variant="ghost"

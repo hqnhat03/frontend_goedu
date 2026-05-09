@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/table"
 import api from "@/lib/axios"
 import { toast } from "sonner"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const statusConfig = {
   draft: { label: "Bản nháp", color: "bg-slate-500/10 text-slate-600 border-slate-200" },
@@ -275,22 +276,32 @@ export default function LevelsPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold py-4">Trình độ</TableHead>
+                <TableHead className="font-semibold py-4 pl-6">Trình độ</TableHead>
                 <TableHead className="font-semibold py-4">Cấp học</TableHead>
                 <TableHead className="font-semibold py-4">Trạng thái</TableHead>
-                <TableHead className="text-right font-semibold py-4">Thao tác</TableHead>
+                <TableHead className="text-center font-semibold py-4">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <RefreshCw className="h-8 w-8 animate-spin opacity-20" />
-                      <p>Đang tải dữ liệu...</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="py-4 pl-6">
+                      <Skeleton className="h-5 w-32" />
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <Skeleton className="h-5 w-24" />
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex justify-center">
+                        <Skeleton className="h-8 w-20 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : items.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
@@ -303,13 +314,8 @@ export default function LevelsPage() {
               ) : (
                 items.map((item: Level) => (
                   <TableRow key={item.id} className="group hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium text-foreground/90 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                          <Layers className="size-4" />
-                        </div>
-                        {item.level}
-                      </div>
+                    <TableCell className="font-medium text-foreground/90 py-4 pl-6">
+                      {item.level}
                     </TableCell>
                     <TableCell className="py-4">
                       <Badge variant="outline" className="font-normal bg-muted/50">
@@ -324,8 +330,8 @@ export default function LevelsPage() {
                         {statusConfig[item.status]?.label || item.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right py-4">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center py-4">
+                      <div className="flex justify-center gap-1">
                         <Can permission="level_edit">
                           <LevelFormDrawer level={item} onSuccess={fetchLevels} />
                         </Can>
@@ -369,7 +375,7 @@ export default function LevelsPage() {
                 e.preventDefault()
                 handleDelete()
               }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-destructive/90"
               disabled={isDeleting}
             >
               {isDeleting ? (

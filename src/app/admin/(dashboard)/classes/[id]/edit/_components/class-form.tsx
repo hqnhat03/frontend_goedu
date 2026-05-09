@@ -41,7 +41,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-import { CourseSelect } from "@/app/admin/(dashboard)/classes/_components/course-select"
+
 import { SchedulePicker } from "@/app/admin/(dashboard)/classes/_components/schedule-picker"
 import { TeacherSelect } from "@/app/admin/(dashboard)/classes/_components/teacher-select"
 import { useClassStore } from "@/store/class-store"
@@ -111,6 +111,7 @@ interface InitialClassData {
   meeting_url?: string;
   status?: string;
   course_id?: number;
+  course_name?: string;
   class_teaches?: { id?: string; teacher_id: number }[];
   class_teachers?: { id?: string; teacher_id: number }[];
   class_schedules?: { id?: string; day_of_week: string; start_time?: string; end_time?: string }[];
@@ -138,7 +139,7 @@ export function ClassForm({ initialData }: ClassFormProps) {
       max_student: initialData.max_student || 25,
       meeting_url: initialData.meeting_url || "",
       status: (initialData.status as "draft" | "published" | "archived") || "published",
-      course_id: initialData.course_id || Number(params.id),
+      course_id: initialData.course_id,
       class_teachers: (initialData.class_teaches || initialData.class_teachers || []).map((t) => ({
         id: t.id || uuidv4(),
         teacher_id: t.teacher_id
@@ -233,21 +234,16 @@ export function ClassForm({ initialData }: ClassFormProps) {
                 <FieldError errors={[{ message: errors.class_code?.message }]} />
               </Field>
 
-              <Field data-invalid={!!errors.course_id}>
-                <FieldLabel>Khóa học <span className="text-destructive">*</span></FieldLabel>
+              <Field>
+                <FieldLabel>Khóa học</FieldLabel>
                 <FieldContent>
-                  <Controller
-                    control={form.control}
-                    name="course_id"
-                    render={({ field }) => (
-                      <CourseSelect
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    )}
+                  <Input
+                    value={initialData.course_name}
+                    readOnly
+                    className="bg-muted/50 cursor-default focus-visible:ring-0 border-dashed"
                   />
+                  <input type="hidden" {...form.register("course_id")} />
                 </FieldContent>
-                <FieldError errors={[{ message: errors.course_id?.message }]} />
               </Field>
             </div>
 

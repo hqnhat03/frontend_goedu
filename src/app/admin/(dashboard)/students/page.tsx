@@ -5,10 +5,9 @@ import { usePermission } from "@/hooks/use-permission"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
 import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Calendar,
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
   Edit,
   Eye,
   Plus,
@@ -17,7 +16,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Trash2,
-  Users,
+  Users
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import * as React from "react"
@@ -171,11 +170,11 @@ export default function StudentsPage() {
   }
 
   const getSortIcon = (column: string) => {
-    if (sortBy !== column) return <ArrowUpDown className="ml-2 h-4 w-4" />
+    if (sortBy !== column) return <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
     return sortOrder === "asc" ? (
-      <ArrowUp className="ml-2 h-4 w-4 text-primary" />
+      <ChevronUp className="ml-2 h-4 w-4 text-primary" />
     ) : (
-      <ArrowDown className="ml-2 h-4 w-4 text-primary" />
+      <ChevronDown className="ml-2 h-4 w-4 text-primary" />
     )
   }
 
@@ -317,6 +316,14 @@ export default function StudentsPage() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow className="hover:bg-transparent">
+              <TableHead
+                className="w-[80px] font-semibold cursor-pointer hover:text-primary transition-colors text-center"
+                onClick={() => handleSort("id")}
+              >
+                <div className="flex items-center justify-center">
+                  ID {getSortIcon("id")}
+                </div>
+              </TableHead>
               <TableHead className="w-[120px] font-semibold">Ảnh đại diện</TableHead>
               <TableHead
                 className="font-semibold cursor-pointer hover:text-primary transition-colors"
@@ -358,28 +365,21 @@ export default function StudentsPage() {
                   Trạng thái {getSortIcon("status")}
                 </div>
               </TableHead>
-              <TableHead
-                className="font-semibold cursor-pointer hover:text-primary transition-colors"
-                onClick={() => handleSort("created_at")}
-              >
-                <div className="flex items-center">
-                  Ngày tạo {getSortIcon("created_at")}
-                </div>
-              </TableHead>
-              <TableHead className="text-right font-semibold">Thao tác</TableHead>
+              <TableHead className="text-center font-semibold">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={cn(isLoading && students.length > 0 && "opacity-50 transition-opacity duration-300")}>
             {isLoading && students.length === 0 ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
+                  <TableCell className="text-center"><Skeleton className="h-4 w-10 mx-auto" /></TableCell>
                   <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                  <TableCell className="text-center"><Skeleton className="h-8 w-32 mx-auto rounded-md" /></TableCell>
                 </TableRow>
               ))
             ) : error ? (
@@ -401,6 +401,9 @@ export default function StudentsPage() {
             ) : (
               students.map((student) => (
                 <TableRow key={student.id} className="group hover:bg-muted/40 transition-colors">
+                  <TableCell className="text-center">
+                    <div className="text-sm font-medium text-muted-foreground">#{student.id}</div>
+                  </TableCell>
                   <TableCell>
                     <Avatar className="h-10 w-10 border-2 border-background shadow-sm ring-1 ring-muted">
                       <AvatarImage src={student.avatar} alt={student.name} />
@@ -428,14 +431,8 @@ export default function StudentsPage() {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {student.created_at ? new Date(student.created_at).toLocaleDateString("vi-VN") : "N/A"}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
+                  <TableCell className="text-center">
+                    <div className="flex justify-center gap-1">
                       <Can permission="student_detail">
                         <Button
                           variant="ghost"

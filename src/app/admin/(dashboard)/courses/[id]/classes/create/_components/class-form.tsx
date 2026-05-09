@@ -9,7 +9,7 @@ import {
   Loader2,
   Save,
 } from "lucide-react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -26,12 +26,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-import { AxiosError } from "axios"
-import { CourseSelect } from "@/app/admin/(dashboard)/classes/_components/course-select"
 import { SchedulePicker } from "@/app/admin/(dashboard)/classes/_components/schedule-picker"
 import { TeacherSelect } from "@/app/admin/(dashboard)/classes/_components/teacher-select"
+import { AxiosError } from "axios"
 
-const classSchema = z.object({
+const baseClassSchema = z.object({
   class_code: z.string().min(1, "Vui lòng nhập mã lớp"),
   start_day: z.date({
     error: "Vui lòng chọn ngày bắt đầu",
@@ -55,7 +54,11 @@ const classSchema = z.object({
     id: z.string(),
     teacher_id: z.number()
   })).min(1, "Cần ít nhất 1 giáo viên phụ trách")
-}).superRefine((data, ctx) => {
+})
+
+type FormValues = z.infer<typeof baseClassSchema>
+
+const classSchema = baseClassSchema.superRefine((data, ctx) => {
   if (data.start_day && data.end_day && !isBefore(startOfDay(data.start_day), startOfDay(data.end_day)) && !isBefore(data.start_day, data.end_day)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -64,8 +67,6 @@ const classSchema = z.object({
     })
   }
 })
-
-type FormValues = z.infer<typeof classSchema>
 
 const statusOptions = [
   {
@@ -87,10 +88,34 @@ const statusOptions = [
 
 export function ClassForm() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const router = useRouter()
   const initialCourseId = params?.id as string
+  const [courseName, setCourseName] = React.useState<string>(searchParams.get("course_name") || "")
 
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [isLoadingCourse, setIsLoadingCourse] = React.useState(false)
+
+  // Fetch course name if not in state/query
+  React.useEffect(() => {
+    if (initialCourseId && !courseName) {
+      const fetchCourseName = async () => {
+        setIsLoadingCourse(true)
+        try {
+          const res = await api.get(`/admin/courses/${initialCourseId}`)
+          const data = res.data?.data || res.data
+          if (data?.name) {
+            setCourseName(data.name)
+          }
+        } catch (error) {
+          console.error("Failed to fetch course name:", error)
+        } finally {
+          setIsLoadingCourse(false)
+        }
+      }
+      fetchCourseName()
+    }
+  }, [initialCourseId, courseName])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(classSchema),
@@ -161,22 +186,23 @@ export function ClassForm() {
                 <FieldError errors={[{ message: errors.class_code?.message }]} />
               </Field>
 
-              <Field data-invalid={!!errors.course_id}>
-                <FieldLabel>Khóa học <span className="text-destructive">*</span></FieldLabel>
+              <Field>
+                <FieldLabel>Khóa học</FieldLabel>
                 <FieldContent>
-                  <Controller
-                    control={form.control}
-                    name="course_id"
-                    render={({ field }) => (
-                      <CourseSelect
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={!!initialCourseId}
-                      />
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20 text-primary font-medium">
+                    <BookOpen className="h-4 w-4" />
+                    {isLoadingCourse ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span className="text-sm opacity-70">Đang tải thông tin khóa học...</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm">{courseName || `ID: ${initialCourseId}`}</span>
                     )}
-                  />
+                  </div>
+                  {/* Hidden input to keep form value if needed, though course_id is already in defaultValues */}
+                  <input type="hidden" {...form.register("course_id", { valueAsNumber: true })} />
                 </FieldContent>
-                <FieldError errors={[{ message: errors.course_id?.message }]} />
               </Field>
             </div>
 

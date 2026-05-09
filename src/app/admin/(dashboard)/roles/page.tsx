@@ -45,6 +45,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -227,20 +228,24 @@ export default function RolesPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold py-4">Vai trò (Role)</TableHead>
-                <TableHead className="text-right font-semibold py-4">Thao tác</TableHead>
+                <TableHead className="font-semibold py-4 pl-6">Vai trò</TableHead>
+                <TableHead className="text-center font-semibold py-4">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={2} className="h-32 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <RefreshCw className="h-8 w-8 animate-spin opacity-20" />
-                      <p>Đang tải dữ liệu...</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="py-4 pl-6">
+                      <Skeleton className="h-5 w-32" />
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex justify-center">
+                        <Skeleton className="h-8 w-20 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : filteredItems.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={2} className="h-32 text-center text-muted-foreground">
@@ -253,18 +258,13 @@ export default function RolesPage() {
               ) : (
                 filteredItems.map((item) => (
                   <TableRow key={item.id} className="group hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium text-foreground/90 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                          <Shield className="size-4" />
-                        </div>
-                        {item.name}
-                      </div>
+                    <TableCell className="font-medium text-foreground/90 py-4 pl-6">
+                      {item.name}
                     </TableCell>
-                    <TableCell className="text-right py-4">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center py-4">
+                      <div className="flex justify-center gap-1">
                         {item.name !== "super_admin" && (
-                          <div className="flex justify-end gap-1">
+                          <div className="flex justify-center gap-1">
                             <Can permission="role_edit">
                               <Button
                                 variant="ghost"

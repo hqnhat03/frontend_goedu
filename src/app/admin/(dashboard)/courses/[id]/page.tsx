@@ -28,6 +28,8 @@ import { toast } from "sonner"
 interface CourseDetail {
   id: number
   name: string
+  slug: string
+  description: string
   status: "draft" | "published" | "archived"
   image_url: string
   price: string
@@ -144,7 +146,7 @@ export default function CourseDetailPage() {
 
         <div className="flex items-center gap-3">
           <Can permission="class_list">
-            <Link href={`/courses/${course.id}/classes`}>
+            <Link href={`/admin/courses/${course.id}/classes?course_name=${encodeURIComponent(course.name)}`}>
               <Button variant="outline" className="gap-2 shadow-sm bg-background hover:bg-primary/5 hover:text-primary border-primary/20 transition-all">
                 <LayoutGrid className="h-4 w-4" />
                 Lớp học
@@ -213,10 +215,10 @@ export default function CourseDetailPage() {
                       <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                         <FileText className="h-4 w-4 text-primary" /> Mô tả khóa học
                       </h3>
-                      <p className="text-muted-foreground leading-relaxed">
-                        Khóa học {course.name} cung cấp kiến thức chuyên sâu về {course.subject}, phù hợp với trình độ {course.level}.
-                        Học viên sẽ được tiếp cận với các nội dung thực tế và bài tập ứng dụng cao.
-                      </p>
+                      <div 
+                        className="text-muted-foreground leading-relaxed whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ __html: course.description }}
+                      />
                     </div>
                   </div>
 

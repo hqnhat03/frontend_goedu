@@ -270,6 +270,15 @@ export default function GuardiansPage() {
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow className="hover:bg-transparent">
+              <TableHead
+                className="w-[80px] font-semibold cursor-pointer hover:bg-muted/80 transition-colors text-center"
+                onClick={() => handleSort("id")}
+              >
+                <div className="flex items-center justify-center">
+                  ID
+                  <SortIcon field="id" />
+                </div>
+              </TableHead>
               <TableHead className="w-[120px] font-semibold">Ảnh đại diện</TableHead>
               <TableHead
                 className="font-semibold cursor-pointer hover:bg-muted/80 transition-colors"
@@ -308,25 +317,26 @@ export default function GuardiansPage() {
                   <SortIcon field="status" />
                 </div>
               </TableHead>
-              <TableHead className="text-right font-semibold">Thao tác</TableHead>
+              <TableHead className="text-center font-semibold">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className={cn(isLoading && guardians.length > 0 && "opacity-50 transition-opacity duration-300")}>
             {isLoading && guardians.length === 0 ? (
               Array.from({ length: pageSize }).map((_, i) => (
                 <TableRow key={i}>
+                  <TableCell className="text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
                   <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-24 rounded-full" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                  <TableCell className="text-center"><Skeleton className="h-8 w-32 mx-auto rounded-md" /></TableCell>
                 </TableRow>
               ))
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center">
+                <TableCell colSpan={8} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center gap-2 text-destructive">
                     <ShieldAlert className="h-8 w-8" />
                     <p className="font-semibold">{error}</p>
@@ -336,7 +346,7 @@ export default function GuardiansPage() {
               </TableRow>
             ) : guardians.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <UserCheck className="h-8 w-8 opacity-20" />
                     <p>Không tìm thấy phụ huynh nào phù hợp.</p>
@@ -349,6 +359,9 @@ export default function GuardiansPage() {
               guardians.map((guardian) => (
 
                 <TableRow key={guardian.id} className="group hover:bg-muted/40 transition-colors">
+                  <TableCell className="font-medium text-muted-foreground text-center">
+                    #{guardian.id}
+                  </TableCell>
                   <TableCell>
                     <Avatar className="h-10 w-10 border-2 border-background shadow-sm ring-1 ring-muted">
                       <AvatarImage src={guardian.avatar || undefined} alt={guardian.name} />
@@ -384,8 +397,8 @@ export default function GuardiansPage() {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
+                  <TableCell className="text-center">
+                    <div className="flex justify-center gap-1">
                       <Can permission="guardian_detail">
                         <Button
                           variant="ghost"

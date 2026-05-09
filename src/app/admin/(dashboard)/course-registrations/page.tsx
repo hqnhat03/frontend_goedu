@@ -4,18 +4,13 @@ import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
 import { AxiosError } from "axios"
 import {
-    CheckCircle2,
     ChevronDown,
     ChevronUp,
     ChevronsUpDown,
-    Clock,
     Edit2,
-    Mail,
-    Phone,
     RefreshCcw,
     Search,
     SearchX,
-    XCircle
 } from "lucide-react"
 import * as React from "react"
 import { toast } from "sonner"
@@ -58,7 +53,7 @@ interface CourseRegistration {
     name: string
     email: string
     phone: string
-    status: "pending" | "completed" | "canceled"
+    status: "pending" | "completed" | "cancelled"
     course_name: string
 }
 
@@ -67,17 +62,14 @@ const statusConfig = {
     pending: {
         label: "Chưa xử lý",
         color: "bg-amber-500/10 text-amber-600 border-amber-200",
-        icon: Clock,
     },
     completed: {
         label: "Hoàn Thành",
         color: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-        icon: CheckCircle2,
     },
-    canceled: {
+    cancelled: {
         label: "Hủy",
         color: "bg-rose-500/10 text-rose-600 border-rose-200",
-        icon: XCircle,
     },
 }
 
@@ -207,7 +199,7 @@ export default function CourseRegistrationsPage() {
         "all": "Tất cả trạng thái",
         "pending": "Chưa xử lý",
         "completed": "Hoàn Thành",
-        "canceled": "Hủy",
+        "cancelled": "Hủy",
     }
 
     const handleReset = () => {
@@ -332,7 +324,7 @@ export default function CourseRegistrationsPage() {
                                     <SortIcon field="status" />
                                 </div>
                             </TableHead>
-                            <TableHead className="text-right font-bold">Thao tác</TableHead>
+                            <TableHead className="text-center font-bold">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -344,7 +336,7 @@ export default function CourseRegistrationsPage() {
                                     <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                                     <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                                     <TableCell><div className="flex justify-center"><Skeleton className="h-7 w-24 rounded-full" /></div></TableCell>
-                                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                                    <TableCell className="text-center"><Skeleton className="h-8 w-32 mx-auto rounded-md" /></TableCell>
                                 </TableRow>
                             ))
                         ) : registrations.length === 0 ? (
@@ -367,7 +359,6 @@ export default function CourseRegistrationsPage() {
                         ) : (
                             registrations.map((reg) => {
                                 const config = statusConfig[reg.status]
-                                const StatusIcon = config.icon
                                 return (
                                     <TableRow key={reg.id} className="hover:bg-primary/[0.02] transition-all duration-300 group border-muted/10">
                                         <TableCell>
@@ -379,37 +370,36 @@ export default function CourseRegistrationsPage() {
                                             </span>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground/80">
-                                                <Mail className="h-3.5 w-3.5 text-primary/60" />
+                                            <div className="text-sm text-muted-foreground/80">
                                                 {reg.email}
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground/80">
-                                                <Phone className="h-3.5 w-3.5 text-primary/60" />
+                                            <div className="text-sm text-muted-foreground/80">
                                                 {reg.phone}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Badge className={cn(
-                                                "font-semibold border shadow-sm px-3 py-1 rounded-full transition-all duration-300 group-hover:scale-105",
+                                                "font-bold border shadow-sm px-4 py-1.5 rounded-full transition-all duration-300 group-hover:scale-105 text-sm",
                                                 config.color
                                             )}>
-                                                <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
                                                 {config.label}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-center">
                                             {hasPermission("course_registration_edit") && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-9 w-9 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all active:scale-90 shadow-none"
-                                                    onClick={() => setEditingRegistration(reg)}
-                                                    title="Chỉnh sửa trạng thái"
-                                                >
-                                                    <Edit2 className="h-4 w-4" />
-                                                </Button>
+                                                <div className="flex justify-center">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-9 w-9 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all active:scale-90 shadow-none"
+                                                        onClick={() => setEditingRegistration(reg)}
+                                                        title="Chỉnh sửa trạng thái"
+                                                    >
+                                                        <Edit2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             )}
                                         </TableCell>
                                     </TableRow>
@@ -505,19 +495,44 @@ export default function CourseRegistrationsPage() {
             <Dialog open={!!editingRegistration} onOpenChange={(open) => !open && setEditingRegistration(null)}>
                 <DialogContent className="sm:max-w-[425px] rounded-2xl border-none shadow-xl">
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold">Cập nhật trạng thái</DialogTitle>
+                        <DialogTitle className="text-xl font-bold text-primary">Cập nhật trạng thái</DialogTitle>
                         <DialogDescription className="text-base">
-                            Thay đổi trạng thái đăng ký của <strong>{editingRegistration?.name}</strong>.
+                            Vui lòng kiểm tra kỹ thông tin đăng ký bên dưới trước khi thay đổi trạng thái.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-6 py-4">
+                        {/* Info Section */}
+                        <div className="space-y-3 p-4 rounded-xl bg-muted/40 border border-muted-foreground/10 shadow-inner">
+                            <div className="flex flex-col gap-1.5 pb-2 border-b border-muted-foreground/5">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70">Khóa học đăng ký</span>
+                                <span className="text-sm font-bold text-foreground leading-snug">{editingRegistration?.course_name}</span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70">Khách hàng</span>
+                                    <span className="text-sm font-semibold">{editingRegistration?.name}</span>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70">Số điện thoại</span>
+                                    <span className="text-sm font-semibold text-primary">{editingRegistration?.phone}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-1 pt-1">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70">Địa chỉ Email</span>
+                                <span className="text-sm font-medium text-muted-foreground">{editingRegistration?.email}</span>
+                            </div>
+                        </div>
+
                         <div className="flex flex-col gap-4">
-                            <div className="grid grid-cols-1 gap-3">
+                            <p className="text-sm font-bold text-foreground/80 px-1">Chọn trạng thái xử lý:</p>
+                            <div className="grid grid-cols-3 gap-2">
                                 <Button
                                     variant="outline"
                                     className={cn(
-                                        "justify-start h-14 px-4 border-2 transition-all duration-300 rounded-xl relative overflow-hidden group",
+                                        "flex items-center justify-center h-12 px-2 border-2 transition-all duration-300 rounded-xl relative overflow-hidden group",
                                         selectedStatus === "pending"
                                             ? "border-amber-500 bg-amber-500/5 text-amber-700 shadow-sm"
                                             : "hover:border-muted-foreground/30"
@@ -525,19 +540,13 @@ export default function CourseRegistrationsPage() {
                                     onClick={() => setSelectedStatus("pending")}
                                     disabled={isUpdating}
                                 >
-                                    <div className={cn(
-                                        "flex items-center justify-center h-8 w-8 rounded-lg mr-3 transition-colors",
-                                        selectedStatus === "pending" ? "bg-amber-500 text-white" : "bg-muted group-hover:bg-muted-foreground/10"
-                                    )}>
-                                        <Clock className="h-5 w-5" />
-                                    </div>
-                                    <span className="font-semibold">Chưa xử lý</span>
+                                    <span className="font-bold text-xs leading-tight">Chưa xử lý</span>
                                 </Button>
 
                                 <Button
                                     variant="outline"
                                     className={cn(
-                                        "justify-start h-14 px-4 border-2 transition-all duration-300 rounded-xl relative overflow-hidden group",
+                                        "flex items-center justify-center h-12 px-2 border-2 transition-all duration-300 rounded-xl relative overflow-hidden group",
                                         selectedStatus === "completed"
                                             ? "border-emerald-500 bg-emerald-500/5 text-emerald-700 shadow-md shadow-emerald-500/10"
                                             : "hover:border-muted-foreground/30"
@@ -545,33 +554,21 @@ export default function CourseRegistrationsPage() {
                                     onClick={() => setSelectedStatus("completed")}
                                     disabled={isUpdating}
                                 >
-                                    <div className={cn(
-                                        "flex items-center justify-center h-8 w-8 rounded-lg mr-3 transition-colors",
-                                        selectedStatus === "completed" ? "bg-emerald-500 text-white" : "bg-muted group-hover:bg-muted-foreground/10"
-                                    )}>
-                                        <CheckCircle2 className="h-5 w-5" />
-                                    </div>
-                                    <span className="font-semibold">Hoàn Thành</span>
+                                    <span className="font-bold text-xs leading-tight">Hoàn Thành</span>
                                 </Button>
 
                                 <Button
                                     variant="outline"
                                     className={cn(
-                                        "justify-start h-14 px-4 border-2 transition-all duration-300 rounded-xl relative overflow-hidden group",
-                                        selectedStatus === "canceled"
+                                        "flex items-center justify-center h-12 px-2 border-2 transition-all duration-300 rounded-xl relative overflow-hidden group",
+                                        selectedStatus === "cancelled"
                                             ? "border-rose-500 bg-rose-500/5 text-rose-700 shadow-md shadow-rose-500/10"
                                             : "hover:border-muted-foreground/30"
                                     )}
-                                    onClick={() => setSelectedStatus("canceled")}
+                                    onClick={() => setSelectedStatus("cancelled")}
                                     disabled={isUpdating}
                                 >
-                                    <div className={cn(
-                                        "flex items-center justify-center h-8 w-8 rounded-lg mr-3 transition-colors",
-                                        selectedStatus === "canceled" ? "bg-rose-500 text-white" : "bg-muted group-hover:bg-muted-foreground/10"
-                                    )}>
-                                        <XCircle className="h-5 w-5" />
-                                    </div>
-                                    <span className="font-semibold">Hủy</span>
+                                    <span className="font-bold text-xs leading-tight">Hủy bỏ</span>
                                 </Button>
                             </div>
                         </div>

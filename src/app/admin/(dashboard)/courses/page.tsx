@@ -56,7 +56,6 @@ import { usePermission } from "@/hooks/use-permission"
 import api from "@/lib/axios"
 import { Level } from "@/store/level-store"
 import { Subject } from "@/store/subject-store"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
@@ -394,6 +393,15 @@ export default function CoursesPage() {
             <TableHeader className="bg-muted/50">
               <TableRow className="hover:bg-transparent">
                 <TableHead
+                  className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors text-center"
+                  onClick={() => handleSort("id")}
+                >
+                  <div className="flex items-center justify-center">
+                    ID
+                    <SortIcon field="id" />
+                  </div>
+                </TableHead>
+                <TableHead
                   className="font-semibold py-4 cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => handleSort("name")}
                 >
@@ -438,32 +446,29 @@ export default function CoursesPage() {
                     <SortIcon field="status" />
                   </div>
                 </TableHead>
-                <TableHead className="text-right font-semibold py-4">Thao tác</TableHead>
+                <TableHead className="text-center font-semibold py-4">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className={cn(isLoading && items.length > 0 && "opacity-50 transition-opacity duration-300")}>
               {isLoading && items.length === 0 ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-12 mx-auto" />
+                    </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-lg" />
-                        <div className="space-y-2">
-                          <Skeleton className="h-4 w-40" />
-                          <Skeleton className="h-3 w-20" />
-                        </div>
-                      </div>
+                      <Skeleton className="h-4 w-40" />
                     </TableCell>
                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24 rounded-md" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto rounded-md" /></TableCell>
+                    <TableCell className="text-center"><Skeleton className="h-8 w-32 mx-auto rounded-md" /></TableCell>
                   </TableRow>
                 ))
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-64 text-center">
+                  <TableCell colSpan={7} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center gap-4 text-destructive">
                       <RefreshCw className="h-12 w-12 opacity-50" />
                       <p className="font-medium">{error}</p>
@@ -473,7 +478,7 @@ export default function CoursesPage() {
                 </TableRow>
               ) : items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-64 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="h-64 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-4">
                       <BookOpen className="h-12 w-12 opacity-20" />
                       <div className="space-y-1">
@@ -486,20 +491,11 @@ export default function CoursesPage() {
               ) : (
                 items.map((item) => (
                   <TableRow key={item.id} className="group hover:bg-muted/40 transition-colors">
+                    <TableCell className="py-4 text-center">
+                      <span className="text-sm font-mono text-muted-foreground">{item.id}</span>
+                    </TableCell>
                     <TableCell className="font-medium text-foreground/90 py-4 max-w-[300px]">
-                      <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                          {item.thumbnail ? (
-                            <Image src={item.thumbnail} alt="" className="size-full object-cover rounded-lg" />
-                          ) : (
-                            <BookOpen className="size-5" />
-                          )}
-                        </div>
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="truncate font-semibold">{item.name}</span>
-                          <span className="text-xs text-muted-foreground line-clamp-1">ID: {item.id}</span>
-                        </div>
-                      </div>
+                      <span className="truncate font-semibold">{item.name}</span>
                     </TableCell>
                     <TableCell className="py-4">
                       <span className="text-sm">{item.subject_name || "N/A"}</span>
@@ -518,8 +514,8 @@ export default function CoursesPage() {
                     <TableCell className="py-4">
                       <StatusBadge status={item.status} className="shadow-none rounded-md" />
                     </TableCell>
-                    <TableCell className="text-right py-4">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center py-4">
+                      <div className="flex justify-center gap-1">
                         <Can permission="course_detail">
                           <Link href={`/courses/${item.id}`}>
                             <Button

@@ -44,6 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
 import { toast } from "sonner"
 
@@ -265,22 +266,24 @@ export default function SubjectsPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold py-4">Tên môn học</TableHead>
+                <TableHead className="font-semibold py-4 pl-8">Tên môn học</TableHead>
                 <TableHead className="font-semibold py-4">Danh mục</TableHead>
                 <TableHead className="font-semibold py-4">Trạng thái</TableHead>
-                <TableHead className="text-right font-semibold py-4">Thao tác</TableHead>
+                <TableHead className="text-center font-semibold py-4">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <RefreshCw className="h-8 w-8 animate-spin opacity-20" />
-                      <p>Đang tải dữ liệu...</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="pl-8 py-4">
+                      <Skeleton className="h-4 w-40" />
+                    </TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24 rounded-md" /></TableCell>
+                    <TableCell className="text-center"><Skeleton className="h-8 w-24 mx-auto rounded-md" /></TableCell>
+                  </TableRow>
+                ))
               ) : items.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
@@ -293,13 +296,8 @@ export default function SubjectsPage() {
               ) : (
                 items.map((item: Subject) => (
                   <TableRow key={item.id} className="group hover:bg-muted/40 transition-colors">
-                    <TableCell className="font-medium text-foreground/90 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                          <BookOpen className="size-4" />
-                        </div>
-                        {item.name}
-                      </div>
+                    <TableCell className="font-medium text-foreground/90 py-4 pl-8">
+                      {item.name}
                     </TableCell>
                     <TableCell className="py-4">
                       <Badge variant="outline" className="font-normal bg-muted/50">
@@ -314,8 +312,8 @@ export default function SubjectsPage() {
                         {statusConfig[item.status].label}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right py-4">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center py-4">
+                      <div className="flex justify-center gap-1">
                         <Can permission="subject_edit">
                           <SubjectFormDrawer
                             subject={item}
@@ -372,7 +370,7 @@ export default function SubjectsPage() {
                 e.preventDefault()
                 handleDelete()
               }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-destructive/90"
               disabled={isDeleting}
             >
               {isDeleting ? (
