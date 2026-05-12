@@ -43,29 +43,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { type Admin } from "@/types/AdminType"
+import { type Role } from "@/types/RoleType"
 import { AxiosError } from "axios"
-
-// ─────────────────────────── Types ───────────────────────────
-
-interface Role {
-    id: number
-    name: string
-    guard_name?: string
-}
-
-export interface Admin {
-    id: string | number
-    name: string
-    email: string
-    phone: string | null
-    address: string | null
-    gender: "male" | "female" | "other"
-    date_of_birth: string | null
-    avatar: string | null
-    status: "active" | "inactive"
-    roles: Role[] | string[]
-    created_at?: string
-}
 
 // ─────────────────────────── Schema ───────────────────────────
 
@@ -88,12 +68,43 @@ type AdminFormValues = z.infer<typeof adminSchema>
 interface GenderOptions {
     value: "male" | "female" | "other"
     label: string
+    activeClass: string
 }
 
 const genderOptions: GenderOptions[] = [
-    { value: "male", label: "Nam" },
-    { value: "female", label: "Nữ" },
-    { value: "other", label: "Khác" },
+    {
+        value: "male",
+        label: "Nam",
+        activeClass:
+            "bg-blue-500/10 border-blue-500/50 text-blue-600 dark:bg-blue-950 dark:border-blue-500 dark:text-blue-300",
+    },
+    {
+        value: "female",
+        label: "Nữ",
+        activeClass:
+            "bg-pink-500/10 border-pink-500/50 text-pink-600 dark:bg-pink-950 dark:border-pink-500 dark:text-pink-300",
+    },
+    {
+        value: "other",
+        label: "Khác",
+        activeClass:
+            "bg-gray-500/10 border-gray-500/50 text-gray-600 dark:bg-gray-950 dark:border-gray-500 dark:text-gray-300",
+    },
+]
+
+const statusOptions = [
+    {
+        value: "active",
+        label: "Hoạt động",
+        activeClass:
+            "bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-500 dark:text-emerald-300",
+    },
+    {
+        value: "inactive",
+        label: "Bị khóa",
+        activeClass:
+            "bg-rose-50 border-rose-500 text-rose-700 dark:bg-rose-950 dark:border-rose-500 dark:text-rose-300",
+    },
 ]
 
 function genderLabel(g?: string) {
@@ -107,7 +118,7 @@ type DrawerMode = "create" | "edit" | "view"
 interface AdminDrawerProps {
     mode?: DrawerMode
     admin?: Admin | null
-    onSuccess?: () => void
+    onSuccess?: (data?: Admin) => void
     onClose?: () => void
     trigger?: React.ReactNode
 }
@@ -171,11 +182,15 @@ export function AdminDrawer({
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = React.useRef<HTMLInputElement>(null)
+    const fetchedAdminIdRef = React.useRef<string | number | null>(null)
 
     // Reset + load data when drawer opens
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
-        if (!open) return
+        if (!open) {
+            fetchedAdminIdRef.current = null
+            return
+        }
 
         // Fetch roles if not already fetched
         if (roles.length === 0) {
@@ -190,6 +205,8 @@ export function AdminDrawer({
         }
 
         if ((internalMode === "edit" || internalMode === "view") && admin) {
+            if (fetchedAdminIdRef.current === admin.id) return
+
             setIsFetching(true)
             api.get(`/admin/admins/${admin.id}`)
                 .then((res) => {
@@ -207,6 +224,7 @@ export function AdminDrawer({
                             ? data.roles.map((r: Role) => typeof r === 'string' ? r : r.name)
                             : [],
                     })
+                    fetchedAdminIdRef.current = admin.id
                 })
                 .catch((err) => {
                     toast.error(
@@ -217,6 +235,8 @@ export function AdminDrawer({
                 })
                 .finally(() => setIsFetching(false))
         } else {
+            if (fetchedAdminIdRef.current === "create") return
+
             reset({
                 name: "",
                 email: "",
@@ -227,6 +247,7 @@ export function AdminDrawer({
                 avatar: null,
                 roles: ["admin"],
             })
+            fetchedAdminIdRef.current = "create"
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, internalMode, admin?.id])
@@ -235,15 +256,20 @@ export function AdminDrawer({
         setIsSubmitting(true)
         try {
             if (internalMode === "edit" && admin) {
-                await api.put(`/admin/admins/${admin.id}`, data)
+                const res = await api.put(`/admin/admins/${admin.id}`, data)
+                if (res.data?.success === false)
+                    throw new Error(res.data.message || "Lỗi khi cập nhật")
                 toast.success("Cập nhật quản trị viên thành công!")
+                setInternalMode("view")
+                onSuccess?.(res.data?.data || res.data)
             } else {
-                await api.post("/admin/admins", data)
+                const res = await api.post("/admin/admins", data)
+                if (res.data?.success === false)
+                    throw new Error(res.data.message || "Lỗi khi tạo")
                 toast.success("Thêm quản trị viên thành công!")
+                handleOpenChange(false)
+                onSuccess?.()
             }
-
-            handleOpenChange(false)
-            onSuccess?.()
         } catch (err: unknown) {
             if (err instanceof AxiosError) {
                 toast.error(err.response?.data?.message || "Đã có lỗi xảy ra.")
@@ -362,6 +388,11 @@ export function AdminDrawer({
                                 <DetailRow icon={MapPin} label="Địa chỉ" value={watch("address")} />
                                 <DetailRow icon={User} label="Giới tính" value={genderLabel(watch("gender"))} />
                                 <DetailRow icon={Calendar} label="Ngày sinh" value={watch("date_of_birth")} />
+                                <DetailRow
+                                    icon={Shield}
+                                    label="Trạng thái"
+                                    value={watch("status") === "active" ? "Đang hoạt động" : "Bị khóa"}
+                                />
                             </div>
                             <Separator />
                             <div className="space-y-3">
@@ -416,61 +447,60 @@ export function AdminDrawer({
                                 </FieldContent>
                                 <FieldError errors={[{ message: errors.email?.message }]} />
                             </Field>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Field>
-                                    <FieldLabel>Số điện thoại</FieldLabel>
+                            <Field>
+                                <FieldLabel>Số điện thoại</FieldLabel>
+                                <FieldContent>
                                     <Input {...register("phone")} placeholder="09xx xxx xxx" disabled={isDisabled} />
-                                </Field>
-                                <Field>
-                                    <FieldLabel>Giới tính</FieldLabel>
-                                    <div className="flex gap-2">
-                                        {genderOptions.map((opt) => (
+                                </FieldContent>
+                            </Field>
+                            <Field>
+                                <FieldLabel>Giới tính</FieldLabel>
+                                <div className="flex gap-2">
+                                    {genderOptions.map((opt) => (
+                                        <button
+                                            key={opt.value}
+                                            type="button"
+                                            onClick={() => setValue("gender", opt.value)}
+                                            className={cn(
+                                                "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
+                                                watch("gender") === opt.value ? opt.activeClass : "border-input bg-transparent text-muted-foreground"
+                                            )}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </Field>
+                            <Field>
+                                <FieldLabel>Ngày sinh</FieldLabel>
+                                <FieldContent>
+                                    <Input {...register("date_of_birth")} type="date" disabled={isDisabled} />
+                                </FieldContent>
+                            </Field>
+                            <Field>
+                                <FieldLabel>Trạng thái</FieldLabel>
+                                <div className="flex gap-2">
+                                    {statusOptions.map((opt) => {
+                                        const isSelected = watch("status") === opt.value
+                                        return (
                                             <button
                                                 key={opt.value}
                                                 type="button"
-                                                onClick={() => setValue("gender", opt.value)}
+                                                disabled={isDisabled}
+                                                onClick={() => setValue("status", opt.value as "active" | "inactive", { shouldValidate: true })}
                                                 className={cn(
-                                                    "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
-                                                    watch("gender") === opt.value ? "bg-primary/10 border-primary text-primary" : "border-input bg-transparent text-muted-foreground"
+                                                    "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all disabled:opacity-50",
+                                                    isSelected
+                                                        ? opt.activeClass
+                                                        : "border-input bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                                                 )}
                                             >
                                                 {opt.label}
                                             </button>
-                                        ))}
-                                    </div>
-                                </Field>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Field>
-                                    <FieldLabel>Ngày sinh</FieldLabel>
-                                    <Input {...register("date_of_birth")} type="date" disabled={isDisabled} />
-                                </Field>
-                                <Field>
-                                    <FieldLabel>Trạng thái</FieldLabel>
-                                    <div className="flex gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setValue("status", "active")}
-                                            className={cn(
-                                                "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
-                                                watch("status") === "active" ? "bg-emerald-50 border-emerald-500 text-emerald-700" : "border-input bg-transparent text-muted-foreground"
-                                            )}
-                                        >
-                                            Hoạt động
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setValue("status", "inactive")}
-                                            className={cn(
-                                                "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all",
-                                                watch("status") === "inactive" ? "bg-rose-50 border-rose-500 text-rose-700" : "border-input bg-transparent text-muted-foreground"
-                                            )}
-                                        >
-                                            Bị khóa
-                                        </button>
-                                    </div>
-                                </Field>
-                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </Field>
                             <Field>
                                 <FieldLabel>Địa chỉ</FieldLabel>
                                 <Input {...register("address")} placeholder="Nhập địa chỉ cư trú..." disabled={isDisabled} />
@@ -518,7 +548,7 @@ export function AdminDrawer({
                                 </div>
                                 <FieldError errors={[{ message: errors.roles?.message }]} />
                             </div>
-                            <div className="flex justify-end gap-3 pt-6 border-t mt-8 sticky bottom-0 bg-background pb-2">
+                            <div className="flex justify-end gap-3 pt-6 border-t mt-8">
                                 <Button type="button" variant="ghost" onClick={() => handleOpenChange(false)} disabled={isDisabled}>Hủy</Button>
                                 <Button type="submit" disabled={isDisabled} className="min-w-[120px] shadow-lg shadow-primary/20 transition-all active:scale-95">
                                     {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</> : <><Save className="mr-2 h-4 w-4" /> Lưu</>}

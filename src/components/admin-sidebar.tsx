@@ -6,6 +6,7 @@ import {
   BookOpen,
   ChevronRight,
   GraduationCap,
+  History,
   LayoutDashboard,
   LayoutGrid,
   ListOrdered,
@@ -80,6 +81,12 @@ const navItems = [
     url: "/permissions",
     icon: ShieldCheck,
     permission: "permission_manage",
+  },
+  {
+    title: "Nhật ký hoạt động",
+    url: "/activity-logs",
+    icon: History,
+    permission: "activity_log_list",
   },
   {
     title: "Quản lý chung",

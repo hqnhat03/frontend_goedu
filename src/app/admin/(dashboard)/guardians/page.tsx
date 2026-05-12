@@ -22,16 +22,7 @@ import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDeleteModal } from "@/components/shared/ConfirmDeleteModal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -54,7 +45,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useDebounce } from "@/hooks/use-debounce"
-import { Guardian, GuardianDrawer } from "./_components/GuardianDrawer"
+import { GuardianDrawer } from "./_components/GuardianDrawer"
+import { type Guardian } from "@/types/GuardianType"
 
 export default function GuardiansPage() {
   const router = useRouter()
@@ -173,7 +165,9 @@ export default function GuardiansPage() {
 
       if (result.success) {
         toast.success(result.message || "Xóa phụ huynh thành công")
-        fetchGuardians() // Refresh list
+        // Xóa khỏi danh sách local
+        setGuardians(prev => prev.filter(g => g.id !== (result.data || guardianToDelete.id)))
+        setTotalItems(prev => Math.max(0, prev - 1))
       } else {
         throw new Error(result.message || "Không thể xóa phụ huynh")
       }
@@ -525,45 +519,28 @@ export default function GuardiansPage() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="glass-morphism border-rose-100 ring-4 ring-rose-50/50">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-rose-600">
-              <ShieldAlert className="h-5 w-5" />
-              Xác nhận xóa phụ huynh
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-base pt-2">
-              Bạn có chắc chắn muốn xóa phụ huynh <strong>{guardianToDelete?.name}</strong>?
-              <br />
-              Hành động này sẽ xóa vĩnh viễn dữ liệu và không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2 sm:gap-0">
-            <AlertDialogCancel disabled={isDeleting} className="bg-muted/50 border-none hover:bg-muted">Hủy</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleConfirmDelete()
-              }}
-              disabled={isDeleting}
-              className="bg-destructive text-white hover:bg-destructive/90 shadow-lg shadow-rose-200 transition-all active:scale-95"
-            >
-              {isDeleting ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Đang xóa...
-                </div>
-              ) : "Xác nhận xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteModal
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        title="Xác nhận xóa phụ huynh"
+        itemName={guardianToDelete?.name}
+      />
 
       {/* Guardian Drawer */}
       <GuardianDrawer
         mode={drawerMode}
         guardian={selectedGuardian}
-        onSuccess={fetchGuardians}
+        onSuccess={(data?: Guardian) => {
+          if (data) {
+            setGuardians(prev => prev.map(g => g.id == data.id ? { ...g, ...data } : g))
+            setSelectedGuardian(prev => prev && prev.id == data.id ? { ...prev, ...data } : prev)
+            setDrawerMode("view")
+          } else {
+            fetchGuardians()
+          }
+        }}
         onClose={() => {
           setDrawerMode(undefined)
           setSelectedGuardian(null)

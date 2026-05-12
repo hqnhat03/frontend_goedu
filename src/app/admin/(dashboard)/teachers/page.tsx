@@ -16,16 +16,7 @@ import {
 import * as React from "react"
 
 import { Can } from "@/components/auth/can"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDeleteModal } from "@/components/shared/ConfirmDeleteModal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -50,9 +41,10 @@ import {
 import { useDebounce } from "@/hooks/use-debounce"
 import { usePermission } from "@/hooks/use-permission"
 import api from "@/lib/axios"
+import { Teacher } from "@/types/TeacherType"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Teacher, TeacherDrawer } from "./_components/TeacherDrawer"
+import { TeacherDrawer } from "./_components/TeacherDrawer"
 
 export default function TeachersPage() {
   const router = useRouter()
@@ -117,8 +109,9 @@ export default function TeachersPage() {
 
       if (response.data.success) {
         toast.success(response.data.message || "Xóa giáo viên thành công")
-        // Refresh the list
-        fetchTeachers()
+        // Xóa khỏi danh sách local
+        setTeachers(prev => prev.filter(t => t.id !== (response.data.data || teacherToDelete.id)))
+        setTotalItems(prev => Math.max(0, prev - 1))
       } else {
         throw new Error(response.data.message || "Không thể xóa giáo viên")
       }
@@ -407,7 +400,7 @@ export default function TeachersPage() {
                   <TableCell>
                     {teacher.status === "active" ? (
                       <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200/50 hover:bg-emerald-500/20">
-                        Hoạt động
+                        Đang hoạt động
                       </Badge>
                     ) : (
                       <Badge variant="secondary" className="bg-rose-500/10 text-rose-600 border-rose-200/50 hover:bg-rose-500/20">
@@ -550,35 +543,26 @@ export default function TeachersPage() {
           setDrawerMode(undefined)
           setSelectedTeacher(null)
         }}
-        onSuccess={() => {
-          fetchTeachers()
+        onSuccess={(data?: Teacher) => {
+          if (data) {
+            setTeachers(prev => prev.map(t => t.id == data.id ? { ...t, ...data } : t))
+            setSelectedTeacher(prev => prev && prev.id == data.id ? { ...prev, ...data } : prev)
+            setDrawerMode("view")
+          } else {
+            fetchTeachers()
+          }
         }}
       />
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận xóa giáo viên</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bạn có chắc chắn muốn xóa giáo viên <strong>{teacherToDelete?.name}</strong>?
-              Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleConfirmDelete()
-              }}
-              disabled={isDeleting}
-              className="bg-destructive text-white hover:bg-destructive/90 transition-colors"
-            >
-              {isDeleting ? "Đang xóa..." : "Xác nhận xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteModal
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        title="Xác nhận xóa giáo viên"
+        itemName={teacherToDelete?.name}
+      />
     </div>
   )
 }

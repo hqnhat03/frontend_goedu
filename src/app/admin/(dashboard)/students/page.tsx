@@ -21,18 +21,10 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
+import { Student } from "@/types/StudentType"
 import { StudentDrawer } from "./_components/StudentDrawer"
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDeleteModal } from "@/components/shared/ConfirmDeleteModal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -56,23 +48,8 @@ import {
 } from "@/components/ui/table"
 import { useDebounce } from "@/hooks/use-debounce"
 
-interface Student {
-  id: string | number
-  student_type: "student" | "employee"
-  name: string
-  email: string
-  phone: string
-  status: "active" | "inactive"
-  avatar: string
-  created_at: string
-}
 
-interface PaginationMeta {
-  total: number
-  per_page: number
-  current_page: number
-  last_page: number
-}
+
 
 export default function StudentsPage() {
   const router = useRouter()
@@ -98,9 +75,10 @@ export default function StudentsPage() {
   const [students, setStudents] = React.useState<Student[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-  const [page, setPage] = React.useState(1)
+  const [currentPage, setCurrentPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(10)
-  const [meta, setMeta] = React.useState<PaginationMeta | null>(null)
+  const [totalItems, setTotalItems] = React.useState(0)
+  const [lastPage, setLastPage] = React.useState(1)
 
   // Debounced search term
   const debouncedSearch = useDebounce(search, 300)
@@ -131,7 +109,7 @@ export default function StudentsPage() {
     try {
       const params = new URLSearchParams()
 
-      params.append("page", page.toString())
+      params.append("page", currentPage.toString())
       params.append("limit", pageSize.toString())
       if (debouncedSearch) params.append("q", debouncedSearch)
       if (status !== "all") params.append("status", status)
@@ -144,9 +122,8 @@ export default function StudentsPage() {
 
       if (result.success && Array.isArray(result.data)) {
         setStudents(result.data)
-        if (result.meta) {
-          setMeta(result.meta)
-        }
+        setTotalItems(result.meta?.total || result.total || 0)
+        setLastPage(result.meta?.last_page || result.last_page || 1)
       } else {
         throw new Error(result.message || "Lỗi khi lấy dữ liệu")
       }
@@ -157,7 +134,7 @@ export default function StudentsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [debouncedSearch, status, studentType, page, pageSize, sortBy, sortOrder])
+  }, [debouncedSearch, status, studentType, currentPage, pageSize, sortBy, sortOrder])
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -166,7 +143,7 @@ export default function StudentsPage() {
       setSortBy(column)
       setSortOrder("desc")
     }
-    setPage(1)
+    setCurrentPage(1)
   }
 
   const getSortIcon = (column: string) => {
@@ -179,7 +156,7 @@ export default function StudentsPage() {
   }
 
   React.useEffect(() => {
-    setPage(1)
+    setCurrentPage(1)
   }, [debouncedSearch, status, studentType])
 
   React.useEffect(() => {
@@ -201,7 +178,9 @@ export default function StudentsPage() {
 
       if (result.success) {
         toast.success(result.message || "Xóa học sinh thành công")
-        fetchStudents() // Refresh list
+        // Xóa khỏi danh sách local
+        setStudents(prev => prev.filter(s => s.id !== (result.data || studentToDelete.id)))
+        setTotalItems(prev => Math.max(0, prev - 1))
       } else {
         throw new Error(result.message || "Không thể xóa học sinh")
       }
@@ -406,7 +385,7 @@ export default function StudentsPage() {
                   </TableCell>
                   <TableCell>
                     <Avatar className="h-10 w-10 border-2 border-background shadow-sm ring-1 ring-muted">
-                      <AvatarImage src={student.avatar} alt={student.name} />
+                      <AvatarImage src={student.avatar || undefined} alt={student.name} />
                       <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
                         {student.name?.split(" ").pop()?.substring(0, 2).toUpperCase() || "HS"}
                       </AvatarFallback>
@@ -485,7 +464,7 @@ export default function StudentsPage() {
       <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4 text-sm text-muted-foreground border-t bg-muted/5 rounded-b-xl">
         <div className="flex items-center gap-4">
           <p>
-            Hiển thị <strong>{students.length}</strong> / <strong>{meta?.total || 0}</strong> học sinh
+            Hiển thị <strong>{students.length}</strong> / <strong>{totalItems}</strong> học sinh
           </p>
           <div className="flex items-center gap-2">
             <span className="whitespace-nowrap">Số hàng:</span>
@@ -493,7 +472,7 @@ export default function StudentsPage() {
               value={pageSize.toString()}
               onValueChange={(val) => {
                 setPageSize(parseInt(val || "10"))
-                setPage(1)
+                setCurrentPage(1)
               }}
             >
               <SelectTrigger className="h-8 w-[70px] bg-background">
@@ -513,8 +492,8 @@ export default function StudentsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPage(prev => Math.max(1, prev - 1))}
-            disabled={page === 1 || isLoading}
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1 || isLoading}
             className="bg-background h-8"
           >
             Trước
@@ -522,8 +501,7 @@ export default function StudentsPage() {
           <div className="flex items-center gap-1">
             {(() => {
               const maxVisible = 5;
-              const lastPage = meta?.last_page || 1;
-              let start = Math.max(1, page - Math.floor(maxVisible / 2));
+              let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
               const end = Math.min(lastPage, start + maxVisible - 1);
 
               if (end - start + 1 < maxVisible) {
@@ -538,13 +516,13 @@ export default function StudentsPage() {
               return pages.map((pageNum) => (
                 <Button
                   key={`page-${pageNum}`}
-                  variant={page === pageNum ? "default" : "ghost"}
+                  variant={currentPage === pageNum ? "default" : "ghost"}
                   size="icon"
                   className={cn(
                     "h-8 w-8 text-xs font-medium",
-                    page === pageNum && "shadow-md shadow-primary/20"
+                    currentPage === pageNum && "shadow-md shadow-primary/20"
                   )}
-                  onClick={() => setPage(pageNum)}
+                  onClick={() => setCurrentPage(pageNum)}
                   disabled={isLoading}
                 >
                   {pageNum}
@@ -556,8 +534,8 @@ export default function StudentsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPage(prev => Math.min(meta?.last_page || 1, prev + 1))}
-            disabled={page === (meta?.last_page || 1) || isLoading}
+            onClick={() => setCurrentPage(prev => Math.min(lastPage, prev + 1))}
+            disabled={currentPage === lastPage || isLoading}
             className="bg-background h-8"
           >
             Sau
@@ -566,39 +544,14 @@ export default function StudentsPage() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="glass-morphism border-rose-100 ring-4 ring-rose-50/50">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-rose-600">
-              <ShieldAlert className="h-5 w-5" />
-              Xác nhận xóa học sinh
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-base pt-2">
-              Bạn có chắc chắn muốn xóa học sinh <strong>{studentToDelete?.name}</strong>?
-              <br />
-              Hành động này sẽ xóa vĩnh viễn dữ liệu và không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2 sm:gap-0">
-            <AlertDialogCancel disabled={isDeleting} className="bg-muted/50 border-none hover:bg-muted">Hủy</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleConfirmDelete()
-              }}
-              disabled={isDeleting}
-              className="bg-destructive text-white hover:bg-destructive/90 shadow-lg shadow-rose-200 transition-all active:scale-95"
-            >
-              {isDeleting ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Đang xóa...
-                </div>
-              ) : "Xác nhận xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteModal
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        title="Xác nhận xóa học sinh"
+        itemName={studentToDelete?.name}
+      />
 
       {/* Student Drawer */}
       <StudentDrawer
@@ -608,8 +561,13 @@ export default function StudentsPage() {
           setDrawerMode(undefined)
           setSelectedStudentId(null)
         }}
-        onSuccess={() => {
-          fetchStudents()
+        onSuccess={(data?: Student) => {
+          if (data) {
+            setStudents(prev => prev.map(s => s.id == data.id ? { ...s, ...data } : s))
+            setDrawerMode("view")
+          } else {
+            fetchStudents()
+          }
         }}
       />
     </div>

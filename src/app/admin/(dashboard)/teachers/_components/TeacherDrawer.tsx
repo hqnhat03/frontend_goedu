@@ -17,8 +17,6 @@ import {
     MapPin,
     Phone,
     Save,
-    ShieldAlert,
-    ShieldCheck,
     User,
     Users
 } from "lucide-react"
@@ -52,26 +50,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { Teacher } from "@/types/TeacherType"
 import { AxiosError } from "axios"
-
-// ─────────────────────────── Types ───────────────────────────
-
-export interface Teacher {
-    id: number | string
-    name: string
-    email: string
-    phone: string
-    address?: string
-    gender?: string
-    nationality?: string
-    expertise?: string
-    experience?: string
-    target_student?: string
-    status: "active" | "inactive"
-    date_of_birth?: string
-    avatar?: string | null
-    bio?: string
-}
 
 // ─────────────────────────── Schema ───────────────────────────
 
@@ -100,9 +80,24 @@ type TeacherFormValues = z.infer<typeof teacherSchema>
 // ─────────────────────────── Helpers ───────────────────────────
 
 const genderOptions = [
-    { value: "male", label: "Nam" },
-    { value: "female", label: "Nữ" },
-    { value: "other", label: "Khác" },
+    {
+        value: "male",
+        label: "Nam",
+        activeClass:
+            "bg-blue-500/10 border-blue-500/50 text-blue-600 dark:bg-blue-950 dark:border-blue-500 dark:text-blue-300",
+    },
+    {
+        value: "female",
+        label: "Nữ",
+        activeClass:
+            "bg-pink-500/10 border-pink-500/50 text-pink-600 dark:bg-pink-950 dark:border-pink-500 dark:text-pink-300",
+    },
+    {
+        value: "other",
+        label: "Khác",
+        activeClass:
+            "bg-gray-500/10 border-gray-500/50 text-gray-600 dark:bg-gray-950 dark:border-gray-500 dark:text-gray-300",
+    },
 ]
 
 const statusOptions = [
@@ -114,7 +109,7 @@ const statusOptions = [
     },
     {
         value: "inactive",
-        label: "Tạm khóa",
+        label: "Bị khóa",
         activeClass:
             "bg-rose-50 border-rose-500 text-rose-700 dark:bg-rose-950 dark:border-rose-500 dark:text-rose-300",
     },
@@ -140,7 +135,7 @@ interface TeacherDrawerProps {
     /** Required for edit / view */
     teacher?: Teacher | null
     /** Callback after successful create/edit */
-    onSuccess?: () => void
+    onSuccess?: (data?: Teacher) => void
     onClose?: () => void
     /** Custom trigger element — wrapping will open the drawer.
      *  If omitted, you must control open state externally via `mode`. */
@@ -199,6 +194,7 @@ export function TeacherDrawer({
         formState: { errors },
         reset,
         watch,
+        setValue,
     } = form
 
     const currentAvatar = watch("avatar")
@@ -207,12 +203,18 @@ export function TeacherDrawer({
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = React.useRef<HTMLInputElement>(null)
+    const fetchedTeacherIdRef = React.useRef<string | number | null>(null)
 
     // Reset + load data when drawer opens
     useEffect(() => {
-        if (!open) return
+        if (!open) {
+            fetchedTeacherIdRef.current = null
+            return
+        }
 
         if ((internalMode === "edit" || internalMode === "view") && teacher) {
+            if (fetchedTeacherIdRef.current === teacher.id) return
+
             setIsFetching(true)
             api.get(`/admin/teachers/${teacher.id}`)
                 .then((res) => {
@@ -234,6 +236,7 @@ export function TeacherDrawer({
                         avatar: data.avatar || "",
                         bio: data.bio || "",
                     })
+                    fetchedTeacherIdRef.current = teacher.id
                 })
                 .catch((err) => {
                     toast.error(
@@ -244,6 +247,8 @@ export function TeacherDrawer({
                 })
                 .finally(() => setIsFetching(false))
         } else {
+            if (fetchedTeacherIdRef.current === "create") return
+
             reset({
                 name: "",
                 email: "",
@@ -259,6 +264,7 @@ export function TeacherDrawer({
                 avatar: "",
                 bio: "",
             })
+            fetchedTeacherIdRef.current = "create"
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, internalMode, teacher?.id])
@@ -276,16 +282,17 @@ export function TeacherDrawer({
                 if (res.data?.success === false)
                     throw new Error(res.data.message || "Lỗi khi cập nhật")
                 toast.success("Cập nhật giáo viên thành công!")
+                setInternalMode("view")
+                onSuccess?.(res.data?.data || res.data)
             } else {
                 const res = await api.post("/admin/teachers", payload)
                 if (res.data?.success === false)
                     throw new Error(res.data.message || "Lỗi khi tạo")
                 toast.success("Thêm giáo viên thành công!")
                 reset()
+                handleOpenChange(false)
+                onSuccess?.()
             }
-
-            handleOpenChange(false)
-            onSuccess?.()
         } catch (err: unknown) {
             if (err instanceof AxiosError) {
                 const msg = err.response?.data?.message || "Đã có lỗi xảy ra."
@@ -508,7 +515,7 @@ export function TeacherDrawer({
                                             value={
                                                 watch("date_of_birth")
                                                     ? format(
-                                                        watch("date_of_birth"),
+                                                        new Date(watch("date_of_birth")),
                                                         "dd/MM/yyyy"
                                                     )
                                                     : undefined
@@ -654,107 +661,103 @@ export function TeacherDrawer({
                                     />
                                 </Field>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    {/* Email */}
-                                    <Field data-invalid={!!errors.email}>
-                                        <FieldLabel>
-                                            Email <span className="text-destructive">*</span>
-                                        </FieldLabel>
-                                        <FieldContent>
-                                            <Input
-                                                {...register("email")}
-                                                type="email"
-                                                placeholder="VD: giaovien@gmail.com"
-                                                disabled={isDisabled}
-                                                className="focus-visible:ring-primary/30"
-                                            />
-                                        </FieldContent>
-                                        <FieldError
-                                            errors={[
-                                                { message: errors.email?.message },
-                                            ]}
+                                {/* Email */}
+                                <Field data-invalid={!!errors.email}>
+                                    <FieldLabel>
+                                        Email <span className="text-destructive">*</span>
+                                    </FieldLabel>
+                                    <FieldContent>
+                                        <Input
+                                            {...register("email")}
+                                            type="email"
+                                            placeholder="VD: giaovien@gmail.com"
+                                            disabled={isDisabled}
+                                            className="focus-visible:ring-primary/30"
                                         />
-                                    </Field>
+                                    </FieldContent>
+                                    <FieldError
+                                        errors={[
+                                            { message: errors.email?.message },
+                                        ]}
+                                    />
+                                </Field>
 
-                                    {/* Số điện thoại */}
-                                    <Field data-invalid={!!errors.phone}>
-                                        <FieldLabel>
-                                            Số điện thoại <span className="text-destructive">*</span>
-                                        </FieldLabel>
-                                        <FieldContent>
-                                            <Input
-                                                {...register("phone")}
-                                                placeholder="VD: 0789123456"
-                                                disabled={isDisabled}
-                                                className="focus-visible:ring-primary/30"
-                                            />
-                                        </FieldContent>
-                                        <FieldError
-                                            errors={[
-                                                { message: errors.phone?.message },
-                                            ]}
+                                {/* Số điện thoại */}
+                                <Field data-invalid={!!errors.phone}>
+                                    <FieldLabel>
+                                        Số điện thoại <span className="text-destructive">*</span>
+                                    </FieldLabel>
+                                    <FieldContent>
+                                        <Input
+                                            {...register("phone")}
+                                            placeholder="VD: 0789123456"
+                                            disabled={isDisabled}
+                                            className="focus-visible:ring-primary/30"
                                         />
-                                    </Field>
-                                </div>
+                                    </FieldContent>
+                                    <FieldError
+                                        errors={[
+                                            { message: errors.phone?.message },
+                                        ]}
+                                    />
+                                </Field>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    {/* Ngày sinh */}
-                                    <Field data-invalid={!!errors.date_of_birth}>
-                                        <FieldLabel>
-                                            Ngày sinh <span className="text-destructive">*</span>
-                                        </FieldLabel>
-                                        <FieldContent>
-                                            <Input
-                                                type="date"
-                                                {...register("date_of_birth")}
-                                                disabled={isDisabled}
-                                                className="focus-visible:ring-primary/30"
-                                            />
-                                        </FieldContent>
-                                        <FieldError
-                                            errors={[
-                                                { message: errors.date_of_birth?.message },
-                                            ]}
+                                {/* Ngày sinh */}
+                                <Field data-invalid={!!errors.date_of_birth}>
+                                    <FieldLabel>
+                                        Ngày sinh <span className="text-destructive">*</span>
+                                    </FieldLabel>
+                                    <FieldContent>
+                                        <Input
+                                            type="date"
+                                            {...register("date_of_birth")}
+                                            disabled={isDisabled}
+                                            className="focus-visible:ring-primary/30"
                                         />
-                                    </Field>
+                                    </FieldContent>
+                                    <FieldError
+                                        errors={[
+                                            { message: errors.date_of_birth?.message },
+                                        ]}
+                                    />
+                                </Field>
 
-                                    {/* Giới tính */}
-                                    <Field data-invalid={!!errors.gender}>
-                                        <FieldLabel>
-                                            Giới tính <span className="text-destructive">*</span>
-                                        </FieldLabel>
-                                        <FieldContent>
-                                            <div className="flex gap-2">
-                                                {genderOptions.map((opt) => {
-                                                    const isSelected = watch("gender") === opt.value
-                                                    return (
-                                                        <button
-                                                            key={opt.value}
-                                                            type="button"
-                                                            disabled={isDisabled}
-                                                            onClick={() =>
-                                                                form.setValue("gender", opt.value, { shouldValidate: true })
-                                                            }
-                                                            className={cn(
-                                                                "flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition-all disabled:opacity-50",
-                                                                isSelected
-                                                                    ? "bg-primary/10 border-primary text-primary"
-                                                                    : "border-input bg-transparent text-muted-foreground hover:bg-muted"
-                                                            )}
-                                                        >
-                                                            {opt.label}
-                                                        </button>
-                                                    )
-                                                })}
-                                            </div>
-                                        </FieldContent>
-                                        <FieldError
-                                            errors={[
-                                                { message: errors.gender?.message },
-                                            ]}
-                                        />
-                                    </Field>
-                                </div>
+                                {/* Giới tính */}
+                                <Field data-invalid={!!errors.gender}>
+                                    <FieldLabel>
+                                        Giới tính <span className="text-destructive">*</span>
+                                    </FieldLabel>
+                                    <FieldContent>
+                                        <div className="flex gap-2">
+                                            {genderOptions.map((opt) => {
+                                                const isSelected = watch("gender") === opt.value
+                                                return (
+                                                    <button
+                                                        key={opt.value}
+                                                        type="button"
+                                                        disabled={isDisabled}
+                                                        onClick={() =>
+                                                            setValue("gender", opt.value, { shouldValidate: true })
+                                                        }
+                                                        className={cn(
+                                                            "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all disabled:opacity-50",
+                                                            isSelected
+                                                                ? opt.activeClass
+                                                                : "border-input bg-transparent text-muted-foreground hover:bg-muted"
+                                                        )}
+                                                    >
+                                                        {opt.label}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </FieldContent>
+                                    <FieldError
+                                        errors={[
+                                            { message: errors.gender?.message },
+                                        ]}
+                                    />
+                                </Field>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     {/* Quốc tịch */}
@@ -794,11 +797,9 @@ export function TeacherDrawer({
 
                                 {/* Trạng thái */}
                                 <Field data-invalid={!!errors.status}>
-                                    <FieldLabel>
-                                        Trạng thái <span className="text-destructive">*</span>
-                                    </FieldLabel>
+                                    <FieldLabel>Trạng thái</FieldLabel>
                                     <FieldContent>
-                                        <div className="flex gap-4">
+                                        <div className="flex gap-2">
                                             {statusOptions.map((opt) => {
                                                 const isSelected = watch("status") === opt.value
                                                 return (
@@ -806,32 +807,20 @@ export function TeacherDrawer({
                                                         key={opt.value}
                                                         type="button"
                                                         disabled={isDisabled}
-                                                        onClick={() =>
-                                                            form.setValue("status", opt.value as "active" | "inactive", { shouldValidate: true })
-                                                        }
+                                                        onClick={() => setValue("status", opt.value as "active" | "inactive", { shouldValidate: true })}
                                                         className={cn(
-                                                            "flex-1 flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 transition-all duration-200 disabled:opacity-50",
+                                                            "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all disabled:opacity-50",
                                                             isSelected
                                                                 ? opt.activeClass
-                                                                : "border-muted bg-muted/20 text-muted-foreground hover:border-muted-foreground/30 hover:bg-muted/40"
+                                                                : "border-input bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                                                         )}
                                                     >
-                                                        {opt.value === "active" ? (
-                                                            <ShieldCheck className={cn("h-5 w-5", isSelected ? "text-emerald-500" : "text-muted-foreground")} />
-                                                        ) : (
-                                                            <ShieldAlert className={cn("h-5 w-5", isSelected ? "text-rose-500" : "text-muted-foreground")} />
-                                                        )}
-                                                        <span className="text-sm font-bold">{opt.label}</span>
+                                                        {opt.label}
                                                     </button>
                                                 )
                                             })}
                                         </div>
                                     </FieldContent>
-                                    <FieldError
-                                        errors={[
-                                            { message: errors.status?.message },
-                                        ]}
-                                    />
                                 </Field>
 
                                 <div className="grid grid-cols-2 gap-4">

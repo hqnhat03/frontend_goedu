@@ -9,21 +9,13 @@ import { AxiosError } from "axios"
 import { Calendar, Camera, Globe, Loader2, Mail, MapPin, Phone, Shield, User } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
+import { type Profile } from "@/types/ProfileType"
 import { toast } from "sonner"
 
-interface AdminProfile {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  avatar: string;
-  address: string;
-  date_of_birth: string;
-}
 
 export default function ProfilePage() {
   const { user: authUser } = useAuthStore()
-  const [profile, setProfile] = React.useState<AdminProfile | null>(null)
+  const [profile, setProfile] = React.useState<Profile | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [isUploading, setIsUploading] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -162,7 +154,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600">
                 <MapPin className="h-4 w-4 text-slate-400" />
-                <span className="font-medium truncate" title={displayAddress}>{displayAddress || 'Chưa cập nhật địa chỉ'}</span>
+                <span className="font-medium truncate" title={displayAddress ?? undefined}>{displayAddress || 'Chưa cập nhật địa chỉ'}</span>
               </div>
             </div>
 

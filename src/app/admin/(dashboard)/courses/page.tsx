@@ -21,16 +21,7 @@ import Link from "next/link"
 import * as React from "react"
 
 import { Can } from "@/components/auth/can"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDeleteModal } from "@/components/shared/ConfirmDeleteModal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -209,7 +200,9 @@ export default function CoursesPage() {
       const result = response.data
       if (result.success) {
         toast.success(result.message || "Xóa khóa học thành công")
-        fetchCourses()
+        // Update local state instead of re-fetching
+        setItems(prev => prev.filter(item => item.id !== (result.data || courseToDelete.id)))
+        setTotalItems(prev => Math.max(0, prev - 1))
       } else {
         toast.error(result.message || "Xóa thất bại")
       }
@@ -567,37 +560,14 @@ export default function CoursesPage() {
         </div>
       </div>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận xóa khóa học</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bạn có chắc chắn muốn xóa khóa học <strong>{courseToDelete?.name}</strong>?
-              Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn và hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleDelete()
-              }}
-              className="bg-destructive text-white hover:bg-destructive/90"
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Đang xóa...
-                </>
-              ) : (
-                "Xác nhận xóa"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteModal
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDelete}
+        loading={isDeleting}
+        title="Xác nhận xóa khóa học"
+        itemName={courseToDelete?.name}
+      />
 
       {/* Footer Info */}
       <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4 text-sm text-muted-foreground border-t bg-muted/10">

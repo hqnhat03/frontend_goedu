@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { type Role } from "@/types/RoleType"
 import * as z from "zod"
 
 import {
@@ -55,10 +56,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-interface Role {
-  id: number
-  name: string
-}
 
 const roleSchema = z.object({
   name: z.string().min(1, "Tên vai trò không được để trống"),

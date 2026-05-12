@@ -23,6 +23,18 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/lib/axios"
 import { AxiosError } from "axios"
+import Image from "next/image"
+
+interface DashboardActivity {
+  id: number
+  action: string
+  description: string
+  subject_name: string | null
+  subject_type: string | null
+  causer_name: string
+  causer_avatar: string | null
+  created_at: string
+}
 
 interface DashboardData {
   total_teacher: number
@@ -30,6 +42,7 @@ interface DashboardData {
   total_course: number
   total_new_student: number
   student_growth: Array<{ label: string; count: number }>
+  recent_activities: DashboardActivity[]
 }
 
 export default function DashboardPage() {
@@ -176,22 +189,50 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="size-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold border border-primary/20">
-                    {i}
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-4 p-2">
+                    <Skeleton className="size-9 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/4" />
+                    </div>
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Học sinh mới đăng ký
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {i * 2} phút trước
-                    </p>
+                ))
+              ) : data?.recent_activities && data.recent_activities.length > 0 ? (
+                data.recent_activities.map((activity) => (
+                  <div key={activity.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="size-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold border border-primary/20 uppercase overflow-hidden">
+                      {activity.causer_avatar ? (
+                        <Image src={activity.causer_avatar} alt={activity.causer_name} className="size-full object-cover" />
+                      ) : (
+                        activity.causer_name.substring(0, 2)
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {activity.description}
+                        {activity.subject_name && (
+                          <span className="text-primary ml-1">
+                            {activity.subject_name}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Bởi {activity.causer_name} • {activity.created_at}
+                      </p>
+                    </div>
+                    <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${activity.action.includes('tạo mới') ? 'bg-green-500' :
+                        activity.action.includes('cập nhật') ? 'bg-blue-500' :
+                          activity.action.includes('xóa') ? 'bg-red-500' : 'bg-primary'
+                      }`} />
                   </div>
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                ))
+              ) : (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  Chưa có hoạt động nào.
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>

@@ -65,20 +65,7 @@ import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
 import { AxiosError } from "axios"
 
-// ─────────────────────────── Types ───────────────────────────
-
-export interface Guardian {
-    id: number | string
-    name: string
-    email: string
-    phone: string
-    address?: string
-    gender?: string
-    status: "active" | "inactive"
-    date_of_birth?: string
-    avatar?: string | null
-    students?: { id: number; name: string; email?: string }[]
-}
+import { type Guardian } from "@/types/GuardianType"
 
 // ─────────────────────────── Schema ───────────────────────────
 
@@ -103,9 +90,24 @@ type GuardianFormValues = z.infer<typeof guardianSchema>
 // ─────────────────────────── Helpers ───────────────────────────
 
 const genderOptions = [
-    { value: "male", label: "Nam" },
-    { value: "female", label: "Nữ" },
-    { value: "other", label: "Khác" },
+    {
+        value: "male",
+        label: "Nam",
+        activeClass:
+            "bg-blue-500/10 border-blue-500/50 text-blue-600 dark:bg-blue-950 dark:border-blue-500 dark:text-blue-300",
+    },
+    {
+        value: "female",
+        label: "Nữ",
+        activeClass:
+            "bg-pink-500/10 border-pink-500/50 text-pink-600 dark:bg-pink-950 dark:border-pink-500 dark:text-pink-300",
+    },
+    {
+        value: "other",
+        label: "Khác",
+        activeClass:
+            "bg-gray-500/10 border-gray-500/50 text-gray-600 dark:bg-gray-950 dark:border-gray-500 dark:text-gray-300",
+    },
 ]
 
 const statusOptions = [
@@ -117,7 +119,7 @@ const statusOptions = [
     },
     {
         value: "inactive",
-        label: "Tạm khóa",
+        label: "Bị khóa",
         activeClass:
             "bg-rose-50 border-rose-500 text-rose-700 dark:bg-rose-950 dark:border-rose-500 dark:text-rose-300",
     },
@@ -146,7 +148,7 @@ interface GuardianDrawerProps {
     /** Required for edit / view */
     guardian?: Guardian | null
     /** Callback after successful create/edit */
-    onSuccess?: () => void
+    onSuccess?: (data?: Guardian) => void
     onClose?: () => void
     /** Custom trigger element — wrapping will open the drawer.
      *  If omitted, you must control open state externally via `mode`. */
@@ -218,6 +220,7 @@ export function GuardianDrawer({
         formState: { errors },
         reset,
         watch,
+        setValue,
     } = form
 
     const currentAvatar = watch("avatar")
@@ -226,15 +229,21 @@ export function GuardianDrawer({
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = React.useRef<HTMLInputElement>(null)
+    const fetchedGuardianIdRef = React.useRef<string | number | null>(null)
 
     // Reset + load data when drawer opens
     useEffect(() => {
-        if (!open) return
+        if (!open) {
+            fetchedGuardianIdRef.current = null
+            return
+        }
         studentDict.current.clear()
         setStudents([])
         setSearchTerm("")
 
         if ((internalMode === "edit" || internalMode === "view") && guardian) {
+            if (fetchedGuardianIdRef.current === guardian.id) return
+
             setIsFetching(true)
             api.get(`/admin/guardians/${guardian.id}`)
                 .then((res) => {
@@ -267,6 +276,7 @@ export function GuardianDrawer({
                             }))
                         )
                     }
+                    fetchedGuardianIdRef.current = guardian.id
                 })
                 .catch((err) => {
                     toast.error(
@@ -277,6 +287,8 @@ export function GuardianDrawer({
                 })
                 .finally(() => setIsFetching(false))
         } else {
+            if (fetchedGuardianIdRef.current === "create") return
+
             reset({
                 name: "",
                 email: "",
@@ -287,6 +299,7 @@ export function GuardianDrawer({
                 avatar: "",
                 student_ids: [],
             })
+            fetchedGuardianIdRef.current = "create"
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, internalMode, guardian?.id])
@@ -340,16 +353,17 @@ export function GuardianDrawer({
                 if (res.data?.success === false)
                     throw new Error(res.data.message || "Lỗi khi cập nhật")
                 toast.success("Cập nhật phụ huynh thành công!")
+                setInternalMode("view")
+                onSuccess?.(res.data?.data || res.data)
             } else {
                 const res = await api.post("/admin/guardians", payload)
                 if (res.data?.success === false)
                     throw new Error(res.data.message || "Lỗi khi tạo")
                 toast.success("Thêm phụ huynh thành công!")
                 reset()
+                handleOpenChange(false)
+                onSuccess?.()
             }
-
-            handleOpenChange(false)
-            onSuccess?.()
         } catch (err: unknown) {
             if (err instanceof AxiosError) {
                 const msg = err.response?.data?.message || "Đã có lỗi xảy ra."
@@ -775,7 +789,7 @@ export function GuardianDrawer({
                                                     type="button"
                                                     disabled={isDisabled}
                                                     onClick={() =>
-                                                        form.setValue(
+                                                        setValue(
                                                             "gender",
                                                             opt.value,
                                                             {
@@ -787,7 +801,7 @@ export function GuardianDrawer({
                                                     className={[
                                                         "flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all disabled:opacity-50",
                                                         isSelected
-                                                            ? "bg-primary/10 border-primary text-primary"
+                                                            ? opt.activeClass
                                                             : "border-input bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
                                                     ].join(" ")}
                                                 >

@@ -17,16 +17,7 @@ import {
 import * as React from "react"
 
 import { Can } from "@/components/auth/can"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { ConfirmDeleteModal } from "@/components/shared/ConfirmDeleteModal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -54,7 +45,8 @@ import api from "@/lib/axios"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { AdminDrawer, type Admin } from "./_components/AdminDrawer"
+import { type Admin } from "@/types/AdminType"
+import { AdminDrawer } from "./_components/AdminDrawer"
 
 export default function AdminsPage() {
   const router = useRouter()
@@ -173,7 +165,9 @@ export default function AdminsPage() {
 
       if (response.status === 200 || response.data?.success) {
         toast.success(response.data?.message || "Xóa quản trị viên thành công")
-        setAdmins(prev => prev.filter(a => a.id !== adminToDelete.id))
+        const deletedId = response.data?.data || adminToDelete.id
+        setAdmins(prev => prev.filter(a => a.id !== deletedId))
+        setTotalItems(prev => Math.max(0, prev - 1))
       }
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -568,35 +562,14 @@ export default function AdminsPage() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold flex items-center gap-2">
-              <div className="p-2 bg-rose-100 text-rose-600 rounded-full">
-                <Trash2 className="h-5 w-5" />
-              </div>
-              Xác nhận xóa tài khoản?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-base py-2">
-              Bạn đang yêu cầu xóa tài khoản quản trị của <strong>{adminToDelete?.name}</strong>.
-              Hành động này <span className="text-destructive font-semibold underline decoration-2 underline-offset-4">không thể hoàn tác</span> và sẽ gỡ bỏ mọi quyền truy cập của người dùng này.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel disabled={isDeleting} className="rounded-xl border-muted">Bỏ qua</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                handleConfirmDelete()
-              }}
-              disabled={isDeleting}
-              className="bg-destructive text-white hover:bg-destructive/90 rounded-xl px-8 shadow-lg shadow-rose-200"
-            >
-              {isDeleting ? "Đang xử lý..." : "Chấp nhận xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteModal
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        title="Xác nhận xóa quản trị viên"
+        itemName={adminToDelete?.name}
+      />
 
       {/* Admin Drawer */}
       <AdminDrawer
@@ -606,8 +579,14 @@ export default function AdminsPage() {
           setDrawerMode(undefined)
           setSelectedAdmin(null)
         }}
-        onSuccess={() => {
-          fetchAdmins()
+        onSuccess={(data?: Admin) => {
+          if (data) {
+            setAdmins(prev => prev.map(a => a.id == data.id ? { ...a, ...data } : a))
+            setSelectedAdmin(prev => prev && prev.id == data.id ? { ...prev, ...data } : prev)
+            setDrawerMode("view")
+          } else {
+            fetchAdmins()
+          }
         }}
       />
     </div>

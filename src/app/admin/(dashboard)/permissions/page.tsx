@@ -23,6 +23,7 @@ import {
   BookOpen,
   CheckCircle2,
   GraduationCap,
+  History,
   Key,
   Layers,
   LayoutDashboard,
@@ -43,13 +44,9 @@ import {
 } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from 'react';
+import { type Role } from "@/types/RoleType"
 import { toast } from 'sonner';
 
-interface Role {
-  id: number;
-  name: string;
-  permissions: string[];
-}
 
 interface PermissionData {
   roles: Role[];
@@ -72,6 +69,7 @@ const GROUP_CONFIG: Record<string, { label: string; icon: React.ComponentType }>
   permission: { label: 'Phân quyền', icon: Key },
   student_in_course: { label: 'HS trong khóa', icon: UserCheck },
   course_registration: { label: 'Đăng ký khóa học', icon: GraduationCap },
+  activity_log: { label: 'Nhật ký hoạt động', icon: History },
 };
 
 const ACTION_LABELS: Record<string, string> = {
@@ -117,7 +115,7 @@ export default function PermissionsPage() {
         // Fallback to deriving all_permissions from roles if needed
         const roles = response.data.data;
         const allPermissionsSet = new Set<string>();
-        roles.forEach((r: Role) => r.permissions.forEach((p: string) => allPermissionsSet.add(p)));
+        roles.forEach((r: Role) => (r.permissions || []).forEach((p: string) => allPermissionsSet.add(p)));
         rawData = {
           roles,
           all_permissions: Array.from(allPermissionsSet)
@@ -129,7 +127,7 @@ export default function PermissionsPage() {
       // Initialize local state
       const initialPermissions: Record<number, string[]> = {};
       rawData.roles.forEach(role => {
-        initialPermissions[role.id] = [...role.permissions];
+        initialPermissions[role.id] = [...(role.permissions || [])];
       });
       setRolePermissions(initialPermissions);
 
@@ -205,9 +203,9 @@ export default function PermissionsPage() {
     if (!originalRole) return false;
 
     const current = rolePermissions[roleId] || [];
-    if (current.length !== originalRole.permissions.length) return true;
+    if (current.length !== (originalRole.permissions || []).length) return true;
 
-    return !current.every(p => originalRole.permissions.includes(p));
+    return !current.every(p => (originalRole.permissions || []).includes(p));
   };
 
   // Grouping logic
